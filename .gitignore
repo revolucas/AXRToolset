@@ -1,0 +1,12 @@
+*.tmp
+*.backup
+*.bak
+*.bkp
+*.xr
+.cmfid_gamedata
+errors.log
+xray_sections.ltx
+coc_unpacked
+vanilla_unpacked
+canvas_ui_icon_equipment.png
+new_ui_icon_equipment.png
