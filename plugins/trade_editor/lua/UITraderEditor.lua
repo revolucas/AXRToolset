@@ -25,14 +25,18 @@ end
 function cUITraderEditor:Reinit()
 	cUIBase.Reinit(self)
 	
-	self:Gui("Add, Tab2, x0 y0 w1024 h720 AltSubmit, Buy/Sell Editor")
+	self:Gui("Add, Tab2, x0 y0 w1024 h720 AltSubmit vUITraderEditorTab hwndUITraderEditorTab_H, Buy/Sell Editor|Death Config")
 	self:Gui("Tab, Buy/Sell Editor")
 		local valid_sections = self:GetSectionList()
-		self:Gui("Add, DropDownList, gOnScriptControlAction x22 y69 w320 h30 R40 H300 vUITraderEditorSection hwndUITraderEditorSection_H, "..valid_sections)
-
 		self:Gui("Add, Text, x22 y49 w140 h20, Section:")
-		self:Gui("Add, ListView, gOnScriptControlAction x22 y109 w820 h440 grid cBlack +altsubmit -multi vUITraderEditorLV1 hwndUITraderEditorLV1_H, file|buy_condition|sell_condition|buy_supplies1|buy_supplies2|buy_supplies3|buy_supplies4|buy_supplies5")
+		self:Gui("Add, DropDownList, gOnScriptControlAction x22 y69 w320 h30 R40 H300 vUITraderEditorSection1 hwndUITraderEditorSection1_H, "..valid_sections)
 		self:Gui("Add, Text, x550 y75 w200 h20, Right-Click to Edit!")
+		self:Gui("Add, ListView, gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITraderEditorLV1 hwndUITraderEditorLV1_H, file|buy_condition|sell_condition|buy_supplies1|buy_supplies2|buy_supplies3|buy_supplies4|buy_supplies5")
+	self:Gui("Tab, Death Config")
+		self:Gui("Add, Text, x22 y49 w140 h20, Section:")
+		self:Gui("Add, DropDownList, gOnScriptControlAction x22 y69 w320 h30 R40 H300 vUITraderEditorSection2 hwndUITraderEditorSection2_H, "..valid_sections)	
+		self:Gui("Add, Text, x550 y75 w200 h20, Right-Click to Edit!")
+		self:Gui("Add, ListView, gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITraderEditorLV2 hwndUITraderEditorLV2_H, file|keep_items|item_count|base|stalker|bandit|killer|dolg|freedom|army|monolith|csky|ecolog")
 	self:Gui("Show, w1024 h720, Trade Editor")
 		
 	LV("LV_Delete",self.ID)
@@ -45,10 +49,14 @@ end
 
 function cUITraderEditor:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
 	cUIBase.OnScriptControlAction(self,hwnd,event,info)
+
 	if (hwnd == tonumber(ahkGetVar("UITraderEditorShow_H"))) then 
 		self:Show(true)
-	elseif (hwnd == tonumber(ahkGetVar("UITraderEditorLV1_H"))) then 
-		local selected = trim(ahkGetVar("UITraderEditorSection"))
+	elseif (hwnd == tonumber(ahkGetVar("UITraderEditorLV1_H"))) then
+		self:Gui("Submit, NoHide")
+		local tab = ahkGetVar("UITraderEditorTab")
+	
+		local selected = trim(ahkGetVar("UITraderEditorSection"..tab))
 		if (selected == nil or selected == "") then 
 			return 
 		end		
@@ -60,11 +68,30 @@ function cUITraderEditor:OnScriptControlAction(hwnd,event,info) -- needed becaus
 				UIModify.GetAndShow()
 			end
 		end
-	elseif (hwnd == tonumber(ahkGetVar("UITraderEditorLV1Find_H"))) then 
-		local text = ahkGetVar("UITraderEditorLV1Find")
-	elseif (hwnd == tonumber(ahkGetVar("UITraderEditorSection_H"))) then 	
+	elseif (hwnd == tonumber(ahkGetVar("UITraderEditorSection1_H"))) then 	
 		self:Gui("Submit, NoHide")
-		self:FillListView()
+		local tab = ahkGetVar("UITraderEditorTab")
+		self:FillListView(tab)
+	elseif (hwnd == tonumber(ahkGetVar("UITraderEditorLV2_H"))) then
+		self:Gui("Submit, NoHide")
+		local tab = ahkGetVar("UITraderEditorTab")
+	
+		local selected = trim(ahkGetVar("UITraderEditorSection"..tab))
+		if (selected == nil or selected == "") then 
+			return 
+		end		
+		
+		if (event == "RightClick") then
+			local option = self.list[tonumber(info)]
+			if (option and not self.listItemSelected) then
+				self.listItemSelected = tonumber(info)
+				UIModify.GetAndShow()
+			end
+		end
+	elseif (hwnd == tonumber(ahkGetVar("UITraderEditorSection2_H"))) then 	
+		self:Gui("Submit, NoHide")
+		local tab = ahkGetVar("UITraderEditorTab")
+		self:FillListView(tab)
 	end
 end
 
@@ -76,11 +103,13 @@ function cUITraderEditor:GetSectionList()
 	return ""
 end
 
-function cUITraderEditor:FillListView()
+function cUITraderEditor:FillListView(typ)
+	typ = tostring(typ)
+	LVTop(self.ID,"UITraderEditorLV"..typ)
 	LV("LV_Delete",self.ID)
 	empty(self.list)
 
-	local selected = trim(ahkGetVar("UITraderEditorSection"))
+	local selected = trim(ahkGetVar("UITraderEditorSection"..typ))
 	if (selected == nil or selected == "") then 
 		return 
 	end
@@ -90,41 +119,76 @@ function cUITraderEditor:FillListView()
 		Msg("Error: Please set gamedata path in settings!")
 		return 
 	end 
-	dir = dir .. "\\configs\\misc\\trade"
-	
-	local function on_execute(path,fname)
-		if not (self.ltx[fname]) then 
-			self.ltx[fname] = IniFile.New(path.."\\"..fname)
-		end
-		
-		local buy_cond= self.ltx[fname]:GetValue("trader","buy_condition")
-		buy_cond = self.ltx[fname]:GetValue(buy_cond,selected)
-		
-		local sell_cond = self.ltx[fname]:GetValue("trader","sell_condition")
-		sell_cond = self.ltx[fname]:GetValue(sell_cond,selected)
-		
-		local buy_supp = self.ltx[fname]:GetValue("trader","buy_supplies")
-		
-		local t,a,b = {},{},{}
-		if (buy_supp and buy_supp ~= "") then
-			t = Xray.parse_condlist(buy_supp)
+
+	if (typ == "1") then
+		local function on_execute(path,fname)
+			if not (self.ltx[fname]) then 
+				self.ltx[fname] = IniFile.New(path.."\\"..fname,true)
+			end
 			
-			table.sort(t)
-			
-			for i=1,#t do 
-				local v = self.ltx[fname]:GetValue(t[1],selected) or ""
-				table.insert(a,v)
-				b[t[i]] = v
+			if (self.ltx[fname]) then
+				local buy_cond= self.ltx[fname]:GetValue("trader","buy_condition")
+				buy_cond = self.ltx[fname]:GetValue(buy_cond,selected)
+				
+				local sell_cond = self.ltx[fname]:GetValue("trader","sell_condition")
+				sell_cond = self.ltx[fname]:GetValue(sell_cond,selected)
+				
+				local buy_supp = self.ltx[fname]:GetValue("trader","buy_supplies")
+				
+				local t,a,b = {},{},{}
+				if (buy_supp and buy_supp ~= "") then
+					t = Xray.parse_condlist(buy_supp)
+					
+					table.sort(t)
+					
+					for i=1,#t do 
+						local v = self.ltx[fname]:GetValue(t[1],selected) or ""
+						table.insert(a,v)
+						b[t[i]] = v
+					end
+				end
+
+				LV("LV_ADD",self.ID,"",fname,buy_cond,sell_cond, unpack(a))
+					
+				table.insert(self.list,{section=selected,path=path.."\\"..fname,buy_condition=buy_cond,sell_condition=sell_cond, buy_supplies=b})
 			end
 		end
-
-		LV("LV_ADD",self.ID,"",fname,buy_cond,sell_cond, unpack(a))
+		
+		recurse_subdirectories_and_execute(dir.."\\configs\\misc\\trade",{"ltx"},on_execute)
+	else
+		-- death configs 
+		local fname = "death_generic.ltx"
+		if not (self.ltx[fname]) then 
+			self.ltx[fname] = IniFile.New(dir.."\\configs\\misc\\"..fname,true)
+		end
+		if (self.ltx[fname]) then 
+		
+			local keep_items = self.ltx[fname]:GetValue("keep_items",selected)
+			local item_count = self.ltx[fname]:GetValue("item_count",selected)
 			
-		table.insert(self.list,{section=selected,path=path.."\\"..fname,buy_condition=buy_cond,sell_condition=sell_cond, buy_supplies=b})
+			LV("LV_ADD",self.ID,"",fname,keep_items,item_count)
+			table.insert(self.list,{section=selected,path=dir.."\\configs\\misc\\"..fname,keep_items=keep_items,item_count=item_count})
+		end
+		
+		local fname = "death_items_by_communities.ltx"
+		if not (self.ltx[fname]) then 
+			self.ltx[fname] = IniFile.New(dir.."\\configs\\misc\\"..fname,true)
+		end
+		if (self.ltx[fname]) then 
+			local v = {}
+			local t = {"base","stalker","bandit","killer","dolg","freedom","army","monolith","csky","ecolog"}
+			for i=1,#t do 
+				v[t[i]] = self.ltx[fname]:GetValue(t[i],selected)
+			end 
+			
+			LV("LV_ADD",self.ID,"",fname,"","",v.base,v.stalker,v.bandit,v.killer,v.dolg,v.freedom,v.army,v.monolith,v.csky,v.ecolog)
+			table.insert(self.list,{section=selected,path=dir.."\\configs\\misc\\"..fname,base=v.base,stalker=v.stalker,bandit=v.bandit,killer=v.killer,dolg=v.dolg,freedom=v.freedom,army=v.army,monolith=v.monolith,csky=v.csky,ecolog=v.ecolog})
+		end
 	end
 	
-	recurse_subdirectories_and_execute(dir,{"ltx"},on_execute)
-	LV("LV_ModifyCol",self.ID)
-	LV("LV_ModifyCol",self.ID,"1","Sort CaseLocale")
-	LV("LV_Modify",self.ID,LV("LV_GetCount"),"Vis")
+	for i=1,16 do
+		LV("LV_ModifyCol",self.ID,tostring(i),"AutoHdr")
+	end
+	--LV("LV_ModifyCol",self.ID,"1","Sort CaseLocale")
+	--LV("LV_Modify",self.ID,LV("LV_GetCount"),"Vis")
 end

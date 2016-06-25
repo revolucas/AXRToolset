@@ -25,13 +25,28 @@ function cUIModify:Reinit()
 	local fname = trim_directory(list.path)
 	
 	self:Gui("Add, Text, w300 h30, "..fname)
-	Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit1", list.buy_condition)
-	Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit2", list.sell_condition)
 	
-	local cnt = 3
-	for sec,v in pairs(list.buy_supplies) do 
-		Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit"..cnt,v)
-		cnt = cnt + 1
+	local tab = ahkGetVar("UITraderEditorTab")
+	if (tab == "1") then
+		Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit1", list.buy_condition)
+		Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit2", list.sell_condition)
+		
+		local cnt = 3
+		for sec,v in pairs(list.buy_supplies) do 
+			Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit"..cnt,v)
+			cnt = cnt + 1
+		end
+	else 
+		local t
+		if (fname == "death_generic.ltx") then 
+			t = {"keep_items","item_count"}
+		else 
+			t = {"base","stalker","bandit","killer","dolg","freedom","army","monolith","csky","ecolog"}
+		end
+		
+		for i=1,#t do 
+			Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit"..i, list[t[i]])
+		end
 	end
  
 	self:Gui("Add, Button, gOnScriptControlAction x12 default hwndUIModifyAccept_H, Accept")
@@ -51,32 +66,54 @@ end
 
 function cUIModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
 	cUIBase.OnScriptControlAction(self,hwnd,event,info)
+	
 	if (hwnd == tonumber(ahkGetVar("UIModifyAccept_H"))) then
 		self:Gui("Submit, NoHide")
+		local tab = ahkGetVar("UITraderEditorTab")
 		
 		local wnd = UITraderEditor.Get()
 		local list = assert(wnd.list[wnd.listItemSelected])
 		local fname = trim_directory(list.path)
-		
+	
 		assert(wnd.ltx[fname])
-		
-		local buy_cond= wnd.ltx[fname]:GetValue("trader","buy_condition")
-		wnd.ltx[fname]:SetValue(buy_cond,list.section,ahkGetVar("UIModifyEdit1"))
-		
-		local sell_cond= wnd.ltx[fname]:GetValue("trader","sell_condition")
-		wnd.ltx[fname]:SetValue(sell_cond,list.section,ahkGetVar("UIModifyEdit2"))
-		
-		local cnt = 3
-		for sec,v in pairs(list.buy_supplies) do 
-			wnd.ltx[fname]:SetValue(sec,list.section,ahkGetVar("UIModifyEdit"..cnt))
-			cnt = cnt + 1
+
+		if (tab == "1") then
+			local t = {wnd.ltx[fname]:GetValue("trader","buy_condition"),wnd.ltx[fname]:GetValue("trader","sell_condition")}
+			for i=1,#t do
+				local v = ahkGetVar("UIModifyEdit"..i) or ""
+				wnd.ltx[fname]:SetValue(t[i],list.section,v)
+			end
+			local cnt = 3
+			for sec,t in pairs(list.buy_supplies) do 
+				local v = ahkGetVar("UIModifyEdit"..cnt)
+				wnd.ltx[fname]:SetValue(sec,list.section,v)
+				cnt = cnt + 1
+			end
+		else 
+			if (fname == "death_generic.ltx") then
+				local t = {"keep_items","item_count"}
+				for i=1,#t do
+					local v = ahkGetVar("UIModifyEdit"..i)
+					if (v and v ~= "") then
+						wnd.ltx[fname]:SetValue(t[i],list.section,v)
+					end
+				end
+			elseif (fname == "death_items_by_communities.ltx") then 
+				local t = {"base","stalker","bandit","killer","dolg","freedom","army","monolith","csky","ecolog"}
+				for i=1,#t do
+					local v = ahkGetVar("UIModifyEdit"..i)
+					if (v and v ~= "") then
+						wnd.ltx[fname]:SetValue(t[i],list.section,v)
+					end
+				end
+			end
 		end
 		
 		wnd.ltx[fname]:SaveExt()
 		
 		self:Show(false)
 		
-		wnd:FillListView()
+		wnd:FillListView(tab)
 	elseif (hwnd == tonumber(ahkGetVar("UIModifyCancel_H"))) then
 		self:Show(false)
 	end

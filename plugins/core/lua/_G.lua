@@ -82,6 +82,5 @@ function ApplicationBegin()
 end
 
 function GuiClose(idx)
-	Msg("Real GuiClose %s",idx)
 	CallbackSend("OnGuiClose",tostring(idx))
 end

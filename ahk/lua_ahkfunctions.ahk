@@ -186,6 +186,7 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "ahkFunction", RegisterCallback("ahkFunction","C"))
    lua_register(l, "ahkGetVar", RegisterCallback("ahkGetVar","C"))
    lua_register(l, "LV", RegisterCallback("LV","C"))
+   lua_register(l, "LVTop", RegisterCallback("LVTop","C"))
    lua_register(l, "LVGetText", RegisterCallback("LVGetText","C"))
 }
 
@@ -2417,6 +2418,19 @@ LVGetText(L)
    Return, 1
 }
 
+LVTop(L)
+{
+   Global
+   
+   arg1 := lua_tostring(L, 1)
+   arg2 := lua_tostring(L, 2)
+   
+   Gui, %arg1%:Default
+   Gui, %arg1%:listview, %arg2%
+   
+   Return 0
+}
+
 LV(L)
 {
 	Global
@@ -2431,6 +2445,7 @@ LV(L)
    
    ;because we are working with new thread
 	Gui, %arg2%:Default
+
    
 	if(n==2)
 		res := %arg1%()
@@ -2458,7 +2473,15 @@ LV(L)
 		res := %arg1%(arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13)
 	if(n==14)
 		res := %arg1%(arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14)
-	 
+	if(n==15)
+		res := %arg1%(arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15)
+	if(n==16)
+		res := %arg1%(arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16)
+	if(n==17)
+		res := %arg1%(arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17)
+	if(n==18)
+		res := %arg1%(arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18)
+        
 	lua_pushstring(L, res)
 	Return, 1
 }
