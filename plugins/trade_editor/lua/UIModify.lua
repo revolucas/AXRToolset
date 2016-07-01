@@ -1,6 +1,6 @@
 function Get()
 	if not (UIModifyWnd) then 
-		UIModifyWnd = cUIModify()
+		UIModifyWnd = cUIModify("2")
 	end
 	return UIModifyWnd
 end
@@ -10,30 +10,30 @@ function GetAndShow()
 end
 
 cUIModify = Class{__includes={cUIBase}}
-function cUIModify:init()
-	cUIBase.init(self)
+function cUIModify:init(id)
+	cUIBase.init(self,id)
 end
 
 function cUIModify:Reinit()
 	cUIBase.Reinit(self)
 	
 	self:Gui("+AlwaysonTop")
-	self:Gui("Font, s10, Verdana")
+	self:Gui("Font|s10|Verdana")
 	
 	local wnd = UITraderEditor.Get()
 	local list = wnd.list[wnd.listItemSelected]
 	local fname = trim_directory(list.path)
 	
-	self:Gui("Add, Text, w300 h30, "..fname)
+	self:Gui("Add|Text|w300 h30|%s",fname)
 	
 	local tab = ahkGetVar("UITraderEditorTab")
 	if (tab == "1") then
-		Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit1", list.buy_condition)
-		Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit2", list.sell_condition)
+		self:Gui("Add|Edit|w300 h30 vUIModifyEdit1|%s",list.buy_condition)
+		self:Gui("Add|Edit|w300 h30 vUIModifyEdit2|%s",list.sell_condition)
 		
 		local cnt = 3
 		for sec,v in pairs(list.buy_supplies) do 
-			Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit"..cnt,v)
+			self:Gui("Add|Edit|w300 h30 vUIModifyEdit%s|%s",cnt,v)
 			cnt = cnt + 1
 		end
 	else 
@@ -45,13 +45,14 @@ function cUIModify:Reinit()
 		end
 		
 		for i=1,#t do 
-			Gui(self.ID..":Add","Edit","w300 h30 vUIModifyEdit"..i, list[t[i]])
+			self:Gui("Add|Edit|w300 h30 vUIModifyEdit%s|%s",i,list[t[i]])
 		end
 	end
  
-	self:Gui("Add, Button, gOnScriptControlAction x12 default hwndUIModifyAccept_H, Accept")
-	self:Gui("Add, Button, gOnScriptControlAction x+4 hwndUIModifyCancel_H, Cancel")
-	self:Gui("Show, center, Edit Values")
+	self:Gui("Add|Button|gOnScriptControlAction x12 default vUIModifyAccept|Accept")
+	self:Gui("Add|Button|gOnScriptControlAction x+4 vUIModifyCancel|Cancel")
+	self:Gui("Show|center|Edit Values")
+	self:Gui("Default")
 end
 
 function cUIModify:OnGuiClose(idx) -- needed because it's registered to callback
@@ -65,10 +66,8 @@ function cUIModify:Destroy()
 end
 
 function cUIModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	cUIBase.OnScriptControlAction(self,hwnd,event,info)
-	
-	if (hwnd == tonumber(ahkGetVar("UIModifyAccept_H"))) then
-		self:Gui("Submit, NoHide")
+	if (hwnd == GuiControlGet(self.ID,"hwnd","UIModifyAccept")) then
+		self:Gui("Submit|NoHide")
 		local tab = ahkGetVar("UITraderEditorTab")
 		
 		local wnd = UITraderEditor.Get()
@@ -114,7 +113,7 @@ function cUIModify:OnScriptControlAction(hwnd,event,info) -- needed because it's
 		self:Show(false)
 		
 		wnd:FillListView(tab)
-	elseif (hwnd == tonumber(ahkGetVar("UIModifyCancel_H"))) then
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIModifyCancel")) then
 		self:Show(false)
 	end
 end

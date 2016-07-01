@@ -19,7 +19,7 @@ DebugConsoleInitialize()
     DllCall("AttachConsole", int, -1, int)
     DllCall("AllocConsole", int)
 
-    dllcall("SetConsoleTitle", "str","Paddy Debug Console")    ; Set the name. Example. Probably could use a_scriptname here 
+    dllcall("SetConsoleTitle", "str","AXR Toolset Console")    ; Set the name. Example. Probably could use a_scriptname here 
     h_Stdout := DllCall("GetStdHandle", "int", -11) ; get the handle
     WinSet, Bottom,, ahk_id %h_stout%      ; make sure it's on the bottom
     WinActivate,Lightroom   ; Application specific; I need to make sure this application is running in the foreground. YMMV

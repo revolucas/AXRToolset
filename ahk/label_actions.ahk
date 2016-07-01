@@ -16,16 +16,19 @@ OnScriptControlAction:
 		e = "DoubleClick"
 	
 	i := A_EventInfo
-	luaL_dostring(L,"_G.UIMainMenuWnd:OnScriptControlAction(" . h . "," . e . "," . i . ")")
+	luaL_dostring(L,"_G.GuiScriptControlAction([[" . h . "]]," . e . "," . i . ")")
 }
 Return 
 
-GuiClose:
 OnExit:
 	luaL_dostring(L,"_G.ApplicationExit()")
 	lua_close(L)
 	lua_UnloadDll(hDll)
 	ExitApp
+Return
+
+GuiClose:
+	luaL_dostring(L,"_G.GuiClose(1)")
 Return
 
 2GuiClose:

@@ -40,7 +40,7 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "FileRemoveDir", RegisterCallback("FileRemoveDir","C"))
    lua_register(l, "FileSetAttrib", RegisterCallback("FileSetAttrib","C"))
    lua_register(l, "FileSetTime", RegisterCallback("FileSetTime","C"))
-   lua_register(l, "Gosub", RegisterCallback("Gosub","C"))
+   lua_register(l, "GoSub", RegisterCallback("GoSub","C"))
    lua_register(l, "Goto", RegisterCallback("Goto","C"))
    lua_register(l, "GroupActivate", RegisterCallback("GroupActivate","C"))
    lua_register(l, "GroupAdd", RegisterCallback("GroupAdd","C"))
@@ -620,7 +620,7 @@ FileSetTime(L)
    return 0
 }
 
-Gosub(L)
+GoSub(L)
 {
    arg1 := lua_tostring(L, 1)
 
@@ -687,8 +687,10 @@ GuiControl(L)
    arg1 := lua_tostring(L, 1)
    arg2 := lua_tostring(L, 2)
    arg3 := lua_tostring(L, 3)
-
-   GuiControl, %arg1%, %arg2%, %arg3%
+   arg4 := lua_tostring(L, 4)
+   
+   Gui, %arg1%:Default
+   GuiControl, %arg2%, %arg3%, %arg4%
 
    return 0
 }
@@ -1654,12 +1656,13 @@ Gui(L)
    Global
 
    ;Gui, sub-command [, Param2, Param3, Param4]
-   SubCommand := lua_tostring(L, 1)
+   Param1 := lua_tostring(L, 1)
    Param2 := lua_tostring(L, 2)
    Param3 := lua_tostring(L, 3)
    Param4 := lua_tostring(L, 4)
-   ;Gui,1:default
-   Gui, %SubCommand%, %Param2%, %Param3%, %Param4%
+   ;Param5 := lua_tostring(L,5)
+   ;Gui, %Param1%:default
+   Gui, %Param1%, %Param2%, %Param3%, %Param4%
 
    return 0
 }
@@ -1886,11 +1889,13 @@ GetKeyState(L)
 
 GuiControlGet(L)
 {
-   Subcommand := lua_tostring(L, 1)
-   ControlID := lua_tostring(L, 2)
-   Param4 := lua_tostring(L, 3)
+   arg1 := lua_tostring(L,1)
+   arg2 := lua_tostring(L,2)
+   arg3 := lua_tostring(L,3)
+   arg4 := lua_tostring(L,4)
 
-   GuiControlGet, v, %Subcommand%, %ControlID%, %Param4%
+   Gui, %arg1%:Default
+   GuiControlGet, v, %arg2%, %arg3%, %arg4%
 
    lua_pushstring(L, v)
    Return, 1

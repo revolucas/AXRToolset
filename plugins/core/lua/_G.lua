@@ -76,11 +76,20 @@ function ApplicationBegin()
 		return
 	end
 
-	UIMainMenuWnd = UIMain.cUIMain()
+	-- Init main window
+	UIMainMenuWnd = UIMain.Get()
+	
 	IterateScriptsForEach("OnApplicationBegin")
 	CallbackSend("OnApplicationBegin")
+	
+	-- Show main window
+	UIMainMenuWnd:Show(true)
 end
 
 function GuiClose(idx)
 	CallbackSend("OnGuiClose",tostring(idx))
+end
+
+function GuiScriptControlAction(hwnd,action,info)
+	CallbackSend("OnScriptControlAction",hwnd,action,info)
 end

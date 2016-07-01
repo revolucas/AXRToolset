@@ -220,7 +220,7 @@ function strformat(s,...)
 			if (type(p[i]) == 'userdata') then
 				return 'userdata'
 			end
-			return tostring(p[i])
+			return tostring(p[i] or "")
 		end
 		s = string.gsub(s,"%%s",sr)
 	end

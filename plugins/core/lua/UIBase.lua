@@ -1,19 +1,25 @@
 cUIBase = Class{}
-function cUIBase:init()
-	self.ID = UIMainMenuWnd:GetID() 
+function cUIBase:init(id)
+	self.ID = id or "1"
 end
 
 function cUIBase:Show(bool)
 	if (bool) then
-		if not (self.isShown) then 
+		if not (self.isShown) then
 			self.isShown = true
+			if (self.parent) then 
+				self.parent:Show(false)
+			end
 			self:Create()
 		end
 	else 
-		--if (self.isShown) then
+		if (self.isShown) then
 			self.isShown = false
 			self:Destroy()
-		--end
+			if (self.parent) then 
+				self.parent:Show(true)
+			end
+		end
 	end
 end
 
@@ -32,6 +38,10 @@ function cUIBase:Create()
 end 
 
 function cUIBase:Destroy()
+	if not (self.loaded) then 
+		return 
+	end 
+	
 	self.loaded = false
 	self:Gui("Destroy")
 	
@@ -54,9 +64,10 @@ function cUIBase:OnScriptControlAction()
 
 end
 
-function cUIBase:Gui(str,...) -- If using text with commas then use normal method
+function cUIBase:Gui(str,...)
 	str = strformat(str,...)
-	local p = str_explode(str,",")
+	local p = str_explode(str,"|") -- separate string into subcommands using |
 	p[1] = self.ID .. ":" .. p[1]
+	p[4] = p[4] and p[4]:gsub("%^","|") -- replace ^ with | because AHK separator is | but we use that to separate subcommands
 	Gui(unpack(p))
 end

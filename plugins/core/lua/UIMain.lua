@@ -1,80 +1,84 @@
-cUIMain = Class{}
-function cUIMain:init()
+function Get()
+	if not (UIMainWnd) then 
+		UIMainWnd = cUIMain("1")
+	end 
+	return UIMainWnd
+end
+
+function GetAndShow()
+	Get():Show(true)
+end
+
+cUIMain = Class{__includes={cUIBase}}
+function cUIMain:init(id)
+	cUIBase.init(self,id)
 	self.plugins = {}
-	self.ID = "1"
-	self.ID_ITR = 1
+end
+
+function cUIMain:Reinit()
+	cUIBase.Reinit(self)
 	
 	self.y = 75
 	
-	self:Gui("Add, Tab2, x0 y0 w1024 h720, Plugins|Settings")
-	self:Gui("Tab, Plugins")
-	
-		-- GroupBox
-		self:Gui("Add, GroupBox, x360 y50 w250 h660, Plugins Launcher")
-	
-	self:Gui("Tab, Settings")
+	self:Gui("Add|Tab2|x0 y0 w1024 h720|Plugins^Settings")
+	self:Gui("Tab|Plugins")
 	
 		-- Buttons 
-		self:Gui("Add, Button, gOnScriptControlAction x485 y80 w25 h20 hwndUIMainBrowseGamedata_H, ...")
-		self:Gui("Add, Button, gOnScriptControlAction x485 y680 w90 h20 hwndUIMainSaveSettings_H, Save Settings")
+		-- register plugin buttons
+		for name,t in pairs(self.plugins) do 
+			self:Gui("Add|Button|gOnScriptControlAction x370 y%s w230 h20 v%s|%s",self.y,name,t.text)
+			self.y = self.y + 25
+		end
+	
+		-- GroupBox
+		self:Gui("Add|GroupBox|x360 y50 w250 h660|Plugins Launcher")
+	
+	self:Gui("Tab|Settings")
+	
+		-- GroupBox
+		self:Gui("Add|GroupBox|x10 y50 w510 h75|Gamedata Path")
+	
+		-- Buttons 
+		self:Gui("Add|Button|gOnScriptControlAction x485 y80 w25 h20 vUIMainBrowseGamedata|...")
+		self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUIMainSaveSettings|Save Settings")
 	
 		-- Editbox 
-		self:Gui("Add, Edit, gOnScriptControlAction x25 y80 w450 h20 vUIMainGamedataPath hwndUIMainGamedataPath_H, ") -- Edit System.ltx
+		self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUIMainGamedataPath|") -- Edit System.ltx
 		
-	self:Gui("Show, w1024 h720, AXR ToolSet")
+	self:Gui("Show|w1024 h720|AXR Toolset")
 	
-	-- Register Callbacks 
-	CallbackRegister("OnUIMainMenuSettingsSaved",self.OnUIMainMenuSettingsSaved,self)
-	CallbackRegister("OnApplicationBegin",self.OnApplicationBegin,self)
-end
-
-function cUIMain:Gui(str)
-	local p = str_explode(str,",")
-	p[1] = self.ID .. ":" .. p[1]
-	Gui(unpack(p))
-end
-
-function cUIMain:GetID()
-	self.ID_ITR = self.ID_ITR + 1 
-	return tostring(self.ID_ITR)
-end
+	GuiControl(self.ID,"","UIMainGamedataPath",gSettings:GetValue("core","Gamedata_Path") or "")
+end 
 
 function cUIMain:AddPluginButton(text,name,func,...)
-	self:Gui("Tab, Plugins")
-	self:Gui( strformat("Add, Button, gOnScriptControlAction x370 y%s w230 h20 hwnd%s_H, %s",self.y,name,text))
-	self.y = self.y + 25
-	self.plugins[name] = {f=func, p={...}}
+	self.plugins[name] = {text=text,f=func,p={...}}
 end
 
 function cUIMain:OnScriptControlAction(hwnd,event,info)
-	if (hwnd == nil or hwnd == "") then 
+	if (hwnd == "") then 
 		return 
 	end 
 	
-	CallbackSend("OnScriptControlAction",hwnd,event,info)
-
-	if (hwnd == tonumber(ahkGetVar("UIMainBrowseGamedata_H"))) then 
-		local dir = FileSelectFolder()
-		GuiControl("","UIMainGamedataPath",dir)
-	elseif (hwnd == tonumber(ahkGetVar("UIMainSaveSettings_H"))) then 
-		self:Gui("Submit, NoHide")
-		CallbackSend("OnUIMainMenuSettingsSaved")
-	elseif (hwnd == tonumber(ahkGetVar("UIMainGamedataPath_H"))) then  
-		--local text = ahkGetVar("UIMainGamedataPath")
+	if (hwnd == GuiControlGet(self.ID,"hwnd","UIMainBrowseGamedata")) then 
+		local dir = FileSelectFolder("*"..(gSettings:GetValue("core","Gamedata_Path") or ""))
+		GuiControl(self.ID,"","UIMainGamedataPath",dir)
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIMainSaveSettings")) then 
+		self:Gui("Submit|NoHide")
+		gSettings:SetValue("core","Gamedata_Path",ahkGetVar("UIMainGamedataPath"))
+		gSettings:Save()
 	end
 	
 	for name,t in pairs(self.plugins) do 
-		if (t.f and hwnd == tonumber(ahkGetVar(name.."_H"))) then
+		if (t.f and hwnd == GuiControlGet(self.ID,"hwnd",name)) then
 			t.f(unpack(t.p),hwnd,event,info)
 		end
 	end
 end
 
-function cUIMain:OnUIMainMenuSettingsSaved()
-	gSettings:SetValue("core","Gamedata_Path",ahkGetVar("UIMainGamedataPath"))
-	gSettings:Save()
+function cUIMain:OnGuiClose(idx)
+	GoSub("OnExit")
 end
 
-function cUIMain:OnApplicationBegin()
-	GuiControl("","UIMainGamedataPath", gSettings:GetValue("core","Gamedata_Path") or "")
+function cUIMain:Show(bool)
+	cUIBase.Show(self,bool)
 end
