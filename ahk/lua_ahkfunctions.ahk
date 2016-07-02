@@ -2415,9 +2415,7 @@ LVGetText(L)
    arg3 := lua_tostring(L, 3)
    
    Gui, %arg1%:Default
-   ;Gui, %arg1%:Listview, %arg2%
-    
-   LV_GetText(v,%arg2%,%arg3%)
+   LV_GetText(v,arg2,arg3)
    
    lua_pushstring(L, v)
    Return, 1

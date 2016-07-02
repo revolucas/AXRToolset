@@ -1,0 +1,9 @@
+snd_draw
+snd_holster
+snd_shoot
+snd_empty
+snd_reload
+snd_shoot_grenade
+snd_reload_grenade
+snd_switch
+snd_silncer_shot

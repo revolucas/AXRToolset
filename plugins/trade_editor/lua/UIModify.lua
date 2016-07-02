@@ -22,6 +22,9 @@ function cUIModify:Reinit()
 	
 	local wnd = UITraderEditor.Get()
 	local list = wnd.list[wnd.listItemSelected]
+	if not (list) then 
+		return 
+	end
 	local fname = trim_directory(list.path)
 	
 	self:Gui("Add|Text|w300 h30|%s",fname)

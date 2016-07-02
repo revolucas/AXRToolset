@@ -1,0 +1,14 @@
+hit_power 
+hit_impulse
+fire_distance
+bullet_speed
+silencer_hit_power
+silencer_hit_impulse
+silencer_fire_distance
+silencer_bullet_speed
+snd_silncer_shot
+rpm
+misfire_probability
+misfire_condition_k
+condition_shot_dec
+cam_relax_speed

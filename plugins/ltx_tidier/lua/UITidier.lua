@@ -23,8 +23,6 @@ end
 function cUITidier:Reinit()
 	cUIBase.Reinit(self)
 	
-	self:Gui("Default")
-	
 	-- GroupBox
 	self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Path")
 	self:Gui("Add|GroupBox|x10 y150 w510 h75|Output Path")

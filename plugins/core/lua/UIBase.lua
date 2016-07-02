@@ -30,11 +30,11 @@ function cUIBase:Create()
 	
 	self.loaded = true
 
+	self:Reinit()
+	
 	-- Register for callbacks
 	CallbackRegister("OnScriptControlAction",self.OnScriptControlAction,self)
 	CallbackRegister("OnGuiClose",self.OnGuiClose,self)
-		
-	self:Reinit()
 end 
 
 function cUIBase:Destroy()

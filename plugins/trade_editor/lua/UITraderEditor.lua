@@ -50,45 +50,25 @@ function cUITraderEditor:OnGuiClose(idx) -- needed because it's registered to ca
 end 
 
 function cUITraderEditor:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	if (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorLV1")) then
-		self:Gui("Submit|NoHide")
-		local tab = ahkGetVar("UITraderEditorTab")
-	
+
+	self:Gui("Submit|NoHide")
+	local tab = ahkGetVar("UITraderEditorTab") or "1"
+		
+	if (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorLV"..tab)) then
 		local selected = trim(ahkGetVar("UITraderEditorSection"..tab))
 		if (selected == nil or selected == "") then 
 			return 
 		end		
 		
 		if (event == "RightClick") then
-			local option = self.list[tonumber(info)]
-			if (option and not self.listItemSelected) then
-				self.listItemSelected = tonumber(info)
+			LVTop(self.ID,"UITraderEditorLV"..tab)
+			local txt = LVGetText(self.ID,info,"1")
+			if (txt and txt ~= "" and not self.listItemSelected) then 
+				self.listItemSelected = txt
 				UIModify.GetAndShow()
 			end
 		end
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorSection1")) then 	
-		self:Gui("Submit|NoHide")
-		local tab = ahkGetVar("UITraderEditorTab")
-		self:FillListView(tab)
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorLV2")) then
-		self:Gui("Submit|NoHide")
-		local tab = ahkGetVar("UITraderEditorTab")
-	
-		local selected = trim(ahkGetVar("UITraderEditorSection"..tab))
-		if (selected == nil or selected == "") then 
-			return 
-		end		
-		
-		if (event == "RightClick") then
-			local option = self.list[tonumber(info)]
-			if (option and not self.listItemSelected) then
-				self.listItemSelected = tonumber(info)
-				UIModify.GetAndShow()
-			end
-		end
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorSection2")) then 	
-		self:Gui("Submit|NoHide")
-		local tab = ahkGetVar("UITraderEditorTab")
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorSection"..tab)) then 	
 		self:FillListView(tab)
 	end
 end
@@ -148,7 +128,7 @@ function cUITraderEditor:FillListView(typ)
 
 				LV("LV_ADD",self.ID,"",fname,buy_cond,sell_cond,unpack(a))
 					
-				table.insert(self.list,{section=selected,path=path.."\\"..fname,buy_condition=buy_cond,sell_condition=sell_cond,buy_supplies=b})
+				self.list[fname] = {section=selected,path=path.."\\"..fname,buy_condition=buy_cond,sell_condition=sell_cond,buy_supplies=b}
 			end
 		end
 		
@@ -165,7 +145,7 @@ function cUITraderEditor:FillListView(typ)
 			local item_count = self.ltx[fname]:GetValue("item_count",selected)
 			
 			LV("LV_ADD",self.ID,"",fname,keep_items,item_count)
-			table.insert(self.list,{section=selected,path=dir.."\\configs\\misc\\"..fname,keep_items=keep_items,item_count=item_count})
+			self.list[fname] = {section=selected,path=dir.."\\configs\\misc\\"..fname,keep_items=keep_items,item_count=item_count}
 		end
 		
 		local fname = "death_items_by_communities.ltx"
@@ -180,13 +160,12 @@ function cUITraderEditor:FillListView(typ)
 			end 
 			
 			LV("LV_ADD",self.ID,"",fname,"","",v.base,v.stalker,v.bandit,v.killer,v.dolg,v.freedom,v.army,v.monolith,v.csky,v.ecolog)
-			table.insert(self.list,{section=selected,path=dir.."\\configs\\misc\\"..fname,base=v.base,stalker=v.stalker,bandit=v.bandit,killer=v.killer,dolg=v.dolg,freedom=v.freedom,army=v.army,monolith=v.monolith,csky=v.csky,ecolog=v.ecolog})
+			self.list[fname] = {section=selected,path=dir.."\\configs\\misc\\"..fname,base=v.base,stalker=v.stalker,bandit=v.bandit,killer=v.killer,dolg=v.dolg,freedom=v.freedom,army=v.army,monolith=v.monolith,csky=v.csky,ecolog=v.ecolog}
 		end
 	end
 	
+	LV("LV_ModifyCol",self.ID,"1","Sort CaseLocale")
 	for i=1,16 do
 		LV("LV_ModifyCol",self.ID,tostring(i),"AutoHdr")
 	end
-	--LV("LV_ModifyCol",self.ID,"1","Sort CaseLocale")
-	--LV("LV_Modify",self.ID,LV("LV_GetCount"),"Vis")
 end

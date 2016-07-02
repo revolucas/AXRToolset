@@ -1,0 +1,14 @@
+scope_zoom_factor
+scope_texture
+scope_name
+scope_x
+scope_y
+silencer_name
+silencer_x
+silencer_y
+grenade_launcher_name
+grenade_launcher_x
+grenade_launcher_y
+scope_status
+silencer_status
+grenade_launcher_status

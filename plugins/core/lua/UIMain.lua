@@ -25,7 +25,7 @@ function cUIMain:Reinit()
 	
 		-- Buttons 
 		-- register plugin buttons
-		for name,t in pairs(self.plugins) do 
+		for name,t in spairs(self.plugins) do 
 			self:Gui("Add|Button|gOnScriptControlAction x370 y%s w230 h20 v%s|%s",self.y,name,t.text)
 			self.y = self.y + 25
 		end

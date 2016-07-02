@@ -1,0 +1,13 @@
+inv_name
+inv_name_short
+inv_weight
+inv_grid_width
+inv_grid_height
+inv_grid_x
+inv_grid_y
+use_condition
+max_uses
+remove_after_use
+empty_weight
+allow_repair
+dont_stack

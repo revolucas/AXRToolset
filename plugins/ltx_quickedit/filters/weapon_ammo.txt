@@ -1,0 +1,6 @@
+ammo_limit
+ammo_current
+ammo_elapsed
+ammo_mag_size
+ammo_class
+grenade_class
