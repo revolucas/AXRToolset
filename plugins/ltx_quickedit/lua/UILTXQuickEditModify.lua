@@ -32,7 +32,7 @@ function cUILTXQuickEditModify:Reinit()
 	for field,v in pairs(list) do 
 		if (field ~= "fname") then
 			self:Gui("Add|Text|x5 y%s w300 h30|%s",y,field)
-			self:Gui("Add|Edit|x200 y%s w300 h30 vUIModifyEdit%s|%s",y,field,v)
+			self:Gui("Add|Edit|x200 y%s w800 h30 vUIModifyEdit%s|%s",y,field,v)
 			y = y + 30
 		end
 	end

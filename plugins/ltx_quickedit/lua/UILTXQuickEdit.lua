@@ -158,7 +158,8 @@ function cUILTXQuickEdit:FillListView(tab)
 	for k,t in pairs(self.list) do
 		local a = {}
 		for i=1,#self.fields do
-			table.insert(a,t[self.fields[i]] or "")
+			local v = t[self.fields[i]] or ""
+			table.insert(a,v)
 		end
 		LV("LV_ADD",self.ID,"",k,unpack(a))
 	end
