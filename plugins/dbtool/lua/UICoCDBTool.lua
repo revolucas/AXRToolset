@@ -262,7 +262,7 @@ spawns = true
 		end
 	end 
 	
-	local sounds_directories = {}
+	local meshes_directories = {}
 	-- create compress_*.ltx for textures
 	local function generate_meshes_options(path,dir)
 		local data = strformat([[
