@@ -334,7 +334,7 @@ shaders = true
 sounds = true
 spawns = true
 ]]
-		for k,v in pairs(texture_directories) do 
+		for k,v in pairs(sounds_directories) do 
 			data = data .. "\nsounds\\" .. k .. " = true"
 		end
 
