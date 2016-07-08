@@ -340,7 +340,7 @@ spawns = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			texture_directories["textures_default"] = true
+			table.insert(compress,"textures_default")
 		end
 	end
 
@@ -381,7 +381,7 @@ textures = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			sounds_directories["sounds_default"] = true
+			table.insert(compress,"sounds_default")
 		end
 	end
 	
@@ -422,7 +422,7 @@ textures = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			meshes_directories["meshes_default"] = true
+			table.insert(compress,"meshes_default")
 		end
 	end
 	
