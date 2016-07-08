@@ -179,7 +179,6 @@ spawns = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			table.insert(compress,dir)
 			level_directories[dir] = true
 		end
 	end 
@@ -218,7 +217,6 @@ spawns = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			table.insert(compress,dir)
 			texture_directories[dir] = true
 		end
 	end 
@@ -257,7 +255,6 @@ spawns = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			table.insert(compress,dir)
 			sounds_directories[dir] = true
 		end
 	end 
@@ -296,7 +293,6 @@ spawns = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			table.insert(compress,dir)
 			meshes_directories[dir] = true
 		end
 	end 
@@ -454,51 +450,68 @@ textures = true
 	os.remove(parent_dir.."\\"..dir..".pack_#7")
 	os.remove(parent_dir.."\\"..dir..".pack_#8")
 				
-	for i=1,#compress do 
-		local name = compress[i]
+				
+	local function create_output(name,fname,out)
 		local chk = gSettings:GetValue("dbtool","check_"..name..tab)
 		if (chk == nil or chk == "1") then
 			RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,"compress_"..name..".ltx"), working_directory )
-			
-			local out = meshes_directories[name] and output_path.."\\resource" or texture_directories[name] and output_path.."\\resource" or level_directories[name] and output_path.."\\maps" or sounds_directories[name] and output_path.."\\sound" or outdir[name] and output_path.."\\"..outdir[name] or output_path
-			
+
 			lfs.mkdir(out)
 			
-			name = meshes_directories[name] and "meshes_"..name or texture_directories[name] and "textures_"..name or sounds_directories[name] and "sounds_"..name or name
-			
-			os.remove(out.."\\"..name..".db")
-			os.remove(out.."\\"..name..".db0")
-			os.remove(out.."\\"..name..".db1")
-			os.remove(out.."\\"..name..".db2")
-			os.remove(out.."\\"..name..".db3")
-			os.remove(out.."\\"..name..".db4")
-			os.remove(out.."\\"..name..".db5")
-			os.remove(out.."\\"..name..".db6")
-			os.remove(out.."\\"..name..".db7")
-			os.remove(out.."\\"..name..".db8")
+			os.remove(out.."\\"..fname..".db")
+			os.remove(out.."\\"..fname..".db0")
+			os.remove(out.."\\"..fname..".db1")
+			os.remove(out.."\\"..fname..".db2")
+			os.remove(out.."\\"..fname..".db3")
+			os.remove(out.."\\"..fname..".db4")
+			os.remove(out.."\\"..fname..".db5")
+			os.remove(out.."\\"..fname..".db6")
+			os.remove(out.."\\"..fname..".db7")
+			os.remove(out.."\\"..fname..".db8")
 	
 			if (file_exists(parent_dir.."\\"..dir..".pack_#1")) then
-				os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..name..".db0")
-				os.rename(parent_dir.."\\"..dir..".pack_#1",out.."\\"..name..".db1")
-				os.rename(parent_dir.."\\"..dir..".pack_#2",out.."\\"..name..".db2")
-				os.rename(parent_dir.."\\"..dir..".pack_#3",out.."\\"..name..".db3")
-				os.rename(parent_dir.."\\"..dir..".pack_#4",out.."\\"..name..".db4")
-				os.rename(parent_dir.."\\"..dir..".pack_#5",out.."\\"..name..".db5")
-				os.rename(parent_dir.."\\"..dir..".pack_#6",out.."\\"..name..".db6")
-				os.rename(parent_dir.."\\"..dir..".pack_#7",out.."\\"..name..".db7")
-				os.rename(parent_dir.."\\"..dir..".pack_#8",out.."\\"..name..".db8")
+				os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db0")
+				os.rename(parent_dir.."\\"..dir..".pack_#1",out.."\\"..fname..".db1")
+				os.rename(parent_dir.."\\"..dir..".pack_#2",out.."\\"..fname..".db2")
+				os.rename(parent_dir.."\\"..dir..".pack_#3",out.."\\"..fname..".db3")
+				os.rename(parent_dir.."\\"..dir..".pack_#4",out.."\\"..fname..".db4")
+				os.rename(parent_dir.."\\"..dir..".pack_#5",out.."\\"..fname..".db5")
+				os.rename(parent_dir.."\\"..dir..".pack_#6",out.."\\"..fname..".db6")
+				os.rename(parent_dir.."\\"..dir..".pack_#7",out.."\\"..fname..".db7")
+				os.rename(parent_dir.."\\"..dir..".pack_#8",out.."\\"..fname..".db8")
 			else
-				os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..name..".db")
+				os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db")
 			end
 			
-			--Msg("compressed %s",name)
-		end
+			--Msg("compressed %s",fname)
+		end	
+	end 
+	
+	for i=1,#compress do 
+		create_output(compress[i],compress[i],outdir[name] and output_path.."\\"..outdir[name] or output_path)
+	end
+	
+	for k,v in pairs(meshes_directories) do 
+		create_output(k,"meshes_"..k,output_path.."\\resource")
+	end
+	
+	for k,v in pairs(sounds_directories) do 
+		create_output(k,"sounds_"..k,output_path.."\\sound")
+	end 
+	
+	for k,v in pairs(texture_directories) do 
+		create_output(k,"textures_"..k,output_path.."\\resource")
+	end 
+	
+	for k,v in pairs(level_directories) do 
+		create_output(k,k,output_path.."\\maps")
 	end
 	
 	Msg("DB Tool:= Finished!")
 	
 	_INACTION = false
 end
+
 
 function ActionUnpack()
 	if (_INACTION) then 

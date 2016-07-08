@@ -1,0 +1,315 @@
+* Detected CPU: AMD Phenom(tm) 9850 Quad-Core Processor [AuthenticAMD], F15/M2/S3, 2500.00 mhz, 72-clk 'rdtsc'
+* CPU features: RDTSC, MMX, SSE, SSE2, SSE3, MONITOR/MWAIT
+* CPU threads: 4
+
+Initializing File System...
+FS: 44620 files cached 0 archives, 7612Kb memory used.
+Init FileSystem 2.383707 sec
+Processing folder: 'anims\'
++F: anims\benchmarks\
++F: anims\camera_effects\
++F: anims\camera_effects\actor_move\
++F: anims\camera_effects\scenario_cam\
++F: anims\camera_effects\scenario_cam\jupiter\
++F: anims\camera_effects\scenario_cam\marsh\
++F: anims\camera_effects\scenario_cam\pripyat\
++F: anims\camera_effects\scenario_cam\zaton\
++F: anims\camera_effects\weapon\
++F: anims\helicopter\
+anims\acidic.ppe                                                                   - VFS
+anims\acidic_mine.ppe                                                              - VFS
+anims\agr_u_fade.ppe                                                               - VFS
+anims\alcohol.ppe                                                                  - VFS
+anims\arena.anm                                                                    - VFS
+anims\artefact_tc_electric_ball_cam.anm                                            - VFS
+anims\artefact_test_fireball_1_cam.anm                                             - VFS
+anims\artefact_test_fireball_2_cam.anm                                             - VFS
+anims\artefact_test_fireball_3_cam.anm                                             - VFS
+anims\black.ppe                                                                    - VFS
+anims\blink.ppe                                                                    - VFS
+anims\brighten.ppe                                                                 - VFS
+anims\contrast.ppe                                                                 - VFS
+anims\controller_hit.ppe                                                           - VFS
+anims\deimos.ppe                                                                   - VFS
+anims\deimos1.ppe                                                                  - VFS
+anims\electra.ppe                                                                  - VFS
+anims\electra_mine.ppe                                                             - VFS
+anims\electro_fade.ppe                                                             - VFS
+anims\fade_in.ppe                                                                  - VFS
+anims\fade_in_out.ppe                                                              - VFS
+anims\fade_to_black_9_sec.ppe                                                      - VFS
+anims\fire_hit.ppe                                                                 - VFS
+anims\flame.ppe                                                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\fire_hit.ppe)
+anims\fuzz.ppe                                                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\electra.ppe)
+anims\gen_torrid_line.anm                                                          - VFS
+anims\gen_torrid_line1.anm                                                         - VFS
+anims\gen_torrid_line2.anm                                                         - VFS
+anims\gen_torrid_line3.anm                                                         - VFS
+anims\gravi.ppe                                                                    - VFS
+anims\gravi_mine.ppe                                                               - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\controller_hit.ppe)
+anims\monolith_off.ppe                                                             - VFS
+anims\mosquito_bald.ppe                                                            - VFS
+anims\nightvision_1.ppe                                                            - VFS
+anims\nightvision_2.ppe                                                            - VFS
+anims\nightvision_3.ppe                                                            - VFS
+anims\pas_b400_acidic.ppe                                                          - VFS
+anims\poltergeist_scan.ppe                                                         - VFS
+anims\psi.ppe                                                                      - VFS
+anims\psi_fade.ppe                                                                 - VFS
+anims\psy_antenna.ppe                                                              - VFS
+anims\psy_antenna_indoor.ppe                                                       - VFS
+anims\psychic.ppe                                                                  - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\psy_antenna.ppe)
+anims\radar_stop.ppe                                                               - VFS
+anims\radiation.ppe                                                                - VFS
+anims\sleep_fade.ppe                                                               - VFS
+anims\snd_shock.ppe                                                                - VFS
+anims\steam_mine.ppe                                                               - VFS
+anims\surge_fade.ppe                                                               - VFS
+anims\surge_shock.ppe                                                              - VFS
+anims\surge_shock_old.ppe                                                          - VFS
+anims\teleport.ppe                                                                 - VFS
+anims\thermal.ppe                                                                  - VFS
+anims\thermal_mine.ppe                                                             - VFS
+anims\yantar_underground_psi.ppe                                                   - VFS
+anims\benchmarks\marsh_benchmark.anm                                               - VFS
+anims\camera_effects\arena.anm                                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\arena.anm)
+anims\camera_effects\dream.anm                                                     - VFS
+anims\camera_effects\drunk.anm                                                     - VFS
+anims\camera_effects\earthquake.anm                                                - VFS
+anims\camera_effects\earthquake_00.anm                                             - VFS
+anims\camera_effects\earthquake_1.anm                                              - VFS
+anims\camera_effects\earthquake_100.anm                                            - VFS
+anims\camera_effects\earthquake_2.anm                                              - VFS
+anims\camera_effects\earthquake_20.anm                                             - VFS
+anims\camera_effects\earthquake_40.anm                                             - VFS
+anims\camera_effects\earthquake_60.anm                                             - VFS
+anims\camera_effects\earthquake_80.anm                                             - VFS
+anims\camera_effects\empty.anm                                                     - VFS
+anims\camera_effects\fatigue.anm                                                   - VFS
+anims\camera_effects\fireball.anm                                                  - VFS
+anims\camera_effects\fusker.anm                                                    - VFS
+anims\camera_effects\head_shot.anm                                                 - VFS
+anims\camera_effects\hit_back.anm                                                  - VFS
+anims\camera_effects\hit_back_left.anm                                             - VFS
+anims\camera_effects\hit_back_right.anm                                            - VFS
+anims\camera_effects\hit_front.anm                                                 - VFS
+anims\camera_effects\hit_front_left.anm                                            - VFS
+anims\camera_effects\hit_front_right.anm                                           - VFS
+anims\camera_effects\hit_left.anm                                                  - VFS
+anims\camera_effects\hit_right.anm                                                 - VFS
+anims\camera_effects\oso_cam.anm                                                   - VFS
+anims\camera_effects\pripyat_horror.anm                                            - VFS
+anims\camera_effects\pripyat_horror1.anm                                           - VFS
+anims\camera_effects\prison_1.anm                                                  - VFS
+anims\camera_effects\radar_stop.anm                                                - VFS
+anims\camera_effects\shell_shock.anm                                               - VFS
+anims\camera_effects\sleep.anm                                                     - VFS
+anims\camera_effects\surge_01.anm                                                  - VFS
+anims\camera_effects\surge_02.anm                                                  - VFS
+anims\camera_effects\val_fireball.anm                                              - VFS
+anims\camera_effects\actor_move\down.anm                                           - VFS
+anims\camera_effects\actor_move\go_back.anm                                        - VFS
+anims\camera_effects\actor_move\go_front.anm                                       - VFS
+anims\camera_effects\actor_move\jump.anm                                           - VFS
+anims\camera_effects\actor_move\strafe_left.anm                                    - VFS
+anims\camera_effects\actor_move\strafe_right.anm                                   - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_a9_actor_conservation_info_cam.anm   - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_a9_actor_power_info_cam.anm          - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_a9_actor_way_info_cam.anm            - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b15_sleep.anm                        - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b15_wake_up.anm                      - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b19_waiting_for_mercs.anm            - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b1_fireball_cam.anm                  - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b213.anm                             - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b217_camera_effector.anm             - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b217_welcome_cameff.anm              - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_1.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_10.anm                      - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_2.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_3.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_4.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_5.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_6.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_7.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_8.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_cam_9.anm                       - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b219_descent_camera.anm              - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b8_heli_4_camera.anm                 - VFS
+anims\camera_effects\scenario_cam\jupiter\jup_b9_heli_1_camera.anm                 - VFS
+anims\camera_effects\scenario_cam\marsh\camera_mar_01.anm                          - VFS
+anims\camera_effects\scenario_cam\marsh\camera_mar_02_up.anm                       - VFS
+anims\camera_effects\scenario_cam\marsh\camera_mar_03_idle.anm                     - VFS
+anims\camera_effects\scenario_cam\marsh\camera_mar_04_on_foot.anm                  - VFS
+anims\camera_effects\scenario_cam\pripyat\labx8_electro_fireball.anm               - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_01.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_02.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_03.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_04.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_05.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_06.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_07.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_08.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_09.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_10.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_11.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_12.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_13.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_14.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_15.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_16.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_17.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_17_1.anm                     - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_18.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_19.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_20.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_21.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_22.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_23.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_24.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_25.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_25_1.anm                     - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_26.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_27.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_28.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_29.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_30.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_31.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a15_cam_32.anm                       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a18_inspect_monolith_cameff.anm      - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a20_dead_recon_squad.anm             - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a20_recon_squad_comm.anm             - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a21_scene_end_cam.anm                - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a22_give_task.anm                    - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a22_radio_camera.anm                 - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a25_find_door_without_explosive_cameff.anm   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a28_evac_cam_1.anm                   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a28_evac_cam_heli.anm                - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_a28_ssu_communication_camera.anm     - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b302_fireball_acidic_cam.anm         - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b304_fireball_cam.anm                - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_1_medik_back.anm       - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_2_dialog_with_kovalsky.anm   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_2_dialog_with_kovalsky_01.anm   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_2_dialog_with_kovalsky_02.anm   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_3_lost_signal.anm      - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_4_strelok_came.anm     - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_5_dialog_with_strelok.anm   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_5_dialog_with_strelok_1.anm   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b305_catscene_5_dialog_with_strelok_2.anm   - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b307_fireball_1.anm                  - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b307_fireball_2.anm                  - VFS
+anims\camera_effects\scenario_cam\pripyat\pri_b307_fireball_3.anm                  - VFS
+anims\camera_effects\scenario_cam\zaton\zat_a23_documents_cam.anm                  - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b100_heli_2_camera.anm                 - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b101_heli_5_camera.anm                 - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b14_robbery.anm                        - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b20_teleport_dive.anm                  - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b28_heli3_camera.anm                   - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b44_fireball_1_cam.anm                 - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b44_fireball_2_cam.anm                 - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b5_from_bandits.anm                    - VFS
+anims\camera_effects\scenario_cam\zaton\zat_b5_from_stalkers.anm                   - VFS
+anims\camera_effects\scenario_cam\zaton\zaton_b54_01.anm                           - VFS
+anims\camera_effects\scenario_cam\zaton\zaton_b56_01.anm                           - VFS
+anims\camera_effects\scenario_cam\zaton\zaton_b56_02.anm                           - VFS
+anims\camera_effects\weapon\abakan_idle_bore.anm                                   - VFS
+anims\camera_effects\weapon\abakan_idle_bore.anm1                                  - VFS
+anims\camera_effects\weapon\abakan_idle_bore2.anm1                                 - VFS
+anims\camera_effects\weapon\abakan_reload.anm                                      - VFS
+anims\camera_effects\weapon\abakan_reload_grenade.anm                              - VFS
+anims\camera_effects\weapon\abakan_reload_w_gl.anm                                 - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\abakan_shoot.anm                                       - VFS
+anims\camera_effects\weapon\abakan_switch_off.anm                                  - VFS
+anims\camera_effects\weapon\abakan_switch_on.anm                                   - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_switch_off.anm)
+anims\camera_effects\weapon\ak74_idle_bore.anm                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore.anm)
+anims\camera_effects\weapon\ak74_idle_bore.anm1                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore.anm1)
+anims\camera_effects\weapon\ak74_idle_bore2.anm1                                   - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore2.anm1)
+anims\camera_effects\weapon\ak74_reload.anm                                        - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\ak74_reload_grenade.anm                                - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload_grenade.anm)
+anims\camera_effects\weapon\ak74_reload_w_gl.anm                                   - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\ak74_shoot.anm                                         - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_shoot.anm)
+anims\camera_effects\weapon\ak74_switch_off.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_switch_off.anm)
+anims\camera_effects\weapon\ak74_switch_on.anm                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_switch_off.anm)
+anims\camera_effects\weapon\ak74u_reload.anm                                       - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\ak74u_shoot.anm                                        - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_shoot.anm)
+anims\camera_effects\weapon\beretta_reload.anm                                     - VFS
+anims\camera_effects\weapon\bm16_reload_l.anm                                      - VFS
+anims\camera_effects\weapon\bm16_reload_lr.anm                                     - VFS
+anims\camera_effects\weapon\bm16_shoot_l.anm                                       - VFS
+anims\camera_effects\weapon\bm16_shoot_r.anm                                       - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\bm16_shoot_l.anm)
+anims\camera_effects\weapon\colt1911_reload.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\desert_eagle_reload.anm                                - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\fn_2000_idle_bore.anm1                                 - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore.anm1)
+anims\camera_effects\weapon\fn_2000_idle_bore2.anm1                                - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore2.anm1)
+anims\camera_effects\weapon\fn_2000_reload.anm                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\fn_2000_reload_grenade.anm                             - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload_grenade.anm)
+anims\camera_effects\weapon\fn_2000_reload_w_gl.anm                                - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\fn_2000_shoot.anm                                      - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_shoot.anm)
+anims\camera_effects\weapon\fn_2000_switch_off.anm                                 - VFS
+anims\camera_effects\weapon\fn_2000_switch_on.anm                                  - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\fort_reload.anm                                        - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\g36_reload.anm1                                        - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\g36_reload_grenade.anm                                 - VFS
+anims\camera_effects\weapon\g36_reload_w_gl.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\g36_switch_off.anm                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\g36_switch_on.anm                                      - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\groza_reload.anm                                       - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\groza_reload_grenade.anm                               - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\g36_reload_grenade.anm)
+anims\camera_effects\weapon\groza_reload_w_gl.anm                                  - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\groza_shoot.anm                                        - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_shoot.anm)
+anims\camera_effects\weapon\groza_switch_off.anm                                   - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\groza_switch_on.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\hpsa_reload.anm                                        - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\knife_idle_bore.anm1                                   - VFS
+anims\camera_effects\weapon\knife_kick_start1.anm                                  - VFS
+anims\camera_effects\weapon\knife_kick_start2.anm                                  - VFS
+anims\camera_effects\weapon\l85_idle_bore.anm1                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore.anm1)
+anims\camera_effects\weapon\l85_idle_bore2.anm1                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore2.anm1)
+anims\camera_effects\weapon\l85_reload.anm                                         - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\l85_reload_grenade.anm                                 - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload_grenade.anm)
+anims\camera_effects\weapon\l85_reload_w_gl.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\l85_shoot.anm                                          - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_shoot.anm)
+anims\camera_effects\weapon\l85_switch_off.anm                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\l85_switch_on.anm                                      - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\lr300_reload.anm                                       - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\lr300_reload_grenade.anm                               - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\g36_reload_grenade.anm)
+anims\camera_effects\weapon\lr300_reload_w_gl.anm                                  - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\lr300_shoot.anm                                        - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_shoot.anm)
+anims\camera_effects\weapon\lr300_switch_off.anm                                   - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\lr300_switch_on.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\mp5_reload.anm                                         - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\mp5_shoot.anm                                          - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_shoot.anm)
+anims\camera_effects\weapon\pb_reload.anm                                          - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\pkm_reload.anm                                         - VFS
+anims\camera_effects\weapon\pm_reload.anm                                          - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\sig220_reload.anm                                      - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\sig550_idle_bore.anm1                                  - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore.anm1)
+anims\camera_effects\weapon\sig550_idle_bore2.anm1                                 - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore2.anm1)
+anims\camera_effects\weapon\sig550_reload.anm                                      - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\sig550_reload_grenade.anm                              - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\g36_reload_grenade.anm)
+anims\camera_effects\weapon\sig550_reload_w_gl.anm                                 - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\sig550_shoot.anm                                       - VFS
+anims\camera_effects\weapon\sig550_switch_off.anm                                  - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\sig550_switch_on.anm                                   - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\fn_2000_switch_off.anm)
+anims\camera_effects\weapon\spas12_reload.anm1                                     - VFS
+anims\camera_effects\weapon\svd_idle_bore.anm1                                     - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore.anm1)
+anims\camera_effects\weapon\svd_idle_bore2.anm1                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_idle_bore2.anm1)
+anims\camera_effects\weapon\toz_reload_l.anm                                       - VFS
+anims\camera_effects\weapon\toz_reload_lr.anm                                      - VFS
+anims\camera_effects\weapon\usp45_reload.anm                                       - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\val_reload.anm                                         - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\vintorez_reload.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\abakan_reload.anm)
+anims\camera_effects\weapon\walter99_reload.anm                                    - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\beretta_reload.anm)
+anims\camera_effects\weapon\winchester1300_reload.anm1                             - ALIAS (E:\STALKER\Games\COP_COC_db_converter\unpacked\anims\camera_effects\weapon\spas12_reload.anm1)
+anims\helicopter\aaa.anm                                                           - VFS
+...Writing pack desc
+Data size: 1157028. Desc size: 18980.
+Pack saved.
+ 
+ 
+Files total/skipped/VFS/aliased: 286/0/213/73
+Overal: 1129K/1210K, 93.4%
+Elapsed time: 0:1
+Compression speed: 1.$ Mb/s
+ 
+
