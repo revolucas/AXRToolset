@@ -11,7 +11,7 @@ function directory_exists(path)
 end
 
 function file_exists(path)
-	return io.open(path) ~= nil
+	return lfs.attributes(path) ~= nil
 end
 
 function get_ext(s)
@@ -133,12 +133,13 @@ function recurse_subdirectories_and_execute(node,ext,func,...)
 		if (node) then
 			for file in lfs.dir(node) do
 				if lfs.attributes(file,"mode") == "file" then
-					printf(file)
+					--Msg(file)
 				elseif lfs.attributes(file,"mode") == "directory" then
 					if (file == ".") then
 						for l in lfs.dir(node) do
 							if (l ~= ".." and l ~= ".") then
 								if lfs.attributes(node.."\\"..file.."\\"..l,"mode") == "file" then
+									--Msg(l)
 									for i=1,#ext do
 										if (get_ext(l) == ext[i]) then
 											func(node,l,...)
@@ -160,6 +161,16 @@ function recurse_subdirectories_and_execute(node,ext,func,...)
 			stack[#stack] = nil
 		else
 			deepest = true
+		end
+	end
+end
+
+function directory_for_each(node,func,...)
+	for l in lfs.dir(node) do
+		if (l ~= ".." and l ~= ".") then
+			if lfs.attributes(node.."\\"..l,"mode") == "directory" then
+				func(node,l,...)
+			end
 		end
 	end
 end

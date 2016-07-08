@@ -70,6 +70,7 @@ function ApplicationExit()
 end
 
 function ApplicationBegin()
+	Msg("----------BEGIN----------")
 	gSettings = IniFile.New(".\\settings.ini",true)
 	if not (gSettings) then
 		Msg("Error: configuration is missing for axr_lua_engine!")

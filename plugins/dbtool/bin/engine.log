@@ -1,0 +1,69 @@
+* Detected CPU: AMD Phenom(tm) 9850 Quad-Core Processor [AuthenticAMD], F15/M2/S3, 2500.00 mhz, 69-clk 'rdtsc'
+* CPU features: RDTSC, MMX, SSE, SSE2, SSE3, MONITOR/MWAIT
+* CPU threads: 4
+
+Initializing File System...
+FS: 44225 files cached 0 archives, 9102Kb memory used.
+Init FileSystem 3.594655 sec
+Processing folder: 'levels\l12_stancia_2\'
++F: levels\l12_stancia_2\meshes\
++F: levels\l12_stancia_2\terrain\
+levels\l12_stancia_2\build.lights                                                  - VFS
+levels\l12_stancia_2\build_details.dds                                             - VFS
+levels\l12_stancia_2\level                                                         - VFS
+levels\l12_stancia_2\level.ai                                                      - VFS
+levels\l12_stancia_2\level.cform                                                   - VFS
+levels\l12_stancia_2\level.details                                                 - VFS
+levels\l12_stancia_2\level.env_mod                                                 - VFS
+levels\l12_stancia_2\level.fog_vol                                                 - VFS
+levels\l12_stancia_2\level.game                                                    - VFS
+levels\l12_stancia_2\level.geom                                                    - VFS
+levels\l12_stancia_2\level.geomx                                                   - VFS
+levels\l12_stancia_2\level.hom                                                     - VFS
+levels\l12_stancia_2\level.ltx                                                     - OK (76.1%)
+levels\l12_stancia_2\level.spawn                                                   - VFS
+levels\l12_stancia_2\level_lods.dds                                                - VFS
+levels\l12_stancia_2\level_lods_nm.dds                                             - VFS
+levels\l12_stancia_2\lmap#1_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#1_2.dds                                                  - VFS
+levels\l12_stancia_2\lmap#2_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#2_2.dds                                                  - VFS
+levels\l12_stancia_2\lmap#3_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#3_2.dds                                                  - VFS
+levels\l12_stancia_2\lmap#4_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#4_2.dds                                                  - VFS
+levels\l12_stancia_2\lmap#5_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#5_2.dds                                                  - VFS
+levels\l12_stancia_2\lmap#6_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#6_2.dds                                                  - VFS
+levels\l12_stancia_2\lmap#7_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#7_2.dds                                                  - VFS
+levels\l12_stancia_2\lmap#8_1.dds                                                  - VFS
+levels\l12_stancia_2\lmap#8_2.dds                                                  - VFS
+levels\l12_stancia_2\meshes\brkbl#0.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#1.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#10.ogf                                           - VFS
+levels\l12_stancia_2\meshes\brkbl#11.ogf                                           - VFS
+levels\l12_stancia_2\meshes\brkbl#2.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#3.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#4.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#5.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#6.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#7.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#8.ogf                                            - VFS
+levels\l12_stancia_2\meshes\brkbl#9.ogf                                            - VFS
+levels\l12_stancia_2\terrain\terrain_stancia_ghost.dds                             - VFS
+levels\l12_stancia_2\terrain\terrain_stancia_ghost_lm.dds                          - VFS
+levels\l12_stancia_2\terrain\terrain_stancia_land.dds                              - VFS
+levels\l12_stancia_2\terrain\terrain_stancia_land_lm.dds                           - VFS
+...Writing pack desc
+Data size: 225235598. Desc size: 2694.
+Pack saved.
+ 
+ 
+Files total/skipped/VFS/aliased: 48/0/47/0
+Overal: 219956K/219956K, 100.0%
+Elapsed time: 0:4
+Compression speed: 1.$ Mb/s
+ 
+
