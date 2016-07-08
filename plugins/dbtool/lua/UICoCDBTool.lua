@@ -452,59 +452,65 @@ textures = true
 				
 				
 	local function create_output(name,fname,out)
-		local chk = gSettings:GetValue("dbtool","check_"..name..tab)
-		if (chk == nil or chk == "1") then
-			RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,"compress_"..name..".ltx"), working_directory )
+		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,"compress_"..name..".ltx"), working_directory )
 
-			lfs.mkdir(out)
-			
-			os.remove(out.."\\"..fname..".db")
-			os.remove(out.."\\"..fname..".db0")
-			os.remove(out.."\\"..fname..".db1")
-			os.remove(out.."\\"..fname..".db2")
-			os.remove(out.."\\"..fname..".db3")
-			os.remove(out.."\\"..fname..".db4")
-			os.remove(out.."\\"..fname..".db5")
-			os.remove(out.."\\"..fname..".db6")
-			os.remove(out.."\\"..fname..".db7")
-			os.remove(out.."\\"..fname..".db8")
-	
-			if (file_exists(parent_dir.."\\"..dir..".pack_#1")) then
-				os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db0")
-				os.rename(parent_dir.."\\"..dir..".pack_#1",out.."\\"..fname..".db1")
-				os.rename(parent_dir.."\\"..dir..".pack_#2",out.."\\"..fname..".db2")
-				os.rename(parent_dir.."\\"..dir..".pack_#3",out.."\\"..fname..".db3")
-				os.rename(parent_dir.."\\"..dir..".pack_#4",out.."\\"..fname..".db4")
-				os.rename(parent_dir.."\\"..dir..".pack_#5",out.."\\"..fname..".db5")
-				os.rename(parent_dir.."\\"..dir..".pack_#6",out.."\\"..fname..".db6")
-				os.rename(parent_dir.."\\"..dir..".pack_#7",out.."\\"..fname..".db7")
-				os.rename(parent_dir.."\\"..dir..".pack_#8",out.."\\"..fname..".db8")
-			else
-				os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db")
-			end
-			
-			--Msg("compressed %s",fname)
-		end	
+		lfs.mkdir(out)
+		
+		os.remove(out.."\\"..fname..".db")
+		os.remove(out.."\\"..fname..".db0")
+		os.remove(out.."\\"..fname..".db1")
+		os.remove(out.."\\"..fname..".db2")
+		os.remove(out.."\\"..fname..".db3")
+		os.remove(out.."\\"..fname..".db4")
+		os.remove(out.."\\"..fname..".db5")
+		os.remove(out.."\\"..fname..".db6")
+		os.remove(out.."\\"..fname..".db7")
+		os.remove(out.."\\"..fname..".db8")
+
+		if (file_exists(parent_dir.."\\"..dir..".pack_#1")) then
+			os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db0")
+			os.rename(parent_dir.."\\"..dir..".pack_#1",out.."\\"..fname..".db1")
+			os.rename(parent_dir.."\\"..dir..".pack_#2",out.."\\"..fname..".db2")
+			os.rename(parent_dir.."\\"..dir..".pack_#3",out.."\\"..fname..".db3")
+			os.rename(parent_dir.."\\"..dir..".pack_#4",out.."\\"..fname..".db4")
+			os.rename(parent_dir.."\\"..dir..".pack_#5",out.."\\"..fname..".db5")
+			os.rename(parent_dir.."\\"..dir..".pack_#6",out.."\\"..fname..".db6")
+			os.rename(parent_dir.."\\"..dir..".pack_#7",out.."\\"..fname..".db7")
+			os.rename(parent_dir.."\\"..dir..".pack_#8",out.."\\"..fname..".db8")
+		else
+			os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db")
+		end
 	end 
 	
 	for i=1,#compress do 
-		create_output(compress[i],compress[i],outdir[name] and output_path.."\\"..outdir[name] or output_path)
+		local chk = gSettings:GetValue("dbtool","check_"..compress[i]..tab)
+		if (chk == nil or chk == "1") then
+			create_output(compress[i],compress[i],outdir[compress[i]] and output_path.."\\"..outdir[compress[i]] or output_path)
+		end
 	end
 	
-	for k,v in pairs(meshes_directories) do 
-		create_output(k,"meshes_"..k,output_path.."\\resource")
+	if (gSettings:GetValue("dbtool","check_meshes"..tab) == "1") then
+		for k,v in pairs(meshes_directories) do 
+			create_output(k,"meshes_"..k,output_path.."\\resource")
+		end
 	end
 	
-	for k,v in pairs(sounds_directories) do 
-		create_output(k,"sounds_"..k,output_path.."\\sound")
-	end 
+	if (gSettings:GetValue("dbtool","check_sounds"..tab) == "1") then
+		for k,v in pairs(sounds_directories) do 
+			create_output(k,"sounds_"..k,output_path.."\\sound")
+		end 
+	end
 	
-	for k,v in pairs(texture_directories) do 
-		create_output(k,"textures_"..k,output_path.."\\resource")
-	end 
+	if (gSettings:GetValue("dbtool","check_textures"..tab) == "1") then
+		for k,v in pairs(texture_directories) do 
+			create_output(k,"textures_"..k,output_path.."\\resource")
+		end 
+	end
 	
-	for k,v in pairs(level_directories) do 
-		create_output(k,k,output_path.."\\maps")
+	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
+		for k,v in pairs(level_directories) do 
+			create_output(k,k,output_path.."\\maps")
+		end
 	end
 	
 	Msg("DB Tool:= Finished!")
