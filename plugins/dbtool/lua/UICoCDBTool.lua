@@ -143,7 +143,7 @@ function ActionSubmit(tab)
 	
 	Msg("DB Tool:= working...")
 	
-	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns","meshes"}
+	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns"}
 	
 	-- create compress_*.ltx for levels
 	local level_directories = {}
@@ -338,7 +338,7 @@ spawns = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			table.insert(compress,"textures_default")
+			texture_directories["textures_default"] = true
 		end
 	end
 
@@ -379,7 +379,7 @@ textures = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			table.insert(compress,"sounds_default")
+			sounds_directories["sounds_default"] = true
 		end
 	end
 	
@@ -420,7 +420,7 @@ textures = true
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			table.insert(compress,"meshes_default")
+			meshes_directories["meshes_default"] = true
 		end
 	end
 	
