@@ -244,6 +244,13 @@ function clear(t)
 	end
 end
 
+function is_empty(t)
+	for k,v in pairs(t) do 
+		return false
+	end
+	return true
+end	
+
 function strformat(s,...)
 	s = tostring(s)
 	if (select('#',...) >= 1) then

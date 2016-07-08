@@ -94,11 +94,11 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 	else 
 		tab = tostring(tonumber(tab) - 1)
 		if (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolBrowseInputPath"..tab)) then
-			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","path") or ""))
-			GuiControl(self.ID,"","UICoCDBToolInputPath",dir)
+			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","path"..tab) or ""))
+			GuiControl(self.ID,"","UICoCDBToolInputPath"..tab,dir)
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolBrowseOutputPath"..tab)) then 
-			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","output_path") or ""))
-			GuiControl(self.ID,"","UICoCDBToolOutputPath",dir)
+			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","output_path"..tab) or ""))
+			GuiControl(self.ID,"","UICoCDBToolOutputPath"..tab,dir)
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute"..tab)) then
 			self:Gui("Submit|NoHide")
 			ActionSubmit(tab)
