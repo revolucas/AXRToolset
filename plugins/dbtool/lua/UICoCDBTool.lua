@@ -262,6 +262,45 @@ spawns = true
 		end
 	end 
 	
+	local sounds_directories = {}
+	-- create compress_*.ltx for textures
+	local function generate_meshes_options(path,dir)
+		local data = strformat([[
+[header]
+auto_load = true
+level_name = single ; former level name, now can be mod name
+level_ver = 1.0 ; former level version, now can be mod version
+entry_point = $fs_root$\gamedata\ ; do not change !
+creator = "Team EPIC" ; creator's name
+link = "forum.epicstalker.com" ; creator's link
+
+[options] ; exclude files from compression with such extension
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
+
+[include_folders]
+meshes\%s = true
+
+[exclude_folders]
+textures = true
+ai = true
+anims = true
+configs = true
+levels = true
+;meshes = true
+scripts = true
+shaders = true
+sounds = true
+spawns = true
+]],dir)
+		local output_file = io.open(working_directory.."compress_"..dir..".ltx","wb+")
+		if (output_file) then
+			output_file:write(data)
+			output_file:close()
+			table.insert(compress,dir)
+			meshes_directories[dir] = true
+		end
+	end 
+	
 	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
 		directory_for_each(input_path.."\\levels",generate_level_options)
 	end
@@ -284,6 +323,7 @@ exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*
 textures = true
 
 [exclude_folders]
+;textures = true
 ai = true
 anims = true
 configs = true
@@ -331,8 +371,9 @@ levels = true
 meshes = true
 scripts = true
 shaders = true
-sounds = true
+;sounds = true
 spawns = true
+textures = true
 ]]
 		for k,v in pairs(sounds_directories) do 
 			data = data .. "\nsounds\\" .. k .. " = true"
@@ -346,6 +387,47 @@ spawns = true
 		end
 	end
 	
+	if (gSettings:GetValue("dbtool","check_meshes"..tab) == "1") then
+		directory_for_each(input_path.."\\meshes",generate_meshes_options)
+		local data = [[
+[header]
+auto_load = true
+level_name = single ; former level name, now can be mod name
+level_ver = 1.0 ; former level version, now can be mod version
+entry_point = $fs_root$\gamedata\ ; do not change !
+creator = "Team EPIC" ; creator's name
+link = "forum.epicstalker.com" ; creator's link
+
+[options] ; exclude files from compression with such extension
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
+
+[include_folders]
+meshes = true
+
+[exclude_folders]
+ai = true
+anims = true
+configs = true
+levels = true
+;meshes = true
+scripts = true
+shaders = true
+sounds = true
+spawns = true
+textures = true
+]]
+		for k,v in pairs(meshes_directories) do 
+			data = data .. "\nmeshes\\" .. k .. " = true"
+		end
+
+		local output_file = io.open(working_directory.."compress_meshes_default.ltx","wb+")
+		if (output_file) then
+			output_file:write(data)
+			output_file:close()
+			table.insert(compress,"meshes_default")
+		end
+	end
+	
 	local outdir = {	
 		["ai"] = "config",
 		["anims"] = "config",
@@ -355,7 +437,10 @@ spawns = true
 		["spawns"] = "config",
 		["shaders"] = "config",
 		["meshes"] = "resource",
+		["meshes_default"] = "resource",
+		["sounds"] = "sound",
 		["sounds_default"] = "sound",
+		["textures"] = "resource"
 		["textures_default"] = "resource"
 	}
 	
@@ -375,11 +460,11 @@ spawns = true
 		if (chk == nil or chk == "1") then
 			RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,"compress_"..name..".ltx"), working_directory )
 			
-			local out = texture_directories[name] and output_path.."\\resource" or level_directories[name] and output_path.."\\maps" or sounds_directories[name] and output_path.."\\sound" or outdir[name] and output_path.."\\"..outdir[name] or output_path
+			local out = meshes_directories[name] and output_path.."\\resource" or texture_directories[name] and output_path.."\\resource" or level_directories[name] and output_path.."\\maps" or sounds_directories[name] and output_path.."\\sound" or outdir[name] and output_path.."\\"..outdir[name] or output_path
 			
 			lfs.mkdir(out)
 			
-			name = texture_directories[name] and "textures_"..name or sounds_directories[name] and "sounds_"..name or name
+			name = meshes_directories[name] and "meshes_"..name or texture_directories[name] and "textures_"..name or sounds_directories[name] and "sounds_"..name or name
 			
 			os.remove(out.."\\"..name..".db")
 			os.remove(out.."\\"..name..".db0")
