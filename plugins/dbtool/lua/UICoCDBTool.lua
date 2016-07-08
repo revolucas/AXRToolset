@@ -440,7 +440,7 @@ textures = true
 		["meshes_default"] = "resource",
 		["sounds"] = "sound",
 		["sounds_default"] = "sound",
-		["textures"] = "resource"
+		["textures"] = "resource",
 		["textures_default"] = "resource"
 	}
 	
