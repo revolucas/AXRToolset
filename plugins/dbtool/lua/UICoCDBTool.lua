@@ -175,7 +175,7 @@ shaders = true
 sounds = true
 spawns = true
 ]],dir)
-		local output_file = io.open(working_directory.."compress_"..dir..".ltx","wb+")
+		local output_file = io.open(working_directory.."compress_levels_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
@@ -183,8 +183,9 @@ spawns = true
 		end
 	end 
 
-	local texture_directories = {}
+	
 	-- create compress_*.ltx for textures
+	local texture_directories = {}
 	local function generate_textures_options(path,dir)
 		local data = strformat([[
 [header]
@@ -213,7 +214,7 @@ shaders = true
 sounds = true
 spawns = true
 ]],dir)
-		local output_file = io.open(working_directory.."compress_"..dir..".ltx","wb+")
+		local output_file = io.open(working_directory.."compress_textures_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
@@ -221,8 +222,9 @@ spawns = true
 		end
 	end 
 	
+	
+	-- create compress_*.ltx for sounds
 	local sounds_directories = {}
-	-- create compress_*.ltx for textures
 	local function generate_sounds_options(path,dir)
 		local data = strformat([[
 [header]
@@ -251,7 +253,7 @@ shaders = true
 ;sounds = true
 spawns = true
 ]],dir)
-		local output_file = io.open(working_directory.."compress_"..dir..".ltx","wb+")
+		local output_file = io.open(working_directory.."compress_sounds_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
@@ -289,7 +291,7 @@ shaders = true
 sounds = true
 spawns = true
 ]],dir)
-		local output_file = io.open(working_directory.."compress_"..dir..".ltx","wb+")
+		local output_file = io.open(working_directory.."compress_meshes_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
@@ -451,8 +453,11 @@ textures = true
 	os.remove(parent_dir.."\\"..dir..".pack_#8")
 				
 				
-	local function create_output(name,fname,out)
-		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,"compress_"..name..".ltx"), working_directory )
+	local function create_output(name,fname,out,prefix)
+	
+		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
+		
+		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,pltx), working_directory )
 
 		lfs.mkdir(out)
 		
@@ -491,25 +496,25 @@ textures = true
 	
 	if (gSettings:GetValue("dbtool","check_meshes"..tab) == "1") then
 		for k,v in pairs(meshes_directories) do 
-			create_output(k,"meshes_"..k,output_path.."\\resource")
+			create_output(k,"meshes_"..k,output_path.."\\resource","meshes")
 		end
 	end
 	
 	if (gSettings:GetValue("dbtool","check_sounds"..tab) == "1") then
 		for k,v in pairs(sounds_directories) do 
-			create_output(k,"sounds_"..k,output_path.."\\sound")
+			create_output(k,"sounds_"..k,output_path.."\\sound","sounds")
 		end 
 	end
 	
 	if (gSettings:GetValue("dbtool","check_textures"..tab) == "1") then
 		for k,v in pairs(texture_directories) do 
-			create_output(k,"textures_"..k,output_path.."\\resource")
+			create_output(k,"textures_"..k,output_path.."\\resource","textures")
 		end 
 	end
 	
 	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
 		for k,v in pairs(level_directories) do 
-			create_output(k,k,output_path.."\\maps")
+			create_output(k,k,output_path.."\\maps","levels")
 		end
 	end
 	
