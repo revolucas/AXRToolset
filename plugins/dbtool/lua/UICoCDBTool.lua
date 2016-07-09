@@ -147,7 +147,10 @@ function ActionSubmit(tab)
 	
 	-- create compress_*.ltx for levels
 	local level_directories = {}
-	local function generate_level_options(path,dir)
+	local function generate_level_options1(path,dir)
+		level_directories[dir] = true
+	end 
+	local function generate_level_options2(dir)
 		local data = strformat([[
 [header]
 auto_load = true
@@ -158,35 +161,42 @@ creator = "Team EPIC" ; creator's name
 link = "forum.epicstalker.com" ; creator's link
 
 [options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk,*.xr
 
 [include_folders]
-levels\%s = true
+.\ = true
 
 [exclude_folders]
-textures = true
-ai = true
+ai = true 
 anims = true
 configs = true
 ;levels = true
-meshes = true
-scripts = true
+meshes = true 
+scripts = true 
 shaders = true
-sounds = true
+sounds = true 
 spawns = true
+textures = true
 ]],dir)
+		for k,v in pairs(level_directories) do 
+			if (k ~= dir) then
+				data = data .. "\nlevels\\" .. k .. " = true"
+			end
+		end
 		local output_file = io.open(working_directory.."compress_levels_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			level_directories[dir] = true
-		end
-	end 
+		end	
+	end
 
 	
 	-- create compress_*.ltx for textures
 	local texture_directories = {}
-	local function generate_textures_options(path,dir)
+	local function generate_textures_options1(path,dir)
+		texture_directories[dir] = true
+	end
+	local function generate_textures_options2(dir)
 		local data = strformat([[
 [header]
 auto_load = true
@@ -200,32 +210,39 @@ link = "forum.epicstalker.com" ; creator's link
 exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
 
 [include_folders]
-textures\%s = true
+.\ = true
 
 [exclude_folders]
-;textures = true
-ai = true
+ai = true 
 anims = true
 configs = true
 levels = true
-meshes = true
-scripts = true
+meshes = true 
+scripts = true 
 shaders = true
-sounds = true
+sounds = true 
 spawns = true
+;textures = true
 ]],dir)
+		for k,v in pairs(texture_directories) do 
+			if (k ~= dir) then
+				data = data .. "\ntextures\\" .. k .. " = true"
+			end
+		end
 		local output_file = io.open(working_directory.."compress_textures_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			texture_directories[dir] = true
 		end
 	end 
 	
 	
 	-- create compress_*.ltx for sounds
 	local sounds_directories = {}
-	local function generate_sounds_options(path,dir)
+	local function generate_sounds_options1(path,dir)
+		sounds_directories[dir] = true
+	end
+	local function generate_sounds_options2(dir)
 		local data = strformat([[
 [header]
 auto_load = true
@@ -239,31 +256,38 @@ link = "forum.epicstalker.com" ; creator's link
 exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
 
 [include_folders]
-sounds\%s = true
+.\ = true
 
 [exclude_folders]
-textures = true
-ai = true
+ai = true 
 anims = true
 configs = true
 levels = true
-meshes = true
-scripts = true
+meshes = true 
+scripts = true 
 shaders = true
-;sounds = true
+;sounds = true 
 spawns = true
+textures = true
 ]],dir)
+		for k,v in pairs(sounds_directories) do 
+			if (k ~= dir) then
+				data = data .. "\nsounds\\" .. k .. " = true"
+			end
+		end
 		local output_file = io.open(working_directory.."compress_sounds_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			sounds_directories[dir] = true
 		end
 	end 
 	
 	local meshes_directories = {}
 	-- create compress_*.ltx for textures
-	local function generate_meshes_options(path,dir)
+	local function generate_meshes_options1(path,dir)
+		meshes_directories[dir] = true
+	end
+	local function generate_meshes_options2(dir)
 		local data = strformat([[
 [header]
 auto_load = true
@@ -277,34 +301,44 @@ link = "forum.epicstalker.com" ; creator's link
 exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
 
 [include_folders]
-meshes\%s = true
+.\ = true
 
 [exclude_folders]
-textures = true
-ai = true
+ai = true 
 anims = true
 configs = true
 levels = true
-;meshes = true
-scripts = true
+;meshes = true 
+scripts = true 
 shaders = true
-sounds = true
+sounds = true 
 spawns = true
+textures = true
 ]],dir)
+		for k,v in pairs(meshes_directories) do 
+			if (k ~= dir) then
+				data = data .. "\nmeshes\\" .. k .. " = true"
+			end
+		end
 		local output_file = io.open(working_directory.."compress_meshes_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
 			output_file:close()
-			meshes_directories[dir] = true
 		end
 	end 
 	
 	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
-		directory_for_each(input_path.."\\levels",generate_level_options)
+		directory_for_each(input_path.."\\levels",generate_level_options1)
+		for k,v in pairs(level_directories) do 
+			generate_level_options2(k)
+		end
 	end
 	
 	if (gSettings:GetValue("dbtool","check_textures"..tab) == "1") then
-		directory_for_each(input_path.."\\textures",generate_textures_options)
+		directory_for_each(input_path.."\\textures",generate_textures_options1)
+		for k,v in pairs(texture_directories) do 
+			generate_textures_options2(k)
+		end
 		local data = [[
 [header]
 auto_load = true
@@ -321,16 +355,6 @@ exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*
 textures = true
 
 [exclude_folders]
-;textures = true
-ai = true
-anims = true
-configs = true
-levels = true
-meshes = true
-scripts = true
-shaders = true
-sounds = true
-spawns = true
 ]]
 		for k,v in pairs(texture_directories) do 
 			data = data .. "\ntextures\\" .. k .. " = true"
@@ -345,7 +369,10 @@ spawns = true
 	end
 
 	if (gSettings:GetValue("dbtool","check_sounds"..tab) == "1") then
-		directory_for_each(input_path.."\\sounds",generate_sounds_options)
+		directory_for_each(input_path.."\\sounds",generate_sounds_options1)
+		for k,v in pairs(sounds_directories) do 
+			generate_sounds_options2(k)
+		end
 		local data = [[
 [header]
 auto_load = true
@@ -362,16 +389,6 @@ exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*
 sounds = true
 
 [exclude_folders]
-ai = true
-anims = true
-configs = true
-levels = true
-meshes = true
-scripts = true
-shaders = true
-;sounds = true
-spawns = true
-textures = true
 ]]
 		for k,v in pairs(sounds_directories) do 
 			data = data .. "\nsounds\\" .. k .. " = true"
@@ -386,7 +403,10 @@ textures = true
 	end
 	
 	if (gSettings:GetValue("dbtool","check_meshes"..tab) == "1") then
-		directory_for_each(input_path.."\\meshes",generate_meshes_options)
+		directory_for_each(input_path.."\\meshes",generate_meshes_options1)
+		for k,v in pairs(meshes_directories) do 
+			generate_meshes_options2(k)
+		end	
 		local data = [[
 [header]
 auto_load = true
@@ -403,16 +423,6 @@ exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*
 meshes = true
 
 [exclude_folders]
-ai = true
-anims = true
-configs = true
-levels = true
-;meshes = true
-scripts = true
-shaders = true
-sounds = true
-spawns = true
-textures = true
 ]]
 		for k,v in pairs(meshes_directories) do 
 			data = data .. "\nmeshes\\" .. k .. " = true"
