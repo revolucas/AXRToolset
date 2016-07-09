@@ -61,7 +61,9 @@ function cUIMain:OnScriptControlAction(hwnd,event,info)
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIMainBrowseGamedata")) then 
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("core","Gamedata_Path") or ""))
-		GuiControl(self.ID,"","UIMainGamedataPath",dir)
+		if (dir and dir ~= "") then
+			GuiControl(self.ID,"","UIMainGamedataPath",dir)
+		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIMainSaveSettings")) then 
 		self:Gui("Submit|NoHide")
 		gSettings:SetValue("core","Gamedata_Path",ahkGetVar("UIMainGamedataPath"))

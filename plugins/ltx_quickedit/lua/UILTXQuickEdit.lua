@@ -75,7 +75,9 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		self:FillListView(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditBrowsePath"..tab)) then
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("ltx_quickedit","path"..tab) or ""))
-		GuiControl(self.ID,"","UILTXQuickEditPath"..tab,dir)
+		if (dir and dir ~= "") then
+			GuiControl(self.ID,"","UILTXQuickEditPath"..tab,dir)
+		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditSaveSettings"..tab)) then
 		local path = ahkGetVar("UILTXQuickEditPath"..tab)
 		if (path and path ~= "") then

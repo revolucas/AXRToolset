@@ -83,10 +83,14 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 	if (tab == "1") then 
 		if (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolBrowseInputPath")) then
 			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","unpack_input_path") or ""))
-			GuiControl(self.ID,"","UICoCDBToolInputPath",dir)
+			if (dir and dir ~= "") then
+				GuiControl(self.ID,"","UICoCDBToolInputPath",dir)
+			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolBrowseOutputPath")) then 
 			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","unpack_output_path") or ""))
-			GuiControl(self.ID,"","UICoCDBToolOutputPath",dir)
+			if (dir and dir ~= "") then
+				GuiControl(self.ID,"","UICoCDBToolOutputPath",dir)
+			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute")) then
 			self:Gui("Submit|NoHide")
 			ActionUnpack()
@@ -95,10 +99,14 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 		tab = tostring(tonumber(tab) - 1)
 		if (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolBrowseInputPath"..tab)) then
 			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","path"..tab) or ""))
-			GuiControl(self.ID,"","UICoCDBToolInputPath"..tab,dir)
+			if (dir and dir ~= "") then
+				GuiControl(self.ID,"","UICoCDBToolInputPath"..tab,dir)
+			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolBrowseOutputPath"..tab)) then 
 			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","output_path"..tab) or ""))
-			GuiControl(self.ID,"","UICoCDBToolOutputPath"..tab,dir)
+			if (dir and dir ~= "") then
+				GuiControl(self.ID,"","UICoCDBToolOutputPath"..tab,dir)
+			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute"..tab)) then
 			self:Gui("Submit|NoHide")
 			ActionSubmit(tab)
@@ -143,7 +151,7 @@ function ActionSubmit(tab)
 	
 	Msg("DB Tool:= working...")
 	
-	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns"}
+	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns","meshes","sounds","textures"}
 	
 	-- create compress_*.ltx for levels
 	local level_directories = {}
@@ -189,250 +197,11 @@ textures = true
 			output_file:close()
 		end	
 	end
-
-	
-	-- create compress_*.ltx for textures
-	local texture_directories = {}
-	local function generate_textures_options1(path,dir)
-		texture_directories[dir] = true
-	end
-	local function generate_textures_options2(dir)
-		local data = strformat([[
-[header]
-auto_load = true
-level_name = single ; former level name, now can be mod name
-level_ver = 1.0 ; former level version, now can be mod version
-entry_point = $fs_root$\gamedata\ ; do not change !
-creator = "Team EPIC" ; creator's name
-link = "forum.epicstalker.com" ; creator's link
-
-[options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
-
-[include_folders]
-.\ = true
-
-[exclude_folders]
-ai = true 
-anims = true
-configs = true
-levels = true
-meshes = true 
-scripts = true 
-shaders = true
-sounds = true 
-spawns = true
-;textures = true
-]],dir)
-		for k,v in pairs(texture_directories) do 
-			if (k ~= dir) then
-				data = data .. "\ntextures\\" .. k .. " = true"
-			end
-		end
-		local output_file = io.open(working_directory.."compress_textures_"..dir..".ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-		end
-	end 
-	
-	
-	-- create compress_*.ltx for sounds
-	local sounds_directories = {}
-	local function generate_sounds_options1(path,dir)
-		sounds_directories[dir] = true
-	end
-	local function generate_sounds_options2(dir)
-		local data = strformat([[
-[header]
-auto_load = true
-level_name = single ; former level name, now can be mod name
-level_ver = 1.0 ; former level version, now can be mod version
-entry_point = $fs_root$\gamedata\ ; do not change !
-creator = "Team EPIC" ; creator's name
-link = "forum.epicstalker.com" ; creator's link
-
-[options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
-
-[include_folders]
-.\ = true
-
-[exclude_folders]
-ai = true 
-anims = true
-configs = true
-levels = true
-meshes = true 
-scripts = true 
-shaders = true
-;sounds = true 
-spawns = true
-textures = true
-]],dir)
-		for k,v in pairs(sounds_directories) do 
-			if (k ~= dir) then
-				data = data .. "\nsounds\\" .. k .. " = true"
-			end
-		end
-		local output_file = io.open(working_directory.."compress_sounds_"..dir..".ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-		end
-	end 
-	
-	local meshes_directories = {}
-	-- create compress_*.ltx for textures
-	local function generate_meshes_options1(path,dir)
-		meshes_directories[dir] = true
-	end
-	local function generate_meshes_options2(dir)
-		local data = strformat([[
-[header]
-auto_load = true
-level_name = single ; former level name, now can be mod name
-level_ver = 1.0 ; former level version, now can be mod version
-entry_point = $fs_root$\gamedata\ ; do not change !
-creator = "Team EPIC" ; creator's name
-link = "forum.epicstalker.com" ; creator's link
-
-[options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
-
-[include_folders]
-.\ = true
-
-[exclude_folders]
-ai = true 
-anims = true
-configs = true
-levels = true
-;meshes = true 
-scripts = true 
-shaders = true
-sounds = true 
-spawns = true
-textures = true
-]],dir)
-		for k,v in pairs(meshes_directories) do 
-			if (k ~= dir) then
-				data = data .. "\nmeshes\\" .. k .. " = true"
-			end
-		end
-		local output_file = io.open(working_directory.."compress_meshes_"..dir..".ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-		end
-	end 
 	
 	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
 		directory_for_each(input_path.."\\levels",generate_level_options1)
 		for k,v in pairs(level_directories) do 
 			generate_level_options2(k)
-		end
-	end
-	
-	if (gSettings:GetValue("dbtool","check_textures"..tab) == "1") then
-		directory_for_each(input_path.."\\textures",generate_textures_options1)
-		for k,v in pairs(texture_directories) do 
-			generate_textures_options2(k)
-		end
-		local data = [[
-[header]
-auto_load = true
-level_name = single ; former level name, now can be mod name
-level_ver = 1.0 ; former level version, now can be mod version
-entry_point = $fs_root$\gamedata\ ; do not change !
-creator = "Team EPIC" ; creator's name
-link = "forum.epicstalker.com" ; creator's link
-
-[options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
-
-[include_folders]
-textures = true
-
-[exclude_folders]
-]]
-		for k,v in pairs(texture_directories) do 
-			data = data .. "\ntextures\\" .. k .. " = true"
-		end
-
-		local output_file = io.open(working_directory.."compress_textures_default.ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-			table.insert(compress,"textures_default")
-		end
-	end
-
-	if (gSettings:GetValue("dbtool","check_sounds"..tab) == "1") then
-		directory_for_each(input_path.."\\sounds",generate_sounds_options1)
-		for k,v in pairs(sounds_directories) do 
-			generate_sounds_options2(k)
-		end
-		local data = [[
-[header]
-auto_load = true
-level_name = single ; former level name, now can be mod name
-level_ver = 1.0 ; former level version, now can be mod version
-entry_point = $fs_root$\gamedata\ ; do not change !
-creator = "Team EPIC" ; creator's name
-link = "forum.epicstalker.com" ; creator's link
-
-[options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
-
-[include_folders]
-sounds = true
-
-[exclude_folders]
-]]
-		for k,v in pairs(sounds_directories) do 
-			data = data .. "\nsounds\\" .. k .. " = true"
-		end
-
-		local output_file = io.open(working_directory.."compress_sounds_default.ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-			table.insert(compress,"sounds_default")
-		end
-	end
-	
-	if (gSettings:GetValue("dbtool","check_meshes"..tab) == "1") then
-		directory_for_each(input_path.."\\meshes",generate_meshes_options1)
-		for k,v in pairs(meshes_directories) do 
-			generate_meshes_options2(k)
-		end	
-		local data = [[
-[header]
-auto_load = true
-level_name = single ; former level name, now can be mod name
-level_ver = 1.0 ; former level version, now can be mod version
-entry_point = $fs_root$\gamedata\ ; do not change !
-creator = "Team EPIC" ; creator's name
-link = "forum.epicstalker.com" ; creator's link
-
-[options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
-
-[include_folders]
-meshes = true
-
-[exclude_folders]
-]]
-		for k,v in pairs(meshes_directories) do 
-			data = data .. "\nmeshes\\" .. k .. " = true"
-		end
-
-		local output_file = io.open(working_directory.."compress_meshes_default.ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-			table.insert(compress,"meshes_default")
 		end
 	end
 	
@@ -445,11 +214,8 @@ meshes = true
 		["spawns"] = "config",
 		["shaders"] = "config",
 		["meshes"] = "resource",
-		["meshes_default"] = "resource",
 		["sounds"] = "sound",
-		["sounds_default"] = "sound",
 		["textures"] = "resource",
-		["textures_default"] = "resource"
 	}
 	
 	os.remove(parent_dir.."\\"..dir..".pack_#0")
@@ -462,9 +228,8 @@ meshes = true
 	os.remove(parent_dir.."\\"..dir..".pack_#7")
 	os.remove(parent_dir.."\\"..dir..".pack_#8")
 				
-				
 	local function create_output(name,fname,out,prefix)
-	
+		Msg(fname)
 		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
 		
 		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,pltx), working_directory )
@@ -497,6 +262,10 @@ meshes = true
 		end
 	end 
 	
+	Sleep(1000)
+	
+	table.sort(compress)
+	
 	for i=1,#compress do 
 		local chk = gSettings:GetValue("dbtool","check_"..compress[i]..tab)
 		if (chk == nil or chk == "1") then
@@ -504,26 +273,8 @@ meshes = true
 		end
 	end
 	
-	if (gSettings:GetValue("dbtool","check_meshes"..tab) == "1") then
-		for k,v in pairs(meshes_directories) do 
-			create_output(k,"meshes_"..k,output_path.."\\resource","meshes")
-		end
-	end
-	
-	if (gSettings:GetValue("dbtool","check_sounds"..tab) == "1") then
-		for k,v in pairs(sounds_directories) do 
-			create_output(k,"sounds_"..k,output_path.."\\sound","sounds")
-		end 
-	end
-	
-	if (gSettings:GetValue("dbtool","check_textures"..tab) == "1") then
-		for k,v in pairs(texture_directories) do 
-			create_output(k,"textures_"..k,output_path.."\\resource","textures")
-		end 
-	end
-	
 	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
-		for k,v in pairs(level_directories) do 
+		for k,v in spairs(level_directories) do 
 			create_output(k,k,output_path.."\\maps","levels")
 		end
 	end
@@ -577,6 +328,8 @@ function ActionUnpack()
 	Msg("DB Tool:= Unpacking...")
 	
 	recurse_subdirectories_and_execute(input_path,{"db","db0","db1","db2","db3","db4","db5","db6","db7","db8","db9","db10"},on_execute)
+	
+	table.sort(patches)
 	
 	for i=1,#patches do 
 		RunWait( strformat([["%s" -unpack -xdb "%s" -dir "%s"]],cp,patches[i],output_path), working_directory )

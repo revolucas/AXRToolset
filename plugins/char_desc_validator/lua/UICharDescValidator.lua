@@ -72,7 +72,9 @@ end
 function cUICharDescValid:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UICharDescValidBrowseInputPath")) then
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("char_desc_validator","path") or ""))
-		GuiControl(self.ID,"","UICharDescValidInputPath",dir)
+		if (dir and dir ~= "") then
+			GuiControl(self.ID,"","UICharDescValidInputPath",dir)
+		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICharDescValidExecute")) then
 		self:Gui("Submit|NoHide")
 		OnValidate()
