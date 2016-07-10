@@ -151,7 +151,7 @@ function ActionSubmit(tab)
 	
 	Msg("DB Tool:= working...")
 	
-	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns","meshes","sounds","textures"}
+	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns","textures","meshes","sounds"}
 	
 	-- create compress_*.ltx for levels
 	local level_directories = {}
@@ -175,20 +175,20 @@ exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*
 .\ = true
 
 [exclude_folders]
-ai = true 
-anims = true
-configs = true
-;levels = true
-meshes = true 
-scripts = true 
-shaders = true
-sounds = true 
-spawns = true
-textures = true
+ai\ = true 
+anims\ = true
+configs\ = true
+;levels\ = true
+meshes\ = true 
+scripts\ = true 
+shaders\ = true
+sounds\ = true 
+spawns\ = true
+textures\ = true
 ]],dir)
 		for k,v in pairs(level_directories) do 
 			if (k ~= dir) then
-				data = data .. "\nlevels\\" .. k .. " = true"
+				data = data .. "\nlevels\\" .. k .. "\\ = true"
 			end
 		end
 		local output_file = io.open(working_directory.."compress_levels_"..dir..".ltx","wb+")
@@ -204,7 +204,7 @@ textures = true
 			generate_level_options2(k)
 		end
 	end
-	
+		
 	local outdir = {	
 		["ai"] = "config",
 		["anims"] = "config",
@@ -214,8 +214,11 @@ textures = true
 		["spawns"] = "config",
 		["shaders"] = "config",
 		["meshes"] = "resource",
+		["meshes_default"] = "resource",
 		["sounds"] = "sound",
+		["sounds_default"] = "sound",
 		["textures"] = "resource",
+		["textures_default"] = "resource"
 	}
 	
 	os.remove(parent_dir.."\\"..dir..".pack_#0")
@@ -228,8 +231,9 @@ textures = true
 	os.remove(parent_dir.."\\"..dir..".pack_#7")
 	os.remove(parent_dir.."\\"..dir..".pack_#8")
 				
+				
 	local function create_output(name,fname,out,prefix)
-		Msg(fname)
+	
 		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
 		
 		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,pltx), working_directory )
