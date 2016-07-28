@@ -66,8 +66,10 @@ function cUILTXQuickEditModify:OnScriptControlAction(hwnd,event,info) -- needed 
 		assert(wnd.ltx[fname])
 		
 		for field,v in pairs(list) do 
-			local val = ahkGetVar("UIModifyEdit"..field)
-			wnd.ltx[fname]:SetValue(wnd.listItemSelected,field,val)
+			if (field ~= "fname") then
+				local val = ahkGetVar("UIModifyEdit"..field)
+				wnd.ltx[fname]:SetValue(wnd.listItemSelected,field,val)
+			end
 		end
 
 		wnd.ltx[fname]:SaveExt()
