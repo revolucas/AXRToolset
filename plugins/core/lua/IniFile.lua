@@ -177,7 +177,7 @@ function cIniFile:SaveExt()
 end
 
 -- Recreates ini as stored in the table
-function cIniFile:Save(sysini)
+function cIniFile:Save(sysini,show_equal)
 	local _s = {}
 	_s.__order = {}
 
@@ -239,7 +239,11 @@ function cIniFile:Save(sysini)
 
 				if not (skip) then
 					if (val == "") then
-						str = str .. addTab(key,40) .. " = \n"
+						if (show_equal) then 
+							str = str .. addTab(key,40) .. " = \n"
+						else
+							str = str .. addTab(key,40) .. "\n"
+						end
 					else
 						str = str .. addTab(key,40) .. " = " .. tostring(val) .. "\n"
 					end
