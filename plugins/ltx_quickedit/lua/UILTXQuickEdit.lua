@@ -62,7 +62,7 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		if (selected == nil or selected == "") then 
 			return 
 		end		
-		
+		Msg(event)
 		if (event == "RightClick") then
 			LVTop(self.ID,"UILTXQuickEditLV"..tab)
 			local txt = LVGetText(self.ID,info,"1")
