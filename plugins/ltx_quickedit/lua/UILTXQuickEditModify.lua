@@ -18,14 +18,14 @@ end
 function cUILTXQuickEditModify:Reinit()
 	cUIBase.Reinit(self)
 	
-	if (wnd.listItemSelected == nil) then 
-		return Msgbox("An error has occured. listItemSelected = nil!")
-	end
-	
 	self:Gui("+AlwaysonTop")
 	self:Gui("Font|s10|Verdana")
 	
 	local wnd = UILTXQuickEdit.Get()
+	if (wnd.listItemSelected == nil) then 
+		return Msgbox("An error has occured. listItemSelected = nil!")
+	end
+	
 	local list = wnd.list[wnd.listItemSelected]
 	
 	if not (list) then 
