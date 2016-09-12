@@ -124,11 +124,12 @@ function cIniFile:SaveExt()
 	local str = ""
 
 	local function addTab(s,n)
+		local padding = {}
 		local l = string.len(s)
-		for i=1,n-l do
-			s = s .. " "
-		end
-		return s
+		for i=1,n-l do 
+			table.insert(padding," ")
+		end 
+		return s .. table.concat(padding)
 	end
 
 	for ln in io.lines(self.fname) do
@@ -177,7 +178,7 @@ function cIniFile:SaveExt()
 end
 
 -- Recreates ini as stored in the table
-function cIniFile:Save(sysini,show_equal)
+function cIniFile:Save(sysini,show_equal,save_as_path)
 	local _s = {}
 	_s.__order = {}
 
@@ -252,7 +253,7 @@ function cIniFile:Save(sysini,show_equal)
 		end
 	end
 
-	local cfg = io.open(self.fname,"w+")
+	local cfg = io.open(save_as_path or self.fname,"w+")
 	cfg:write(str)
 	cfg:close()
 end
@@ -281,6 +282,7 @@ function cIniFile:SaveOrderByClass(lookup)
 	-- order to list sections
 	local __cls = {
 		"II_BOLT",
+		"TORCH",
 		"TORCH_S",
 		"S_PDA",
 		"D_PDA",
@@ -304,9 +306,12 @@ function cIniFile:SaveOrderByClass(lookup)
 		"II_BANDG",
 		"II_ANTIR",
 
+		"G_F1",
+		"G_RGD5",
 		"G_F1_S",
 		"G_RGD5_S",
 
+		"AMMO",
 		"AMMO_S",
 		"S_OG7B",
 		"S_VOG25",
@@ -331,6 +336,8 @@ function cIniFile:SaveOrderByClass(lookup)
 		"WP_SVU",
 		"WP_VAL",
 
+		"EQU_STLK",
+		"EQU_HLMET",
 		"E_STLK",
 		"E_HLMET"
 	}

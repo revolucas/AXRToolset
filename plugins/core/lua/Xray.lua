@@ -17,7 +17,9 @@ valid_item_classes =
 
 	["E_STLK"]   = true,
 	["E_HLMET"]  = true,
-
+	["EQU_STLK"]   = true,
+	["EQU_HLMET"]  = true,
+	
 	["II_BANDG"] = true,
 	["II_MEDKI"] = true,
 	["II_ANTIR"] = true,
@@ -45,6 +47,7 @@ valid_item_classes =
 	["WP_SVU"] = true,
 	["WP_VAL"] = true,
 
+	["AMMO"]	= true,
 	["AMMO_S"]   = true,
 	["S_OG7B"]   = true,
 	["S_VOG25"]  = true,
@@ -52,6 +55,8 @@ valid_item_classes =
 
 	["G_F1_S"]   = true,
 	["G_RGD5_S"] = true,
+	["G_F1"]   = true,
+	["G_RGD5"] = true,
 
 	["WP_SCOPE"] = true,
 	["WP_SILEN"] = true,
@@ -94,11 +99,13 @@ end
 function IsAmmo(k)
 	local cls = system_ini():GetValue(k,"class",3)
 	local t = 	{
+		["AMMO"]	= true,
 		["AMMO_S"]   = true,
 		["S_OG7B"]   = true,
 		["S_VOG25"]  = true,
 		["S_M209"]   = true,
-
+		["G_F1"]   = true,
+		["G_RGD5"] = true,
 		["G_F1_S"]   = true,
 		["G_RGD5_S"] = true
 	}
@@ -109,7 +116,9 @@ function IsOutfit(k)
 	local cls = system_ini():GetValue(k,"class",3)
 	local t = 	{
 		["E_STLK"]   = true,
-		["E_HLMET"]  = true
+		["E_HLMET"]  = true,
+		["EQU_STLK"]   = true,
+		["EQU_HLMET"]  = true
 	}
 	return cls and t[cls] == true
 end
@@ -198,8 +207,9 @@ function get_item_sections_list(ini,reload)
 	end
 	
 	ini = ini or system_ini()
-	if not (ini) then 
-		return 
+	if not (ini and ini.root) then 
+		Msg("Failed to load system.ini from your given Game_Path. See the 'Settings' tab.")
+		return
 	end
 	
 	item_list = IniFile.New("xray_sections.ltx")
@@ -210,6 +220,8 @@ function get_item_sections_list(ini,reload)
 		return
 	end
 	
+	Msg("Generating a list of valid item sections from unpacked gamedata")
+	
 	item_list.root = {}
 
 	for section,t in pairs(ini.root) do
@@ -218,6 +230,7 @@ function get_item_sections_list(ini,reload)
 				if not (string.find(section,"ap_mp_")) then -- IGNORE MP items
 					local v = ini:GetValue(section,"inv_name")
 					if (v and v ~= "" and v ~= "default") then -- most likely an item, add to list
+						--Msg("%s",section)
 						item_list:SetValue("sections",section,"")
 					end
 				end
@@ -229,5 +242,33 @@ function get_item_sections_list(ini,reload)
 	
 	item_list.loaded = true
 	
+	Msg("Finished...")
+	
 	return item_list
+end
+
+local translated_list = nil
+function translate_string(string_name,gamedata_path)
+	if (translated_list) then 
+		return translated_list[string_name] or string_name
+	end 
+	
+	translated_list = {}
+	
+	local function on_execute(path,fname)
+		local f = io.open(path.."\\"..fname,"rb")
+		if (f) then
+			local data = f:read("*all")
+			if (data) then
+				for st_name,text in string.gmatch(data,[[id="([%w_%.]*)".-<text>(.-)</text>]]) do
+					translated_list[st_name] = text
+				end
+			end
+			f:close()
+		end
+	end
+	
+	recurse_subdirectories_and_execute(gamedata_path.."\\configs\\text\\eng",{"xml"},on_execute)
+	
+	return translated_list[string_name] or string_name
 end

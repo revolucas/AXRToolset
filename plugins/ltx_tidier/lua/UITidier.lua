@@ -66,9 +66,24 @@ function cUITidier:OnScriptControlAction(hwnd,event,info) -- needed because it's
 			gSettings:SetValue("ltx_tidier","output_path",o_path)
 			gSettings:Save()
 			-- Run(target,working_directory)
-			Run( strformat([["%s" "%s" "%s"]],ahkGetVar("A_WorkingDir")..[[\plugins\ltx_tidier\bin\LTXTidier.bat]],i_path,o_path), ahkGetVar("A_WorkingDir")..[[\plugins\ltx_tidier\bin\]] )
+			--Run( strformat([["%s" "%s" "%s"]],ahkGetVar("A_WorkingDir")..[[\plugins\ltx_tidier\bin\LTXTidier.bat]],i_path,o_path), ahkGetVar("A_WorkingDir")..[[\plugins\ltx_tidier\bin\]] )
+			cUITidier:DoTidy(i_path,o_path)
 		else 
 			MsgBox("LTX Tidier: Incorrect path setup! input=%s output=%s",i_path,o_path)
 		end
 	end
+end
+
+function cUITidier:DoTidy(i_path,o_path)
+	
+	local function on_execute(path,fname)
+		Msg(path.."\\"..fname)
+		local ltx = IniFile.New(path.."\\"..fname,true)
+		if (ltx) then 
+			ltx:Save(nil,true,o_path.."\\"..fname)
+		end
+	end 
+	Msg("LTX Tidier:= Begin")
+	recurse_subdirectories_and_execute(i_path,{"ltx"},on_execute)
+	Msg("LTX Tidier:= End")
 end

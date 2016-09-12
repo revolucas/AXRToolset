@@ -3,6 +3,7 @@ Scripts = {}
 
 require'lua_extensions'
 require'lfs'
+marshal = require'marshal'
 Class = require'Class'
 CallbackManager = require'CallbackManager'
 require'Utils'
@@ -76,7 +77,7 @@ function ApplicationBegin()
 		Msg("Error: configuration is missing for axr_lua_engine!")
 		return
 	end
-
+	
 	-- Init main window
 	UIMainMenuWnd = UIMain.Get()
 	

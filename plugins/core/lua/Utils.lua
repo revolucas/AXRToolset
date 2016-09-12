@@ -6,6 +6,38 @@ function rem_quotes(txt)
 	return txt
 end
 
+function addTab(s,n)
+	local padding = {}
+	local l = string.len(s)
+	for i=1,n-l do 
+		table.insert(padding," ")
+	end 
+	return s .. table.concat(padding)
+end
+	
+function trim_comment(str)
+	local a = string.find(str,";")
+	return a and trim(string.sub(str,1,a-1)) or str
+end
+
+function get_comment(str)
+	local a = string.find(str,";")
+	return a and " " .. string.sub(str,a) or ""
+end
+
+function string:split(pat)
+	pat = pat or '%s+'
+  local st, g = 1, self:gmatch("()("..pat..")")
+  local function getter(self, segs, seps, sep, cap1, ...)
+    st = sep and seps + #sep
+    return self:sub(segs, (seps or 0) - 1), cap1 or sep, ...
+  end
+  local function splitter(self)
+    if st then return getter(self, st, g()) end
+  end
+  return splitter, self
+end
+
 function directory_exists(path)
 	return os.execute( "CD " .. path ) == 0
 end
@@ -267,6 +299,65 @@ function strformat(s,...)
 	end
 	return s
 end
+
+function strformat_table(tbl,header)
+	local txt = header and ("-- " .. tostring(header) .. "\n{\n\n") or "{\n\n"
+	local depth = 1
+
+	local function tab(amt)
+		local str = ""
+		for i=1,amt, 1 do
+			str = str .. "\t"
+		end
+		return str
+	end
+
+	local function table_to_string(tbl)
+		local size = 0
+		for k,v in pairs(tbl) do
+			size = size + 1
+		end
+
+		local key
+		local i = 1
+
+		for k,v in pairs(tbl) do
+			if (type(k) == "number") then
+				key = "[" .. k .. "]"
+			else
+				key = "[\""..tostring(k) .. "\"]"
+			end
+
+			if (type(v) == "table") then
+				txt = txt .. tab(depth) .. key .. " =\n"..tab(depth).."{\n"
+				depth = depth + 1
+				table_to_string(v,tab(depth))
+				depth = depth - 1
+				txt = txt .. tab(depth) .. "}"
+			elseif (type(v) == "number" or type(v) == "boolean") then
+				txt = txt .. tab(depth) .. key .. " = " .. tostring(v)
+			elseif (type(v) == "userdata") then
+				txt = txt .. tab(depth) .. key .. " = \"unknown userdata\""
+			else
+				txt = txt .. tab(depth) .. key .. " = \"" .. tostring(v) .. "\""
+			end
+
+			if (i == size) then
+				txt = txt .. "\n"
+			else
+				txt = txt .. ",\n"
+			end
+
+			i = i + 1
+		end
+	end
+
+	table_to_string(tbl)
+
+	txt = txt .. "\n}"
+	
+	return txt
+end 
 
 function Msg(s,...)
 	DebugMsg(strformat(s,...))
