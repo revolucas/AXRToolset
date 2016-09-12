@@ -65,6 +65,7 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		if (event and string.lower(event) == "rightclick") then
 			LVTop(self.ID,"UILTXQuickEditLV"..tab)
 			local txt = LVGetText(self.ID,LVGetNext(self.ID,"0"),"1")
+			Msg("event=%s LVGetNext=%s txt=%s",event,LVGetNext(self.ID,"0"),txt)
 			if (txt and txt ~= "" and not self.listItemSelected) then 
 				self.listItemSelected = txt
 				UILTXQuickEditModify.GetAndShow()
