@@ -2425,11 +2425,13 @@ LVGetText(L)
 LVGetNext(L)
 {
    arg1 := lua_tostring(L, 1)
-   arg2 := lua_tonumber(L, 2)
-   arg3 := lua_tostring(L, 3)
+   arg2 := lua_tostring(L, 2)
+   arg3 := lua_tonumber(L, 3)
+   arg4 := lua_tostring(L, 4)
    
    Gui, %arg1%:Default
-   v := LV_GetNext(arg2,arg3)
+   Gui, %arg1%:listview, %arg2%
+   v := LV_GetNext(arg3,arg4)
    
    lua_pushstring(L, v)
    Return, 1

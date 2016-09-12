@@ -62,8 +62,8 @@ function cUITraderEditor:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		
 		if (event == "RightClick") then
 			LVTop(self.ID,"UITraderEditorLV"..tab)
-			local txt = LVGetText(self.ID,info,"1")
-			if (txt and txt ~= "" and not self.listItemSelected) then 
+			local txt = LVGetText(self.ID,LVGetNext(self.ID,"0","UITraderEditorLV"..tab),"1")
+			if (txt and txt ~= "" and not self.listItemSelected) then
 				self.listItemSelected = txt
 				UIModify.GetAndShow()
 			end
