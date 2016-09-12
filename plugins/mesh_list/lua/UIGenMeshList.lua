@@ -26,6 +26,9 @@ function cUIGenMeshList:Reinit()
 	
 	-- GroupBox
 	self:Gui("Add|GroupBox|x10 y50 w510 h75|Unpacked Gamedata Directory")
+
+	-- Checkbox 
+	self:Gui("Add|CheckBox|x175 w300 h25 %s vUIGenMeshListTag%s|%s",gSettings:GetValue("mesh_list","existing_that_are_used") == "1" and "Checked" or "","existing_that_are_used","Check Textures that are Used (Takes awhile)")
 	
 	-- Buttons 
 	self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUIGenMeshListBrowseInputPath|...")
@@ -35,7 +38,7 @@ function cUIGenMeshList:Reinit()
 	-- Editbox 
 	self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUIGenMeshListInputPath|")
 
-	
+
 	self:Gui("Show|w1024 h720|Generate Mesh List")
 	
 	GuiControl(self.ID,"","UIGenMeshListInputPath", gSettings:GetValue("mesh_list","path") or "")
@@ -83,6 +86,10 @@ function OnGenerate()
 	
 	empty(texturefile.root)
 	
+	local bCheckExisting = ahkGetVar("UIGenMeshListTagexisting_that_are_used")
+	gSettings:SetValue("mesh_list","existing_that_are_used",bCheckExisting)
+	bCheckExisting = bCheckExisting == "1" and true or false
+		
 	local data
 	local function on_execute_ltx(path,fname)
 		local f = io.open(path.."\\"..fname,"rb")
@@ -127,25 +134,27 @@ function OnGenerate()
 		local key = string.gsub(path,inputpath.."\\meshes\\", "")
 		
 		if not (outfile:KeyExist("visual",key.."\\"..fname)) then 
+			Msg("unused:= %s",fname)
 			outfile:SetValue("unused",key.."\\"..fname,"")
-			
 			--os.execute( strformat([[xcopy /Y "%s\%s" "%s\backup\gamedata\meshes\%s\"]],path,fname,inputpath,key) )
 			--local txt = fname:sub(1,-5) .. ".txt"
 			--os.execute( strformat([[xcopy /Y "%s\%s" "%s\backup\gamedata\meshes\%s\"]],path,txt,inputpath,key) )
 		else 
 			outfile:SetValue("existing_that_are_used",key.."\\"..fname,"")
-			local f = io.open(path.."\\"..fname,"rb")
-			if (f) then
-				data = f:read("*all")
-				f:close()
-				if (data) then
-					local look = {"act","artifact","briks","controller","corp","crete","decal","detail","door","ed","effects","fbr","flare","floor","food","fx","glas","glass","glow","grad","grenadier","grnd","hud","internal","intro","item","lights","map","mtl","mutantparts","pfx","prop","roof","shoker_mod","sign","sky","ston","terrain","tile","trees","ui","veh","vehicle","vine","wall","water","wind","wm","wood","wpn"}
-					for i=1,#look do 
-						for w in string.gmatch(data, look[i].."\\([#/\\%-_%w]+)") do 
-							texturefile:SetValue("textures_used_by_existing",look[i].."\\"..trim(w)..".dds","")
+			if (bCheckExisting) then
+				local f = io.open(path.."\\"..fname,"rb")
+				if (f) then
+					data = f:read("*all")
+					f:close()
+					if (data) then
+						local look = {"act","artifact","briks","controller","corp","crete","decal","detail","door","ed","effects","fbr","flare","floor","food","fx","glas","glass","glow","grad","grenadier","grnd","hud","internal","intro","item","lights","map","mtl","mutantparts","pfx","prop","roof","shoker_mod","sign","sky","ston","terrain","tile","trees","ui","veh","vehicle","vine","wall","water","wind","wm","wood","wpn"}
+						for i=1,#look do 
+							for w in string.gmatch(data, look[i].."\\([#/\\%-_%w]+)") do 
+								texturefile:SetValue("textures_used_by_existing",look[i].."\\"..trim(w)..".dds","")
+							end
 						end
-					end
-				end 
+					end 
+				end
 			end
 		end
 	end 
