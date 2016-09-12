@@ -188,6 +188,7 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "LV", RegisterCallback("LV","C"))
    lua_register(l, "LVTop", RegisterCallback("LVTop","C"))
    lua_register(l, "LVGetText", RegisterCallback("LVGetText","C"))
+   lua_register(l, "LVGetNext", RegisterCallback("LVGetNext","C"))
 }
 
 DebugMsg(L)
@@ -2416,6 +2417,19 @@ LVGetText(L)
    
    Gui, %arg1%:Default
    LV_GetText(v,arg2,arg3)
+   
+   lua_pushstring(L, v)
+   Return, 1
+}
+
+LVGetNext(L)
+{
+   arg1 := lua_tostring(L, 1)
+   arg2 := lua_tonumber(L, 2)
+   arg3 := lua_tostring(L, 3)
+   
+   Gui, %arg1%:Default
+   v := LV_GetNext(arg2,arg3)
    
    lua_pushstring(L, v)
    Return, 1

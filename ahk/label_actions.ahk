@@ -8,7 +8,7 @@ OnScriptControlAction:
 	
 	e := A_GuiEvent
 	i := A_EventInfo
-	luaL_dostring(L,"_G.GuiScriptControlAction([[" . h . "]],[[" . e . "]]," . i . ")")
+	luaL_dostring(L,"_G.GuiScriptControlAction([[" . h . "]],[[" . e . "]],[[" . i . "]])")
 }
 Return 
 

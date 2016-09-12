@@ -61,11 +61,10 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		local selected = ahkGetVar("UILTXQuickEditSection"..tab)
 		if (selected == nil or selected == "") then 
 			return 
-		end		
-		Msg(event)
-		if (event == "RightClick") then
+		end
+		if (event and string.lower(event) == "rightclick") then
 			LVTop(self.ID,"UILTXQuickEditLV"..tab)
-			local txt = LVGetText(self.ID,info,"1")
+			local txt = LVGetText(self.ID,LVGetNext(self.ID,"0"),"1")
 			if (txt and txt ~= "" and not self.listItemSelected) then 
 				self.listItemSelected = txt
 				UILTXQuickEditModify.GetAndShow()
