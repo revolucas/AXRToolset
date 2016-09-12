@@ -1,3 +1,4 @@
+UIModifyWnd = nil
 function Get()
 	if not (UIModifyWnd) then 
 		UIModifyWnd = cUILTXQuickEditModify("2")
@@ -17,11 +18,20 @@ end
 function cUILTXQuickEditModify:Reinit()
 	cUIBase.Reinit(self)
 	
+	if (wnd.listItemSelected == nil) then 
+		return Msgbox("An error has occured. listItemSelected = nil!")
+	end
+	
 	self:Gui("+AlwaysonTop")
 	self:Gui("Font|s10|Verdana")
 	
 	local wnd = UILTXQuickEdit.Get()
 	local list = wnd.list[wnd.listItemSelected]
+	
+	if not (list) then 
+		return Msgbox("An error has occured. list = nil!")
+	end
+	
 	local fname = list.fname
 	
 	self:Gui("Add|Text|w300 h30|%s",fname)
