@@ -90,42 +90,55 @@ function OnGenerate()
 	gSettings:SetValue("mesh_list","existing_that_are_used",bCheckExisting)
 	bCheckExisting = bCheckExisting == "1" and true or false
 		
+	local ignore_paths = {
+		["environment"] = true,
+		["fog"] = true,
+		["weathers"] = true,
+		["weather_effects"] = true,
+		["ambients"] = true,
+		["ambient_channels"] = true,
+	}
 	local data
 	local function on_execute_ltx(path,fname)
-		local f = io.open(path.."\\"..fname,"rb")
-		if (f) then
-			Msg("scanning %s\\%s",path,fname)
-			data = f:read("*all")
-			f:close()
-			if (data) then
-				local ext = get_ext(fname)
-				if (ext == "xml") then 
-					for w in string.gmatch(data,"<visual>([/\\%-_%w]+)</visual>") do
-						outfile:SetValue("visual",trim(w)..".ogf","")
-					end
-				else
-					for w in string.gmatch(data,"dynamics\\([#/\\%-_%w]+)") do 
-						outfile:SetValue("visual","dynamics\\"..trim(w)..".ogf","")
-					end
-					for w in string.gmatch(data,"equipments\\([#/\\%-_%w]+)") do 
-						outfile:SetValue("visual","equipments\\"..trim(w)..".ogf","")
-					end
-					for w in string.gmatch(data,"actors\\([#/\\%-_%w]+)") do 
-						outfile:SetValue("visual","actors\\"..trim(w)..".ogf","")
-					end
-					for w in string.gmatch(data,"grenadier\\([#/\\%-_%w]+)") do 
-						outfile:SetValue("visual","grenadier\\"..trim(w)..".ogf","")
-					end
-					for w in string.gmatch(data,"monsters\\([#/\\%-_%w]+)") do 
-						outfile:SetValue("visual","monsters\\"..trim(w)..".ogf","")
-					end
-					for w in string.gmatch(data,"([/\\%-_%w]+).ogf") do
-						outfile:SetValue("visual",trim(w)..".ogf","")
+		local check_path = trim_directory(path)
+		if (ignore_paths[check_path]) then 
+
+		else
+			local f = io.open(path.."\\"..fname,"rb")
+			if (f) then
+				Msg("scanning %s\\%s",path,fname)
+				data = f:read("*all")
+				f:close()
+				if (data) then
+					local ext = get_ext(fname)
+					if (ext == "xml") then 
+						for w in string.gmatch(data,"<visual>([/\\%-_%w]+)</visual>") do
+							outfile:SetValue("visual",trim(w)..".ogf","")
+						end
+					else
+						for w in string.gmatch(data,"dynamics\\([#/\\%-_%w]+)") do 
+							outfile:SetValue("visual","dynamics\\"..trim(w)..".ogf","")
+						end
+						for w in string.gmatch(data,"equipments\\([#/\\%-_%w]+)") do 
+							outfile:SetValue("visual","equipments\\"..trim(w)..".ogf","")
+						end
+						for w in string.gmatch(data,"actors\\([#/\\%-_%w]+)") do 
+							outfile:SetValue("visual","actors\\"..trim(w)..".ogf","")
+						end
+						for w in string.gmatch(data,"grenadier\\([#/\\%-_%w]+)") do 
+							outfile:SetValue("visual","grenadier\\"..trim(w)..".ogf","")
+						end
+						for w in string.gmatch(data,"monsters\\([#/\\%-_%w]+)") do 
+							outfile:SetValue("visual","monsters\\"..trim(w)..".ogf","")
+						end
+						for w in string.gmatch(data,"([/\\%-_%w]+).ogf") do
+							outfile:SetValue("visual",trim(w)..".ogf","")
+						end
 					end
 				end
-			end
-			
-		end	
+				
+			end	
+		end
 	end 
 
 	recurse_subdirectories_and_execute(inputpath,{"ltx","xml","spawn"},on_execute_ltx)

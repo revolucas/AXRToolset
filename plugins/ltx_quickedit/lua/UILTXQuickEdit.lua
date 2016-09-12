@@ -133,22 +133,37 @@ function cUILTXQuickEdit:FillListView(tab)
 	
 	LV("LV_ModifyCol",self.ID,"1","AutoHdr")
 	
+	local ignore_paths = {
+		["environment"] = true,
+		["fog"] = true,
+		["weathers"] = true,
+		["weather_effects"] = true,
+		["ambients"] = true,
+		["ambient_channels"] = true,
+	}
+	
 	local function on_execute(path,fname)
-		if not (self.ltx[fname]) then 
-			self.ltx[fname] = IniFile.New(path.."\\"..fname,true)
-		end
-		
-		if (self.ltx[fname]) then
-			local t = self.ltx[fname]:GetSections()
-			for n=1,#t do
-				for i=1,#self.fields do 
-					local v = self.ltx[fname]:GetValue(t[n],self.fields[i])
-					if (v) then
-						if not (self.list[t[n]]) then
-							self.list[t[n]] = {}
-							self.list[t[n]].fname = fname
+		local check_path = trim_directory(path)
+		if (ignore_paths[check_path]) then 
+
+		else
+			Msg(fname)
+			if not (self.ltx[fname]) then 
+				self.ltx[fname] = IniFile.New(path.."\\"..fname,true)
+			end
+			
+			if (self.ltx[fname]) then
+				local t = self.ltx[fname]:GetSections()
+				for n=1,#t do
+					for i=1,#self.fields do 
+						local v = self.ltx[fname]:GetValue(t[n],self.fields[i])
+						if (v) then
+							if not (self.list[t[n]]) then
+								self.list[t[n]] = {}
+								self.list[t[n]].fname = fname
+							end
+							self.list[t[n]][self.fields[i]] = v
 						end
-						self.list[t[n]][self.fields[i]] = v
 					end
 				end
 			end
