@@ -1,14 +1,14 @@
-UILTXQuickEditWnd = nil
+local oUILTXQuickEdit = nil
 function OnApplicationBegin()
 	UIMainMenuWnd:AddPluginButton("LTX QuickEdit","UILTXQuickEditShow",GetAndShow)
 end
 
 function Get()
-	if not (UILTXQuickEditWnd) then 
-		UILTXQuickEditWnd = cUILTXQuickEdit("1")
-		UILTXQuickEditWnd.parent = UIMainMenuWnd
+	if not (oUILTXQuickEdit) then 
+		oUILTXQuickEdit = cUILTXQuickEdit("1")
+		oUILTXQuickEdit.parent = UIMainMenuWnd
 	end 
-	return UILTXQuickEditWnd
+	return oUILTXQuickEdit
 end
 
 function GetAndShow()
@@ -18,6 +18,14 @@ end
 cUILTXQuickEdit = Class{__includes={cUIBase}}
 function cUILTXQuickEdit:init(id)
 	cUIBase.init(self,id)
+end
+
+function cUILTXQuickEdit:Show(bool)
+	cUIBase.Show(self,bool)
+end 
+
+function cUILTXQuickEdit:Create()
+	cUIBase.Create(self)
 end
 
 function cUILTXQuickEdit:Reinit()
@@ -65,7 +73,7 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		if (event and string.lower(event) == "rightclick") then
 			LVTop(self.ID,"UILTXQuickEditLV"..tab)
 			local txt = LVGetText(self.ID,LVGetNext(self.ID,"0","UILTXQuickEditLV"..tab),"1")
-			Msg("event=%s LVGetNext=%s txt=%s",event,LVGetNext(self.ID,"0","UILTXQuickEditLV"..tab),txt)
+			--Msg("event=%s LVGetNext=%s txt=%s",event,LVGetNext(self.ID,"0","UILTXQuickEditLV"..tab),txt)
 			if (txt and txt ~= "" and not self.listItemSelected) then 
 				self.listItemSelected = txt
 				UILTXQuickEditModify.GetAndShow()
@@ -85,6 +93,10 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 			gSettings:Save()
 		end
 	end
+end
+
+function cUILTXQuickEdit:Gui(...)
+	cUIBase.Gui(self,...)
 end
 
 function cUILTXQuickEdit:GetFilterList()
@@ -147,7 +159,7 @@ function cUILTXQuickEdit:FillListView(tab)
 		if (ignore_paths[check_path]) then 
 
 		else
-			Msg(fname)
+			--Msg(fname)
 			if not (self.ltx[fname]) then 
 				self.ltx[fname] = IniFile.New(path.."\\"..fname,true)
 			end

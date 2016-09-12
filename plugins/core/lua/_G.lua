@@ -40,6 +40,10 @@ function CreateScriptIfNotExist(path,fname)
 	else 
 		_G[name] = {}
 		local l = assert(loadfile(path.."\\"..fname))
+		if not (l) then 
+			MsgBox("Assert failed for loadfile(%s\\%s)",path,fname)
+			return
+		end
 		setfenv(l,_G[name])
 		setmetatable(_G[name],{ __index = _G })
 		Modules[dir] = l()

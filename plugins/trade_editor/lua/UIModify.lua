@@ -1,17 +1,14 @@
-function Get()
-	if not (UIModifyWnd) then 
-		UIModifyWnd = cUIModify("2")
-	end
-	return UIModifyWnd
-end
-
-function GetAndShow()
-	Get():Show(true)
-end
-
 cUIModify = Class{__includes={cUIBase}}
 function cUIModify:init(id)
 	cUIBase.init(self,id)
+end
+
+function cUIModify:Show(bool)
+	cUIBase.Show(self,bool)
+end 
+
+function cUIModify:Create()
+	cUIBase.Create(self)
 end
 
 function cUIModify:Reinit()
@@ -121,3 +118,18 @@ function cUIModify:OnScriptControlAction(hwnd,event,info) -- needed because it's
 	end
 end
 
+function cUIModify:Gui(...)
+	cUIBase.Gui(self,...)
+end
+-------------------------------------------------
+local oUIModify = nil
+function Get()
+	if not (oUIModify) then 
+		oUIModify = cUIModify("2")
+	end
+	return oUIModify
+end
+
+function GetAndShow()
+	Get():Show(true)
+end

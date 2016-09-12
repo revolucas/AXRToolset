@@ -1,18 +1,14 @@
-UIModifyWnd = nil
-function Get()
-	if not (UIModifyWnd) then 
-		UIModifyWnd = cUILTXQuickEditModify("2")
-	end
-	return UIModifyWnd
-end
-
-function GetAndShow()
-	Get():Show(true)
-end
-
 cUILTXQuickEditModify = Class{__includes={cUIBase}}
 function cUILTXQuickEditModify:init(id)
 	cUIBase.init(self,id)
+end
+
+function cUILTXQuickEditModify:Show(bool)
+	cUIBase.Show(self,bool)
+end 
+
+function cUILTXQuickEditModify:Create()
+	cUIBase.Create(self)
 end
 
 function cUILTXQuickEditModify:Reinit()
@@ -92,3 +88,18 @@ function cUILTXQuickEditModify:OnScriptControlAction(hwnd,event,info) -- needed 
 	end
 end
 
+function cUILTXQuickEditModify:Gui(...)
+	cUIBase.Gui(self,...)
+end
+------------------------
+local oUILTXQuickEditModify = nil
+function Get()
+	if not (oUILTXQuickEditModify) then 
+		oUILTXQuickEditModify = cUILTXQuickEditModify("2")
+	end
+	return oUILTXQuickEditModify
+end
+
+function GetAndShow()
+	Get():Show(true)
+end

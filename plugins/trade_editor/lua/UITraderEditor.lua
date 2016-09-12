@@ -1,14 +1,14 @@
-UITraderEditorWnd = nil
+local oUITraderEditor = nil
 function OnApplicationBegin()
 	UIMainMenuWnd:AddPluginButton("Trader Editor","UITraderEditorShow",GetAndShow)
 end
 
 function Get()
-	if not (UITraderEditorWnd) then 
-		UITraderEditorWnd = cUITraderEditor("1")
-		UITraderEditorWnd.parent = UIMainMenuWnd
+	if not (oUITraderEditor) then 
+		oUITraderEditor = cUITraderEditor("1")
+		oUITraderEditor.parent = UIMainMenuWnd
 	end 
-	return UITraderEditorWnd
+	return oUITraderEditor
 end
 
 function GetAndShow()
@@ -21,6 +21,14 @@ function cUITraderEditor:init(id)
 
 	self.ltx = {}
 	self.list = {}
+end
+
+function cUITraderEditor:Show(bool)
+	cUIBase.Show(self,bool)
+end 
+
+function cUITraderEditor:Create()
+	cUIBase.Create(self)
 end
 
 function cUITraderEditor:Reinit()
@@ -71,6 +79,10 @@ function cUITraderEditor:OnScriptControlAction(hwnd,event,info) -- needed becaus
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorSection"..tab)) then 	
 		self:FillListView(tab)
 	end
+end
+
+function cUITraderEditor:Gui(...)
+	cUIBase.Gui(self,...)
 end
 
 function cUITraderEditor:GetSectionList()
