@@ -34,6 +34,7 @@ function cUICoCDBTool:Reinit()
 		-- Buttons 
 		self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath|...")
 		self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath|...")
+		self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUICoCDBToolSaveSettings0|Save Settings")	
 		self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUICoCDBToolExecute|Unpack")		
 		
 		-- Editbox 
@@ -60,6 +61,7 @@ function cUICoCDBTool:Reinit()
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath%s|...",n)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath%s|...",n)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUICoCDBToolSaveSettings%s|Save Settings",n)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUICoCDBToolExecute%s|Make DBs",n)
 			
 			-- Editbox 
@@ -94,6 +96,13 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute")) then
 			self:Gui("Submit|NoHide")
 			ActionUnpack()
+		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings0")) then
+			local input_path = ahkGetVar("UICoCDBToolInputPath")
+			local output_path = ahkGetVar("UICoCDBToolOutputPath")
+			
+			gSettings:SetValue("dbtool","unpack_input_path",input_path)
+			gSettings:SetValue("dbtool","unpack_output_path",output_path)
+			gSettings:Save()
 		end
 	else 
 		tab = tostring(tonumber(tab) - 1)
@@ -110,6 +119,18 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute"..tab)) then
 			self:Gui("Submit|NoHide")
 			ActionSubmit(tab)
+		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings"..tab)) then
+			local input_path = ahkGetVar("UICoCDBToolInputPath"..tab)
+			local output_path = ahkGetVar("UICoCDBToolOutputPath"..tab)
+			
+			for i=1,#DBChecks do 
+				local bool = ahkGetVar("UICoCDBToolCheck"..DBChecks[i]..tab)
+				gSettings:SetValue("dbtool","check_"..DBChecks[i]..tab,bool)
+			end
+			
+			gSettings:SetValue("dbtool","path"..tab,input_path or "")
+			gSettings:SetValue("dbtool","output_path"..tab,output_path or "")
+			gSettings:Save()
 		end
 	end
 end
