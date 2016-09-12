@@ -6,17 +6,9 @@ OnScriptControlAction:
 {
 	GuiControlGet, h, hwnd, %A_GuiControl%
 	
-	e :=""
-	
-	if (A_GuiEvent == "RightClick")
-		e = "RightClick"
-	else if (A_GuiEvent == "Normal")
-		e = "Normal"
-	else if (A_GuiEvent == "DoubleClick")
-		e = "DoubleClick"
-	
+	e := A_GuiEvent
 	i := A_EventInfo
-	luaL_dostring(L,"_G.GuiScriptControlAction([[" . h . "]]," . e . "," . i . ")")
+	luaL_dostring(L,"_G.GuiScriptControlAction([[" . h . "]],[[" . e . "]]," . i . ")")
 }
 Return 
 
