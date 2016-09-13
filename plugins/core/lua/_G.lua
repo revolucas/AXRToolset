@@ -44,8 +44,8 @@ function CreateScriptIfNotExist(path,fname)
 			MsgBox("Assert failed for loadfile(%s\\%s)",path,fname)
 			return
 		end
-		setfenv(l,_G[name])
 		setmetatable(_G[name],{ __index = _G })
+		setfenv(l,_G[name])
 		Modules[dir] = l()
 	end	
 	
