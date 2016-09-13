@@ -220,7 +220,7 @@ function cUILTXQuickEditModify:Reinit()
 	self:Gui("+AlwaysonTop")
 	self:Gui("Font|s10|Verdana")
 	
-	local wnd = UILTXQuickEdit.Get()
+	local wnd = Get()
 	if (wnd.listItemSelected == nil) then 
 		return Msgbox("An error has occured. listItemSelected = nil!")
 	end
@@ -259,7 +259,7 @@ end
 function cUILTXQuickEditModify:Destroy()
 	cUIBase.Destroy(self)
 	
-	UILTXQuickEdit.Get().listItemSelected = nil 
+	Get().listItemSelected = nil 
 end
 
 function cUILTXQuickEditModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
@@ -268,7 +268,7 @@ function cUILTXQuickEditModify:OnScriptControlAction(hwnd,event,info) -- needed 
 	local tab = ahkGetVar("UILTXQuickEditTab") or "1"
 		
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIModifyAccept")) then
-		local wnd = UILTXQuickEdit.Get()
+		local wnd = Get()
 		local list = assert(wnd.list[wnd.listItemSelected])
 		local fname = list.fname
 	

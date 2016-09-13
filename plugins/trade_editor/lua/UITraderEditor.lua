@@ -201,7 +201,7 @@ function cUIModify:Reinit()
 	self:Gui("+AlwaysonTop")
 	self:Gui("Font|s10|Verdana")
 	
-	local wnd = UITraderEditor.Get()
+	local wnd = Get()
 	local list = wnd.list[wnd.listItemSelected]
 	if not (list) then 
 		return 
@@ -246,7 +246,7 @@ end
 function cUIModify:Destroy()
 	cUIBase.Destroy(self)
 	
-	UITraderEditor.Get().listItemSelected = nil 
+	Get().listItemSelected = nil 
 end
 
 function cUIModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
@@ -254,7 +254,7 @@ function cUIModify:OnScriptControlAction(hwnd,event,info) -- needed because it's
 		self:Gui("Submit|NoHide")
 		local tab = ahkGetVar("UITraderEditorTab")
 		
-		local wnd = UITraderEditor.Get()
+		local wnd = Get()
 		local list = assert(wnd.list[wnd.listItemSelected])
 		local fname = trim_directory(list.path)
 	
