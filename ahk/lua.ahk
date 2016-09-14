@@ -627,6 +627,11 @@ luaL_openlibs(ByRef l)
    Return, DllCall("lua51\luaL_openlibs", "UInt", l, "Cdecl")
 }
 
+lua_pushglobaltable(ByRef l)
+{
+   Return, DllCall("lua51\lua_pushglobaltable", "UInt", l, "Cdecl")
+}
+
 ;int luaL_optint (lua_State *L, int narg, int d);
 ;lua_Integer luaL_optinteger (lua_State *L, int narg, lua_Integer d);
 ;long luaL_optlong (lua_State *L, int narg, long d);

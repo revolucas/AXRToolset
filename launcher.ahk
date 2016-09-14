@@ -18,26 +18,14 @@ luaL_openlibs(L)
 lua_registerAhkFunction(L)
 
 ; Append to default package paths
-luaL_dostring(L,"package.path = package.path .. ';lua\\?.lua;plugins\\core\\lua\\?.lua'")
+luaL_dostring(L,"package.path = package.path .. ';core\\?.lua'")
 luaL_dostring(L,"package.cpath = package.cpath .. ';bin\\?.dll;..\\bin\\?.dll'")
 
-luaL_dofile(L, "plugins\core\lua\_G.lua")
+luaL_dofile(L, "core\main.lua")
 
 if lua_isstring(L,-1) {
 	MsgBox % "Error: " . lua_tostring(L,-1)
 }
-
-; Load all lua plugins
-Loop Files, %A_WorkingDir%\plugins\*.lua, R
-{
-    luaL_dostring(L,"_G.CreateScriptIfNotExist([[" . A_LoopFileDir . "]],[[" . A_LoopFileShortName . "]])")
-}
-
-if lua_isstring(L,-1) {
-	MsgBox % "Error: " . lua_tostring(L,-1)
-}
-
-luaL_dostring(L,"_G.ApplicationBegin()")
 
 ;ExitApp
 return

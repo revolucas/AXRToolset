@@ -20,33 +20,33 @@ OnExit:
 Return
 
 GuiClose:
-	luaL_dostring(L,"_G.GuiClose(1)")
+	luaL_dostring(L,"_G.GuiClose([[1]])")
 Return
 
 2GuiClose:
-	luaL_dostring(L,"_G.GuiClose(2)")
+	luaL_dostring(L,"_G.GuiClose([[2]])")
 Return
 
 3GuiClose:
-	luaL_dostring(L,"_G.GuiClose(3)")
+	luaL_dostring(L,"_G.GuiClose([[3]])")
 Return
 
 4GuiClose:
-	luaL_dostring(L,"_G.GuiClose(4)")
+	luaL_dostring(L,"_G.GuiClose([[4]])")
 Return
 
 5GuiClose:
-	luaL_dostring(L,"_G.GuiClose(5)")
+	luaL_dostring(L,"_G.GuiClose([[5]])")
 Return
 
 6GuiClose:
-	luaL_dostring(L,"_G.GuiClose(6)")
+	luaL_dostring(L,"_G.GuiClose([[6]])")
 Return
 
 7GuiClose:
-	luaL_dostring(L,"_G.GuiClose(7)")
+	luaL_dostring(L,"_G.GuiClose([[7]])")
 Return
 
 8GuiClose:
-	luaL_dostring(L,"_G.GuiClose(8)")
+	luaL_dostring(L,"_G.GuiClose([[8]])")
 Return
