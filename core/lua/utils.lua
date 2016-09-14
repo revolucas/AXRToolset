@@ -165,25 +165,17 @@ function recurse_subdirectories_and_execute(node,ext,func,...)
 	while not deepest do
 		if (node) then
 			for file in lfs.dir(node) do
-				if lfs.attributes(file,"mode") == "file" then
-					--Msg(file)
-				elseif lfs.attributes(file,"mode") == "directory" then
-					if (file == ".") then
-						for l in lfs.dir(node) do
-							if (l ~= ".." and l ~= ".") then
-								if lfs.attributes(node.."\\"..file.."\\"..l,"mode") == "file" then
-									--Msg(l)
-									for i=1,#ext do
-										if (get_ext(l) == ext[i]) then
-											func(node,l,...)
-										end
-									end
-								elseif lfs.attributes(node.."\\"..file.."\\"..l,"mode") == "directory" then
-									--print(node .. "\\"..l)
-									table.insert(stack,node .. "\\" .. l)
-								end
-							end
+				local fullpath = node .. "\\" .. file
+				local mode = lfs.attributes(fullpath,"mode")
+				if (mode == "file") then
+					for i=1,#ext do
+						if (get_ext(file) == ext[i]) then
+							func(node,file,...)
 						end
+					end
+				elseif (mode == "directory") then
+					if (file ~= ".." and file ~= "." and not file_exists(fullpath.."\\.ignore")) then
+						table.insert(stack,fullpath)
 					end
 				end
 			end

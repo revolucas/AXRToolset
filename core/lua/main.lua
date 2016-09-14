@@ -1,15 +1,17 @@
 _AXRTOOLSET_METATABLE_ = {}
-local _G = _G
+local _G = _G -- because we later set _G._G to _AXRTOOLSET_METATABLE_
 ----------------------------------------------------
 -- INCLUDES
 ----------------------------------------------------
+package.path = package.path .. ';core\\lua\\?.lua'
+package.cpath = package.cpath .. ';bin\\?.dll;..\\bin\\?.dll'
+
 require "lua_extensions"
 require "lfs"
 Marshal = require "marshal"
 Class = require "middleclass"
 require "utils"
 require "inifile"
-
 ----------------------------------------------------
 -- Global Utils
 ----------------------------------------------------
@@ -33,7 +35,6 @@ end
 
 function CallbackSend(name,...)
 	if (callbacks[name]) then
-	
 		for func_or_userdata,v in pairs(callbacks[name]) do 
 			if (type(func_or_userdata) == "function") then 
 				func_or_userdata(...)
@@ -73,7 +74,8 @@ function auto_load(t,k)
 	local path
 	local fname = k .. ".lua"
 	local function on_execute(fs_path,fs_fname)
-		if (fs_fname == fname) then 
+		if (fs_fname == fname) then
+			--package.path = package.path .. ';'..fs_path..'\\?.lua'
 			path = fs_path
 			return
 		end
