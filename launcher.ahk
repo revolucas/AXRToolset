@@ -17,10 +17,6 @@ OnExit, OnExit
 luaL_openlibs(L)
 lua_registerAhkFunction(L)
 
-; Append to default package paths
-luaL_dostring(L,"package.path = package.path .. ';core\\lua\\?.lua'")
-luaL_dostring(L,"package.cpath = package.cpath .. ';bin\\?.dll;..\\bin\\?.dll'")
-
 luaL_dofile(L, "core\lua\main.lua")
 
 if lua_isstring(L,-1) {
