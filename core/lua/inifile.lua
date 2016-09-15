@@ -120,7 +120,7 @@ end
 
 -- Save ini by preserving original file. Cannot insert new keys or sections
 function cIniFile:SaveExt()
-	local t,sec,comment
+	local t,sec,key,comment
 	local str = ""
 
 	local function addTab(s,n)
@@ -135,7 +135,7 @@ function cIniFile:SaveExt()
 	for ln in io.lines(self.fname) do
 		ln = trim(ln)
 		if (startsWith(ln,"[")) then
-
+			sec = string.match(trim_comment(ln),"%[(.-)%]")
 			-- inject new fields that previously didn't exist
 			if (sec and self.root[sec] and self.insert[sec]) then
 				for i=1,#self.insert[sec] do
@@ -145,29 +145,27 @@ function cIniFile:SaveExt()
 					end
 				end
 			end
-
-			t = str_explode(ln,";")
-			t = str_explode(t[1],":")
-
-			sec = string.sub(t[1],2,-2)
-		elseif (not startsWith(ln,";") and self.root[sec]) then
-			comment = string.find(ln,";")
-			comment = comment and string.sub(ln,comment) or ""
-
-			if (comment ~= "") then
-				comment = addTab("\t",40) .. comment
-			end
-
-			t = str_explode(ln,"=")
-			if (self.root[sec][t[1]] ~= nil) then
-				if (self.root[sec][t[1]] == "") then
-					ln = addTab(t[1],40) .. " =" .. comment
-				else
-					ln = addTab(t[1],40) .. " = " .. tostring(self.root[sec][t[1]]) .. comment
+			
+			str = str .. ln .. "\n"
+		elseif (sec and self.root[sec]) then
+			key = trim(trim_comment(string.match(ln,"(.-)=") or ln))
+			
+			if (key and self.root[sec][key]) then
+				comment = get_comment(ln) or ""
+				if (comment ~= "") then 
+					comment = addTab(comment,20)
 				end
+				if (self.root[sec][key] == "") then
+					str = str .. addTab(key,40) .. " =" .. comment .. "\n"
+				else
+					str = str .. addTab(key,40) .. " = " .. tostring(self.root[sec][key]) .. comment .. "\n"
+				end
+			else 
+				str = str .. ln .. "\n"
 			end
+		else 
+			str = str .. ln .. "\n"
 		end
-		str = str .. ln .. "\n"
 	end
 	
 	empty(self.insert)

@@ -25,6 +25,16 @@ function get_comment(str)
 	return a and " " .. string.sub(str,a) or ""
 end
 
+function get_section_includes(str)
+	local a = string.find(str,"]")
+	return a and " " .. string.sub(str,a+2) or ""
+end
+
+function trim_section_includes(str)
+	local a = string.find(str,"]")
+	return a and trim(string.sub(str,1,a)) or str
+end
+
 function string:split(pat)
 	pat = pat or '%s+'
   local st, g = 1, self:gmatch("()("..pat..")")
@@ -100,32 +110,31 @@ end
 
 function file_to_table(fname,parent,simple)
 	local root = parent and parent.root or {}
-	local sec,t,key,val
+	local sec,t,key
 	for line in io.lines(fname) do
+		line = trim(trim_comment(line))
 		if (line ~= "" and line ~= "\n") then
 			if (startsWith(line, "#include")) then
-				t = str_explode(line,";")
-				t = str_explode(t[1],[["]])
-
-				if (simple ~= true and parent ~= nil and file_exists(get_path(fname)..t[2])) then
-					file_to_table(get_path(fname)..t[2],parent,simple)
+				if (simple ~= true and parent ~= nil) then
+					local inc = string.match(line,[["(.-)"]]) or ""
+					if (inc ~= "" and file_exists(get_path(fname)..inc)) then
+						file_to_table(get_path(fname)..inc,parent,simple)
+					end
 				end
 			elseif (startsWith(line, "[")) then
-				t = str_explode(line,";")
-				t = str_explode(t[1],":")
-
-				sec = string.sub(t[1],2,-2)
-
+				sec = string.match(line,"%[(.-)%]")
+				
 				if (root[sec]) then
 					printf("ERROR: Duplicate section exists! %s",line)
 				end
 
-				root[sec] = {}
+				root[sec] = root[sec] or {}
 
-				if (t[2]) then
-					root[sec]["_____link"] = t[2]
+				local inc = get_section_includes(line)
+				if (inc) then
+					root[sec]["_____link"] = inc
 					if (simple ~= true) then
-						local a = str_explode(t[2],",")
+						local a = str_explode(inc,",")
 						for k,v in pairs(a) do
 							if (root[v]) then
 								for kk,vv in pairs(root[v]) do
@@ -135,22 +144,11 @@ function file_to_table(fname,parent,simple)
 						end
 					end
 				end
-			elseif (not startsWith(line, ";") and not startsWith(line,"	") and not startsWith(line," ")) then
-				t = str_explode(line,";")
-				key = trim(string.match(t[1],"(.-)=") or t[1])
-				if (key and key ~= "") then
-					key = trim(key)
-					val = string.match(t[1],"=(.+)")
-					if (val) then
-						val = trim(val)
-					end
-
-					if (sec) then
-						root[sec] = root[sec] or {}
-						root[sec][key] = val or ""
-					else
-						root[key] = val or ""
-					end
+			elseif (sec) then
+				key = trim(string.match(line,"(.-)=") or line)
+				if (key ~= "") then
+					root[sec] = root[sec] or {}
+					root[sec][key] = trim(string.match(line,"=(.+)") or "")
 				end
 			end
 		end
