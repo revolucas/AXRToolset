@@ -1,4 +1,6 @@
 function ApplicationBegin()
+	math.randomseed(os.time())
+	
 	gSettings = cIniFile:new(".\\settings.ini",true)
 	if not (gSettings) then
 		Msg("Error: configuration is missing for axr_lua_engine!")

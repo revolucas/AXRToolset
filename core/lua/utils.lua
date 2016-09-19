@@ -15,6 +15,11 @@ function addTab(s,n)
 	return s .. table.concat(padding)
 end
 	
+function trim_ext(str)
+	local a = string.find(str,"%.")
+	return a and trim(string.sub(str,1,a-1)) or str
+end
+
 function trim_comment(str)
 	local a = string.find(str,";")
 	return a and trim(string.sub(str,1,a-1)) or str
@@ -131,7 +136,7 @@ function file_to_table(fname,parent,simple)
 				root[sec] = root[sec] or {}
 
 				local inc = get_section_includes(line)
-				if (inc) then
+				if (inc and inc ~= "") then
 					root[sec]["_____link"] = inc
 					if (simple ~= true) then
 						local a = str_explode(inc,",")
@@ -163,17 +168,19 @@ function recurse_subdirectories_and_execute(node,ext,func,...)
 	while not deepest do
 		if (node) then
 			for file in lfs.dir(node) do
-				local fullpath = node .. "\\" .. file
-				local mode = lfs.attributes(fullpath,"mode")
-				if (mode == "file") then
-					for i=1,#ext do
-						if (get_ext(file) == ext[i]) then
-							func(node,file,...)
+				if (file ~= ".." and file ~= ".") then
+					local fullpath = node .. "\\" .. file
+					local mode = lfs.attributes(fullpath,"mode")
+					if (mode == "file") then
+						for i=1,#ext do
+							if (get_ext(file) == ext[i]) then
+								func(node,file,...)
+							end
 						end
-					end
-				elseif (mode == "directory") then
-					if (file ~= ".." and file ~= "." and not file_exists(fullpath.."\\.ignore")) then
-						table.insert(stack,fullpath)
+					elseif (mode == "directory") then
+						if not (file_exists(fullpath.."\\.ignore")) then
+							table.insert(stack,fullpath)
+						end
 					end
 				end
 			end

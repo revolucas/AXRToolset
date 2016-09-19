@@ -102,4 +102,46 @@ end
 
 function cMainMenu:Show(bool)
 	inherited.Show(self,bool)
+	--cMainMenu:Test()
+end
+
+function cMainMenu:Test()
+	local smarts = {}
+	local fname = "start_positions.ltx"
+	for line in io.lines(fname) do
+		line = trim(trim_comment(line))
+		if (line ~= "" and line ~= "\n") then
+			local p = str_explode(line,"=")
+			if (p[1] and p[2]) then
+				local smart_name = trim(p[2])
+				if not (smarts[smart_name]) then 
+					smarts[smart_name] = {}
+				end
+				
+				local squad_section = trim(p[1])
+				table.insert(smarts[smart_name],squad_section)
+			end
+		end 
+	end
+	
+	local str = ""
+	
+	for smart,t in spairs(smarts) do 
+		str = str .. "[" .. smart .. "]\n"
+		table.sort(t)
+		for i=1,#t do 
+			if (string.find(t[i],"sim")) then
+				str = str .. addTab(t[i],40) .. "= 1\n"
+			else 
+				str = str .. t[i] .. "\n"
+			end
+		end
+		str = str .. "\n"
+	end
+	
+	local f = io.open("new_start_positions.ltx","wb")
+	if (f) then 
+		f:write(str)
+		f:close()
+	end
 end

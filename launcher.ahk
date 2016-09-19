@@ -26,6 +26,6 @@ if lua_isstring(L,-1) {
 ;ExitApp
 return
 
-#include core\ahk\label_actions.ahk 
-#include core\ahk\ui_handlers.ahk 
+#include core\ahk\label_actions.ahk
+#include core\ahk\ui_handlers.ahk
 #include core\ahk\message_register.ahk

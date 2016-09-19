@@ -215,7 +215,7 @@ function cIniFile:Save(sysini,show_equal,save_as_path)
 			str = str .. "\n[" .. section .. "]"
 		end
 
-		if (self.root[section]["_____link"]) then
+		if (self.root[section]["_____link"] and self.root[section]["_____link"] ~= "") then
 			str = str .. ":" .. self.root[section]["_____link"] .. "\n"
 		else
 			str = str .. "\n"

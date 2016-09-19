@@ -339,7 +339,7 @@ function ActionUnpack()
 	gSettings:SetValue("dbtool","unpack_output_path",output_path)
 	gSettings:Save()
 		
-	local working_directory = ahkGetVar("A_WorkingDir")..[[\scripts\dbtool\bin\]]
+	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory .. "converter.exe"
 	
 	local patches = {}

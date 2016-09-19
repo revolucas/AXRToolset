@@ -4,6 +4,7 @@
 cUIBase = Class "cUIBase"
 function cUIBase:initialize(id)
 	self.ID = id or "1"
+	self.UID =  math.random(100)..math.random()..math.random(1000)
 end
 
 function cUIBase:Show(bool)
