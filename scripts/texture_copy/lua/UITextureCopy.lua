@@ -49,7 +49,7 @@ function cUITextureCopy:Reinit()
 				local y = 245
 				--table.sort(Checks[i_s])
 				for n=1,#Checks[i_s] do
-					self:Gui("Add|CheckBox|x50 y%s w100 h22 %s vUITextureCopyCheck%s%s|%s",y,gSettings:GetValue("TextureCopy","check_"..Checks[i_s][n]..i_s,"") == "1" and "Checked" or "",Checks[i_s][n],i_s,Checks[i_s][n])
+					self:Gui("Add|CheckBox|x50 y%s w150 h22 %s vUITextureCopyCheck%s%s|%s",y,gSettings:GetValue("TextureCopy","check_"..Checks[i_s][n]..i_s,"") == "1" and "Checked" or "",Checks[i_s][n],i_s,Checks[i_s][n])
 					y = y + 20
 				end
 			end
@@ -156,6 +156,8 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 	end
 	
 	local overwrite = ahkGetVar("UITextureCopyCheck"..Checks[tab][1]..tab) == "1"
+	local copy_textures_in_thm = ahkGetVar("UITextureCopyCheck"..Checks[tab][2]..tab) == "1"
+	
 	local file_types = {".dds","_bump.dds","_bump#.dds",".thm","_bump.thm","_bump#.thm",".ogm",".ini",".seq"}
 	local function on_execute(path,fname)
 		local root_dir = trim_directory(path)
@@ -163,13 +165,42 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 		local key_name = root_dir.."\\"..fn
 		if (cop_to_soc[key_name]) then
 			for i=1,#file_types do
-				if (overwrite or not file_exists(output_path.."\\"..cop_to_soc[key_name]..file_types[i])) then
-					local f = io.open(path.."\\"..fn..file_types[i],"rb")
-					if (f) then
-						local data = f:read("*all")
-						f:close()
-						if (data) then
-							lfs.mkdir(output_path.."\\"..root_dir)
+				local f = io.open(path.."\\"..fn..file_types[i],"rb")
+				if (f) then
+					local data = f:read("*all")
+					f:close()
+					if (data) then
+						-- copy textures defined in .thm too
+						-- XXX seems to be unecessary?
+						--[[
+						if (copy_textures_in_thm) then
+							if (get_ext(file_types[i]) == "thm") then 
+								for a,b in string.gmatch(data,"([%w_#%.]*)\\([%w_#%.]*)") do 
+									for n=1,#file_types do
+										if (overwrite or not file_exists(output_path.."\\"..a.."\\"..b..file_types[i])) then
+											f = io.open(path.."\\"..a.."\\"..b..file_types[i],"rb")
+											if (f) then 
+												local data2 = f:read("*all")
+												f:close()
+												if (data2) then 
+													f = io.open(output_path.."\\"..a.."\\"..b..file_types[i],"wb")
+													if (f) then 
+														f:write(data2)
+														f:close()
+														Msg("Copied %s",output_path.."\\"..a.."\\"..b..file_types[i])
+													end
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+						--]]
+					
+						if (overwrite or not file_exists(output_path.."\\"..cop_to_soc[key_name]..file_types[i])) then
+							-- create new file and copy data
+							lfs.mkdir(output_path.."\\"..trim_directory(cop_to_soc[key_name]))
 							f = io.open(output_path.."\\"..cop_to_soc[key_name]..file_types[i],"wb")
 							if (f) then
 								f:write(data)
