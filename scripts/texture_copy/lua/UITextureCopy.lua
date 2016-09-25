@@ -148,6 +148,8 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 		return
 	end
 	
+	lfs.mkdir(output_path)
+	
 	-- the ltx is setup for soc = cop texture, we reverse this
 	local cop_to_soc = {}
 	local old_to_new = ltx:GetKeys("old_to_new")
