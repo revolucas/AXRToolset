@@ -6,12 +6,15 @@ local _G = _G -- because we later set _G._G to _AXRTOOLSET_METATABLE_
 package.path = package.path .. ';core\\lua\\?.lua'
 package.cpath = package.cpath .. ';bin\\?.dll;..\\bin\\?.dll'
 
+ffi = require "ffi"
 require "lua_extensions"
 require "lfs"
+bit = require "bit"
 Marshal = require "marshal"
 Class = require "middleclass"
 require "utils"
 require "inifile"
+require "fs"
 ----------------------------------------------------
 -- Global Utils
 ----------------------------------------------------

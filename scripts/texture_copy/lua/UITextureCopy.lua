@@ -31,7 +31,7 @@ end
 function cUITextureCopy:Reinit()
 	inherited.Reinit(self)
 	
-	local tabs = {"SoC->CoP rename"}
+	local tabs = {"SoC->CoP rename","missing bump#"}
 	Checks["1"] = {"overwrite"}
 	
 	-- below will be automated based on above tab definition and checks
@@ -216,4 +216,58 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
 	
 	Msg("TextureCopy:= (SoC->CoP) Finished!")
+end
+
+function cUITextureCopy:ActionExecute2(tab,input_path,output_path)
+	
+	Msg("TextureCopy:= Missing Bump# Working...")
+	
+	lfs.mkdir(output_path)
+	lfs.mkdir(output_path.."\\textures")
+
+	local ltx = cIniFile:new(output_path.."\\missing_bumps.ltx",true)
+	ltx.root = {}
+	
+	local function trim_texture_dir(str)
+		local a = string.find(str,"textures\\")
+		return a and trim(string.sub(str,a)) or ""
+	end
+	
+	local function trim_bump_ext(str)
+		local a = string.find(str,"_bump")
+		return a and trim(string.sub(str,1,a-1)) or str
+	end
+	
+	local function on_execute(path,fname)
+		local fn = trim_ext(fname)
+		if (string.find(fname,"_bump.dds") and not file_exists(path.."\\"..fn.."#.dds")) then
+			local relative_path = trim_texture_dir(path)
+			local tname = trim_bump_ext(fn)
+			ltx:SetValue("missing_bump#",relative_path.."\\"..fn.."#.dds","")
+			
+			if (file_exists(path.."\\"..tname..".dds")) then 
+				local f = io.open(path.."\\"..tname..".dds","rb")
+				if (f) then
+					local data = f:read("*all")
+					f:close()
+					if (data) then
+						-- create new file and copy data
+						lfs.mkdir(output_path.."\\"..relative_path.."\\")
+						f = io.open(output_path.."\\"..relative_path.."\\"..tname..".dds","wb")
+						if (f) then
+							f:write(data)
+							f:close()
+							Msg("Copied %s",relative_path.."\\"..tname..".dds")
+						end
+					end 
+				end
+			end
+		end
+	end
+	
+	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	
+	ltx:Save()
+	
+	Msg("TextureCopy:= Missing Bump# Finished!")
 end

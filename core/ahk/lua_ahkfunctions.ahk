@@ -189,6 +189,7 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "LVTop", RegisterCallback("LVTop","C"))
    lua_register(l, "LVGetText", RegisterCallback("LVGetText","C"))
    lua_register(l, "LVGetNext", RegisterCallback("LVGetNext","C"))
+   lua_register(l, "HexToFloat", RegisterCallback("HexToFloat","C"))
 }
 
 DebugMsg(L)
@@ -2448,6 +2449,27 @@ LVTop(L)
    Gui, %arg1%:listview, %arg2%
    
    Return 0
+}
+
+MCodeLz( ByRef B,H) {  ; Hex2Bin() of Hex2Bin()/Bin2Hex() by Laszlo Hars
+   Static H2B            ; www.autohotkey.com/forum/viewtopic.php?p=180469#180469
+   If !H2B  ; C Source/Author Notes:  www.autohotkey.com/forum/viewtopic.php?p=162089#162089
+    VarSetCapacity(H2B,74,0), NumPut(0x168A0C24748B56,H2B,0,"Int64")
+    , NumPut(0x8B573B74D28446,H2B, 7,"Int64"), NumPut(0xC0C28A530C247C,H2B,14,"Int64")
+    , NumPut(0x8AE9F609B106E8,H2B,21,"Int64"), NumPut(0x8804E1C0CA02C8,H2B,28,"Int64")
+    , NumPut(0x74D28446168A0F,H2B,35,"Int64"), NumPut(0xB306E8C0C28A1A,H2B,42,"Int64")
+    , NumPut(0x020FE280EBF609,H2B,49,"Int64"), NumPut(0x168A0788C10AC2,H2B,56,"Int64")
+    , NumPut(0x5BCD75D2844647,H2B,63,"Int64"), NumPut(0x00C35E5F,H2B,70)
+   Return VarSetCapacity( B,StrLen(H)//2), DllCall( &H2B, Str,B, Str,H, "CDecl UInt" )
+}
+
+HexToFloat(L)
+{
+   arg1 := lua_tostring(L,1)
+   MCodeLz(Data,arg1)
+   v := NumGet( Data,0,"Float" )
+   lua_pushnumber(L,v)
+   Return, 1
 }
 
 LV(L)

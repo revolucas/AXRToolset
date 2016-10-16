@@ -118,7 +118,7 @@ function cIniFile:KeyExist(sec,key)
 	return self.root and self.root[sec] and self.root[sec][key] ~= nil
 end
 
--- Save ini by preserving original file. Cannot insert new keys or sections
+-- Save ini by preserving original file.
 function cIniFile:SaveExt()
 	local t,sec,key,comment
 	local str = ""
