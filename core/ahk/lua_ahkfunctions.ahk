@@ -189,6 +189,7 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "LVTop", RegisterCallback("LVTop","C"))
    lua_register(l, "LVGetText", RegisterCallback("LVGetText","C"))
    lua_register(l, "LVGetNext", RegisterCallback("LVGetNext","C"))
+   lua_register(l, "LVModify", RegisterCallback("LVModify","C"))
    lua_register(l, "HexToFloat", RegisterCallback("HexToFloat","C"))
 }
 
@@ -2438,6 +2439,22 @@ LVGetNext(L)
    Return, 1
 }
 
+LVModify(L)
+{
+   arg1 := lua_tostring(L, 1)
+   arg2 := lua_tostring(L, 2)
+   arg3 := lua_tonumber(L, 3)
+   arg4 := lua_tostring(L, 4)
+   arg5 := lua_tostring(L, 4)
+   
+   Gui, %arg1%:Default
+   Gui, %arg1%:listview, %arg2%
+   
+   v := LV_Modify(arg3,arg4,arg5)
+   lua_pushstring(L, v)
+   Return, 1
+}
+
 LVTop(L)
 {
    Global
@@ -2474,18 +2491,18 @@ HexToFloat(L)
 
 LV(L)
 {
-	Global
-	local n, Function, arg, res
+   Global
+   local n, Function, arg, res
 
-	n := lua_gettop(L)
+   n := lua_gettop(L)
 
-	loop, %n%
-	{
-		arg%A_Index% := lua_tostring(L,A_Index)
-	}
+   loop, %n%
+   {
+      arg%A_Index% := lua_tostring(L,A_Index)
+   }
    
    ;because we are working with new thread
-	Gui, %arg2%:Default
+   Gui, %arg2%:Default
 
    
 	if(n==2)

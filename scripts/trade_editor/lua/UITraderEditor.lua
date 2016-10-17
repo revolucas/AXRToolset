@@ -15,7 +15,9 @@ function Get()
 end
 
 function GetAndShow()
-	Get():Show(true)
+	local _ui = Get()
+	_ui:Show(true)
+	return _ui
 end
 -----------------------------------------------------------------
 -- UI Class Definition
@@ -76,10 +78,11 @@ function cUITraderEditor:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		
 		if (event == "RightClick") then
 			LVTop(self.ID,"UITraderEditorLV"..tab)
-			local txt = LVGetText(self.ID,LVGetNext(self.ID,"0","UITraderEditorLV"..tab),"1")
+			local row = LVGetNext(self.ID,"0","UITraderEditorLV"..tab)
+			local txt = LVGetText(self.ID,row,"1")
 			if (txt and txt ~= "" and not self.listItemSelected) then
 				self.listItemSelected = txt
-				GetAndShowModify()
+				GetAndShowModify().modify_row = row
 			end
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorSection"..tab)) then 	
@@ -199,7 +202,9 @@ function GetModify()
 end
 
 function GetAndShowModify()
-	GetModify():Show(true)
+	local _ui = GetModify()
+	_ui:Show(true)
+	return _ui
 end
 -----------------------------------------------------------------
 -- UI Modify Class Definition
@@ -234,13 +239,20 @@ function cUITraderEditorModify:Reinit()
 	
 	local tab = ahkGetVar("UITraderEditorTab")
 	if (tab == "1") then
-		self:Gui("Add|Edit|w300 h30 vUIModifyEdit1|%s",list.buy_condition)
-		self:Gui("Add|Edit|w300 h30 vUIModifyEdit2|%s",list.sell_condition)
+		local y = 35
+		self:Gui("Add|Text|x5 y%s w300 h30|%s",y,"buy_condition")
+		self:Gui("Add|Edit|x200 y%s w300 h30 vUIModifyEdit1|%s",y,list.buy_condition)
+		y = y + 30
+		self:Gui("Add|Text|x5 y%s w300 h30|%s",y,"sell_condition")
+		self:Gui("Add|Edit|x200 y%s w300 h30 vUIModifyEdit2|%s",y,list.sell_condition)
+		y = y + 30
 		
 		local cnt = 3
 		for sec,v in pairs(list.buy_supplies) do 
-			self:Gui("Add|Edit|w300 h30 vUIModifyEdit%s|%s",cnt,v)
+			self:Gui("Add|Text|x5 y%s w300 h30|%s",y,sec)
+			self:Gui("Add|Edit|x200 y%s w300 h30 vUIModifyEdit%s|%s",y,cnt,v)
 			cnt = cnt + 1
+			y = y + 30
 		end
 	else 
 		local t
@@ -250,8 +262,11 @@ function cUITraderEditorModify:Reinit()
 			t = {"base","stalker","bandit","killer","dolg","freedom","army","monolith","csky","ecolog"}
 		end
 		
+		local y = 35
 		for i=1,#t do 
-			self:Gui("Add|Edit|w300 h30 vUIModifyEdit%s|%s",i,list[t[i]])
+			self:Gui("Add|Text|x5 y%s w300 h30|%s",y,t[i])
+			self:Gui("Add|Edit|x200 y%s w300 h30 vUIModifyEdit%s|%s",y,i,list[t[i]])
+			y = y + 30
 		end
 	end
  
@@ -280,37 +295,66 @@ function cUITraderEditorModify:OnScriptControlAction(hwnd,event,info) -- needed 
 		local list = assert(wnd.list[wnd.listItemSelected])
 		local fname = trim_directory(list.path)
 	
-		assert(wnd.ltx[fname])
+		if not (wnd.ltx[fname]) then 
+			Msg("Error with cUITraderEditorModify")
+			return
+		end
 
 		if (tab == "1") then
+			local a = {}
 			local t = {wnd.ltx[fname]:GetValue("trader","buy_condition"),wnd.ltx[fname]:GetValue("trader","sell_condition")}
-			for i=1,#t do
-				local v = ahkGetVar("UIModifyEdit"..i) or ""
-				wnd.ltx[fname]:SetValue(t[i],list.section,v)
-			end
+			
+			local v = trim(ahkGetVar("UIModifyEdit1")) or ""
+			wnd.ltx[fname]:SetValue(t[1],list.section,v)
+			list.buy_condition = v
+			table.insert(a,v)
+			
+			v = trim(ahkGetVar("UIModifyEdit2")) or ""
+			wnd.ltx[fname]:SetValue(t[2],list.section,v)
+			list.sell_condition = v
+			table.insert(a,v)
+			
 			local cnt = 3
 			for sec,t in pairs(list.buy_supplies) do 
-				local v = ahkGetVar("UIModifyEdit"..cnt)
+				local v = trim(ahkGetVar("UIModifyEdit"..cnt)) or ""
 				wnd.ltx[fname]:SetValue(sec,list.section,v)
+				list.buy_supplies[sec] = v
+				table.insert(a,v)
 				cnt = cnt + 1
 			end
+			
+			LVTop(self.ID,"UITraderEditorLV1")
+			LV("LV_Modify",wnd.ID,self.modify_row,"",fname,unpack(a))
 		else 
 			if (fname == "death_generic.ltx") then
 				local t = {"keep_items","item_count"}
 				for i=1,#t do
-					local v = ahkGetVar("UIModifyEdit"..i)
-					if (v and v ~= "") then
-						wnd.ltx[fname]:SetValue(t[i],list.section,v)
-					end
+					local v = trim(ahkGetVar("UIModifyEdit"..i))
+					wnd.ltx[fname]:SetValue(t[i],list.section,v)
+					list[t[i]] = v
 				end
+				
+				LVTop(self.ID,"UITraderEditorLV1")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col2",wnd.ltx[fname]:GetValue(t[1],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col3",wnd.ltx[fname]:GetValue(t[2],list.section) or "")
 			elseif (fname == "death_items_by_communities.ltx") then 
 				local t = {"base","stalker","bandit","killer","dolg","freedom","army","monolith","csky","ecolog"}
 				for i=1,#t do
-					local v = ahkGetVar("UIModifyEdit"..i)
-					if (v and v ~= "") then
-						wnd.ltx[fname]:SetValue(t[i],list.section,v)
-					end
+					local v = trim(ahkGetVar("UIModifyEdit"..i))
+					wnd.ltx[fname]:SetValue(t[i],list.section,v)
+					list[t[i]] = v
 				end
+				LVTop(self.ID,"UITraderEditorLV1")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col4",wnd.ltx[fname]:GetValue(t[1],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col5",wnd.ltx[fname]:GetValue(t[2],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col6",wnd.ltx[fname]:GetValue(t[3],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col7",wnd.ltx[fname]:GetValue(t[4],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col8",wnd.ltx[fname]:GetValue(t[5],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col9",wnd.ltx[fname]:GetValue(t[6],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col10",wnd.ltx[fname]:GetValue(t[7],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col11",wnd.ltx[fname]:GetValue(t[8],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col12",wnd.ltx[fname]:GetValue(t[9],list.section) or "")
+				LV("LV_Modify",wnd.ID,self.modify_row,"Col13",wnd.ltx[fname]:GetValue(t[10],list.section) or "")
 			end
 		end
 		
@@ -318,7 +362,7 @@ function cUITraderEditorModify:OnScriptControlAction(hwnd,event,info) -- needed 
 		
 		self:Show(false)
 		
-		wnd:FillListView(tab)
+		--wnd:FillListView(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIModifyCancel")) then
 		self:Show(false)
 	end

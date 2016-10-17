@@ -15,7 +15,9 @@ function Get()
 end
 
 function GetAndShow()
-	Get():Show(true)
+	local _ui = Get()
+	_ui:Show(true)
+	return _ui
 end
 
 -----------------------------------------------------------------
@@ -79,11 +81,12 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		end
 		if (event and string.lower(event) == "rightclick") then
 			LVTop(self.ID,"UILTXQuickEditLV"..tab)
-			local txt = LVGetText(self.ID,LVGetNext(self.ID,"0","UILTXQuickEditLV"..tab),"1")
+			local row = LVGetNext(self.ID,"0","UILTXQuickEditLV"..tab)
+			local txt = LVGetText(self.ID,row,"1")
 			--Msg("event=%s LVGetNext=%s txt=%s",event,LVGetNext(self.ID,"0","UILTXQuickEditLV"..tab),txt)
 			if (txt and txt ~= "" and not self.listItemSelected) then 
 				self.listItemSelected = txt
-				GetAndShowModify()
+				GetAndShowModify().modify_row = row
 			end
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditSection"..tab)) then 	
@@ -219,7 +222,9 @@ function GetModify()
 end
 
 function GetAndShowModify()
-	GetModify():Show(true)
+	local _ui = GetModify()
+	_ui:Show(true)
+	return _ui
 end
 -----------------------------------------------------------------
 -- UI Modify Class Definition
@@ -299,16 +304,24 @@ function cUILTXQuickEditModify:OnScriptControlAction(hwnd,event,info) -- needed 
 		
 		for field,v in pairs(list) do 
 			if (field ~= "fname") then
-				local val = ahkGetVar("UIModifyEdit"..field)
+				local val = trim(ahkGetVar("UIModifyEdit"..field))
 				wnd.ltx[fname]:SetValue(wnd.listItemSelected,field,val)
+				list[field] = val
 			end
 		end
 
 		wnd.ltx[fname]:SaveExt()
+
+		local a = {}
+		for i=1,#wnd.fields do 
+			local v = list[wnd.fields[i]] or ""
+			table.insert(a,v)
+		end
+		
+		LVTop(wnd.ID,"UILTXQuickEditLV"..tab)
+		LV("LV_Modify",wnd.ID,self.modify_row,"",wnd.listItemSelected,unpack(a))
 		
 		self:Show(false)
-		
-		wnd:FillListView(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIModifyCancel")) then
 		self:Show(false)
 	end

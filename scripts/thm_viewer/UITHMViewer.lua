@@ -1,3 +1,12 @@
+--[[
+
+Notes: When using LV functions make sure to switch to GUI ID that has the LV before using commands. For example
+I couldn't figure out why LV commands weren't working while in the Modify UI. it's because I had to switch 
+to GUI 0.
+http://stackoverflow.com/questions/24002210/cannot-update-listview
+
+--]]
+
 local Checks = {}
 local thm_fields = {	"version","texture_format","flags","border_color",
 					"fade_color","fade_amount","mip_filter","texture_width",
@@ -25,7 +34,9 @@ function Get()
 end
 
 function GetAndShow()
-	Get():Show(true)
+	local _ui = Get()
+	_ui:Show(true)
+	return _ui
 end
 
 -----------------------------------------------------------------
@@ -147,11 +158,12 @@ function cUITHMViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 		end
 		if (event and string.lower(event) == "rightclick") then
 			LVTop(self.ID,"UITHMViewerLV"..tab)
-			local txt = LVGetText(self.ID,LVGetNext(self.ID,"0","UITHMViewerLV"..tab),"1")
+			local row = LVGetNext(self.ID,"0","UITHMViewerLV"..tab)
+			local txt = LVGetText(self.ID,row,"1")
 			--Msg("event=%s LVGetNext=%s txt=%s",event,LVGetNext(self.ID,"0","UITHMViewerLV"..tab),txt)
 			if (txt and txt ~= "" and not self.listItemSelected) then 
 				self.listItemSelected = txt
-				GetAndShowModify(tab)
+				GetAndShowModify(tab).modify_row = row
 			end
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerSection"..tab)) then 	
@@ -411,10 +423,13 @@ function cUITHMViewer:ActionExecute2(tab)
 	_INACTION = false
 end
 
-function cUITHMViewer:FillListView(tab)
+function cUITHMViewer:FillListView(tab,skip)
 	LVTop(self.ID,"UITHMViewerLV"..tab)
 	LV("LV_Delete",self.ID)
-	empty(self.list)
+	
+	if not (skip) then
+		empty(self.list)
+	end
 
 	local selected = trim(ahkGetVar("UITHMViewerSection"..tab))
 	if (selected == nil or selected == "") then 
@@ -430,7 +445,7 @@ function cUITHMViewer:FillListView(tab)
 		LV("LV_DeleteCol",self.ID,"1")
 	end
 			
-	self["FillListView"..tab](self,tab,selected,dir)
+	self["FillListView"..tab](self,tab,selected,dir,skip)
 	
 	LV("LV_ModifyCol",self.ID,"1","Sort CaseLocale")
 	LV("LV_ModifyCol",self.ID,"1","AutoHdr")
@@ -440,7 +455,7 @@ function cUITHMViewer:FillListView(tab)
 	end
 end
 
-function cUITHMViewer:FillListView1(tab,selected,dir)
+function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 	
 	LV("LV_InsertCol",self.ID,tostring(1),"","filename")
 	for i=1,#thm_fields do 
@@ -485,7 +500,7 @@ function cUITHMViewer:FillListView1(tab,selected,dir)
 	end
 end
 
-function cUITHMViewer:FillListView3(tab,selected,dir)
+function cUITHMViewer:FillListView3(tab,selected,dir,skip)
 	local fields = {"DDS","THM"}
 	for i=1,#fields do 
 		LV("LV_InsertCol",self.ID,tostring(i),"",fields[i])
@@ -518,7 +533,9 @@ function cUITHMViewer:FillListView3(tab,selected,dir)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(dir,{"dds"},on_execute)
+	if not (skip) then
+		recurse_subdirectories_and_execute(dir,{"dds"},on_execute)
+	end
 	
 	for fname,t in pairs(self.list) do
 		LV("LV_ADD",self.ID,"",fname,t[3] and t[2] or "")
@@ -544,7 +561,9 @@ function GetModify(tab)
 end
 
 function GetAndShowModify(tab)
-	GetModify(tab):Show(true)
+	local _ui = GetModify(tab)
+	_ui:Show(true)
+	return _ui
 end
 -----------------------------------------------------------------
 -- UI Modify Class Definition
@@ -593,6 +612,9 @@ function cUITHMViewerModify:Reinit()
  
 	self:Gui("Add|Button|gOnScriptControlAction x12 default vUITHMViewerModifyAccept|Accept")
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyCancel|Cancel")
+	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyOpenDDS|Open .DDS")
+	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyCopy|Copy")
+	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyPaste|Paste")
 	self:Gui("Show|center|Edit Values")
 	self:Gui("Default")
 end
@@ -625,12 +647,47 @@ function cUITHMViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 		end
 
 		wnd.thm[fname]:save()
+
+		local a = {}
+		for i=1,#thm_fields do
+			table.insert(a,list[thm_fields[i]] or "")
+		end
+		LVTop(wnd.ID,"UITHMViewerLV"..tab)
+		LV("LV_Modify",wnd.ID,self.modify_row,"",fname,unpack(a))
 		
 		self:Show(false)
-		
-		wnd:FillListView(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyCancel")) then
 		self:Show(false)
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyOpenDDS")) then 
+		local wnd = Get()
+		local fname = wnd.listItemSelected
+		local list = assert(wnd.list[fname])
+		local full_path = list[1].."\\"..fname
+		
+		os.execute(strformat([[start "" "%s"]],full_path))
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyCopy")) then
+		local wnd = Get()
+		local fname = wnd.listItemSelected
+		local list = assert(wnd.list[fname])
+		local thm_path = list[1].."\\"..list[2]
+		
+		local t = wnd.thm[thm_path].params
+		for k,v in pairs(t) do
+			clipboard[k] = v
+		end
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyPaste")) then
+		local wnd = Get()
+		local fname = wnd.listItemSelected
+		local list = assert(wnd.list[fname])
+		local thm_path = list[1].."\\"..list[2]
+		for k,v in pairs(clipboard) do 
+			wnd.thm[thm_path].params[k] = v
+		end
+		
+		local selected = fname
+		self:Show(false)
+		wnd.listItemSelected = fname
+		self:Show(true)
 	end
 end
 
@@ -732,10 +789,12 @@ function cUITHMViewerModify2:OnScriptControlAction(hwnd,event,info) -- needed be
 		end
 
 		wnd.thm[thm_path]:save()
+		wnd.list[fname][3] = true
+		
+		LVTop(wnd.ID,"UITHMViewerLV"..tab)
+		LV("LV_Modify",wnd.ID,self.modify_row,"Col2",thm_path)
 		
 		self:Show(false)
-		
-		wnd:FillListView(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyCancel2")) then
 		self:Show(false)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyOpenDDS2")) then 
