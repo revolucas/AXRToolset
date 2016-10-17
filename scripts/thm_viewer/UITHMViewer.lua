@@ -792,7 +792,7 @@ function cUITHMViewerModify2:OnScriptControlAction(hwnd,event,info) -- needed be
 		wnd.list[fname][3] = true
 		
 		LVTop(wnd.ID,"UITHMViewerLV"..tab)
-		LV("LV_Modify",wnd.ID,self.modify_row,"Col2",thm_path)
+		LV("LV_Modify",wnd.ID,self.modify_row,"Col2",list[2])
 		
 		self:Show(false)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyCancel2")) then
