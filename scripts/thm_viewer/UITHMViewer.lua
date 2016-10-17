@@ -63,7 +63,7 @@ function cUITHMViewer:Reinit()
 	self.list = self.list or {}
 	
 	local tabs = {"THM Viewer","THM Validater","THM Editor"}
-	Checks["2"] = {"check_missing_dds","resync_size","resync_format","resync_mipmaps","resync_bumpname"}
+	Checks["2"] = {"resync_size","resync_format","resync_mipmaps","resync_bumpname"}
 	
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vUITHMViewerTab hwndUITHMViewerTab_H|%s",table.concat(tabs,"^"))
 	
@@ -233,11 +233,10 @@ function cUITHMViewer:ActionExecute2(tab)
 	
 	_INACTION = true
 	
-	local opt_check_missing = ahkGetVar("UITHMViewerCheck"..Checks[tab][1]..tab) == "1"
-	local opt_resync_size = ahkGetVar("UITHMViewerCheck"..Checks[tab][2]..tab) == "1"
-	local opt_resync_format = ahkGetVar("UITHMViewerCheck"..Checks[tab][3]..tab) == "1"
-	local opt_resync_mipmaps = ahkGetVar("UITHMViewerCheck"..Checks[tab][4]..tab) == "1"
-	local opt_advance_verify = ahkGetVar("UITHMViewerCheck"..Checks[tab][5]..tab) == "1"
+	local opt_resync_size = ahkGetVar("UITHMViewerCheck"..Checks[tab][1]..tab) == "1"
+	local opt_resync_format = ahkGetVar("UITHMViewerCheck"..Checks[tab][2]..tab) == "1"
+	local opt_resync_mipmaps = ahkGetVar("UITHMViewerCheck"..Checks[tab][3]..tab) == "1"
+	local opt_advance_verify = ahkGetVar("UITHMViewerCheck"..Checks[tab][4]..tab) == "1"
 	--local opt_create_missing_thm = ahkGetVar("UITHMViewerCheck"..Checks[tab][6]..tab) == "1"
 	
 	error_log = ""
@@ -250,10 +249,7 @@ function cUITHMViewer:ActionExecute2(tab)
 			local fn = trim_ext(fname)
 			local dds_path = path.."\\"..fn..".dds"
 			if not (file_exists(dds_path)) then
-				if (opt_check_missing) then
-					--Msg("%s.dds not found",fn)
-					error_log = error_log .. strformat("%s.dds not found even though there is %s.thm by this name (normal behavior for textures in terrain directory)\n\r",fn,fn)
-				end
+				error_log = error_log .. strformat("%s.dds not found even though there is %s.thm by this name (normal behavior for textures in terrain directory)\n\r",fn,fn)
 			else 
 				local dds = cBinaryData:new(dds_path,128)
 				if (dds) then 
@@ -348,6 +344,11 @@ function cUITHMViewer:ActionExecute2(tab)
 		local fn = trim_ext(fname)
 		local thm_path = path.."\\"..fn..".thm"
 		local short = string.find(fname,"_bump.dds") and string.gsub(fname,"(_bump.dds)","")
+		
+		if (short and not file_exists(path.."\\"..short.."_bump#.dds")) then 
+			error_log = error_log .. strformat("%s.dds does not have a %s_bump#.dds\n\r",fn,short)
+		end 
+		
 		if not (file_exists(thm_path)) then
 			error_log = error_log .. strformat("%s.dds does not have a *.thm\n\r",fn)
 			
@@ -407,10 +408,11 @@ function cUITHMViewer:ActionExecute2(tab)
 			end
 		end
 	end
+
+	Msg("THM Validater := Checking DDS...")
+	
 	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute_2)
 
-	
-	
 	Msg("THM Validater := Finished! (check thm_viewer_log.txt)")
 
 	local thm_log, err = io.open("thm_viewer_log.txt","wb")
