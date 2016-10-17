@@ -246,6 +246,7 @@ function cUITHMViewer:ActionExecute2(tab)
 		if (thm:size() <= 0) then 
 			Msg("THM Validater := %s size is zero!",fname)
 		else 
+			Msg(fname)
 			local fn = trim_ext(fname)
 			local dds_path = path.."\\"..fn..".dds"
 			if not (file_exists(dds_path)) then
@@ -341,6 +342,7 @@ function cUITHMViewer:ActionExecute2(tab)
 	recurse_subdirectories_and_execute(input_path,{"thm"},on_execute)
 	
 	local function on_execute_2(path,fname)
+		Msg(fname)
 		local fn = trim_ext(fname)
 		local thm_path = path.."\\"..fn..".thm"
 		local short = string.find(fname,"_bump.dds") and string.gsub(fname,"(_bump.dds)","")
