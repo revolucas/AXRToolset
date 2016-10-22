@@ -241,6 +241,7 @@ function cUITHMViewer:ActionExecute2(tab)
 	
 	error_log = ""
 	
+	local files_resynced_count = 0
 	local function on_execute(path,fname)
 		local thm = Xray.cTHM:new(path.."\\"..fname)
 		if (thm:size() <= 0) then 
@@ -330,7 +331,8 @@ function cUITHMViewer:ActionExecute2(tab)
 							--thm.params.mip_filter = "Triangle"
 							
 							thm:save()
-							Msg("%s resynced with dds",fn)
+							--Msg("%s resynced with dds",fn)
+							files_resynced_count = files_resynced_count + 1
 						end
 					end
 				end
@@ -404,6 +406,7 @@ function cUITHMViewer:ActionExecute2(tab)
 							-- [MUST BE IN textures\ root to work] advanced user only
 							thm.params.bump_name = relfn
 							thm:save()
+							files_resynced_count = files_resynced_count + 1
 						end
 					end
 				end
@@ -415,7 +418,12 @@ function cUITHMViewer:ActionExecute2(tab)
 	
 	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute_2)
 
-	Msg("THM Validater := Finished! (check thm_viewer_log.txt)")
+	
+	if (files_resynced_count > 0) then
+		Msg("THM Validater := Finished! %s *.thm resynced. (check thm_viewer_log.txt)",files_resynced_count)
+	else
+		Msg("THM Validater := Finished! (check thm_viewer_log.txt)")
+	end
 
 	local thm_log, err = io.open("thm_viewer_log.txt","wb")
 	if (err) then 

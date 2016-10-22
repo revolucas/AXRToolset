@@ -169,10 +169,13 @@ function cUIConverter:ActionExecute2(tab,input_path,output_path)
 	
 	local function on_execute(path,fname)
 		if (Checks[tab]) then
-			for i=1,#Checks[tab] do
-				if (gSettings:GetValue("converter","check_"..Checks[tab][i]..tab,"") == "1") then
-					RunWait( strformat([["%s" -omf -%s "%s" -out "%s"]],cp,Checks[tab][i],path.."\\"..fname,output_path.."\\"..trim_ext(fname).."."..Checks[tab][i]), working_directory )
-				end
+			local fn = trim_ext(fname)
+			lfs.mkdir(output_path)
+			if (gSettings:GetValue("converter","check_"..Checks[tab][1]..tab,"") == "1") then
+				RunWait( strformat([["%s" -omf -%s "%s" -out "%s"]],cp,Checks[tab][1],path.."\\"..fname,output_path.."\\"..trim_ext(fname).."."..Checks[tab][1]), working_directory )
+			else
+				lfs.mkdir(output_path.."\\"..fn)
+				RunWait( strformat([["%s" -omf -skl all "%s"]],cp,path.."\\"..fname), output_path.."\\"..fn )
 			end
 		end
 	end
@@ -194,7 +197,7 @@ function cUIConverter:ActionExecute3(tab,input_path,output_path)
 	
 	Msg("Converter:= (DDS) Working...")
 	
-	recurse_subdirectories_and_execute(input_path,{"omf"},on_execute)	
+	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)	
 	
 	Msg("Converter:= (DDS) Finished!")
 end
