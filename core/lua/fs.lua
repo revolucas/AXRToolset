@@ -239,6 +239,8 @@ function cBinaryData:find_chunk(ID)
 		if (self.r_marker > size) then 
 			self.r_marker = size
 			return 0
+		elseif (self.r_marker == size) then 
+			return dwSize
 		end
 	end
 	return 0
