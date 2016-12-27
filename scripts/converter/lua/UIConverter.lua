@@ -31,7 +31,7 @@ end
 function cUIConverter:Reinit()
 	inherited.Reinit(self)
 	
-	local tabs = {"OGF->Object","OMF->SKLS","DDS->TGA"}
+	local tabs = {"OGF->Object","OMF->SKLS","DDS->TGA","OGF->SMD"}
 	Checks["1"] = {"object", "bones", "skls"}
 	Checks["2"] = {"skls"}
 	Checks["3"] = {"with_solid","with_bump"}
@@ -200,4 +200,19 @@ function cUIConverter:ActionExecute3(tab,input_path,output_path)
 	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)	
 	
 	Msg("Converter:= (DDS) Finished!")
+end
+
+function cUIConverter:ActionExecute4(tab,input_path,output_path)
+	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
+	local cp = working_directory .. "ogf2smd.exe"
+	
+	local function on_execute(path,fname)
+		RunWait( strformat([["%s" "%s"  "%s"]],cp,path.."\\"..fname,output_path), working_directory )
+	end
+	
+	Msg("Converter:= (OGF->SMD) Working...")
+	
+	recurse_subdirectories_and_execute(input_path,{"ogf"},on_execute)	
+	
+	Msg("Converter:= (OGF->SMD) Finished!")
 end

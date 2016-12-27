@@ -51,10 +51,12 @@ function cUILTXQuickEdit:Reinit()
 		self:Gui("Tab|Workspace "..i)
 			self:Gui("Add|Text|x22 y49 w140 h20|Filter:")
 			self:Gui("Add|DropDownList|gOnScriptControlAction x22 y69 w320 h30 R40 H300 vUILTXQuickEditSection%s|"..filters,i)
-			self:Gui("Add|Text|x550 y75 w200 h20|Right-Click to Edit!")
 			self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUILTXQuickEditLV%s|section",i)
+			self:Gui("Add|Text|x400 y50 w200 h20|Pattern Matching:")
+			self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUILTXQuickEditSearch%s|",i)
 			
 			self:Gui("Add|GroupBox|x22 y555 w530 h75|Working Directory")
+			self:Gui("Add|Text|x560 y555 w200 h20|Right-Click to Edit!")
 			self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUILTXQuickEditBrowsePath%s|...",i)
 			self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUILTXQuickEditPath%s|",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUILTXQuickEditSaveSettings%s|Save Settings",i)
@@ -101,6 +103,11 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		if (path and path ~= "") then
 			gSettings:SetValue("ltx_quickedit","path"..tab,path)
 			gSettings:Save()
+		end
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditSearch"..tab)) then
+		local selected = trim(ahkGetVar("UILTXQuickEditSection"..tab))
+		if (selected and selected ~= "") then
+			self:FillListView(tab)
 		end
 	end
 end
@@ -164,6 +171,7 @@ function cUILTXQuickEdit:FillListView(tab)
 		["ambient_channels"] = true,
 	}
 	
+	local search_str = trim(ahkGetVar("UILTXQuickEditSearch"..tab))
 	local function on_execute(path,fname)
 		local check_path = trim_directory(path)
 		if (ignore_paths[check_path]) then 
@@ -180,11 +188,13 @@ function cUILTXQuickEdit:FillListView(tab)
 					for i=1,#self.fields do 
 						local v = self.ltx[fname]:GetValue(t[n],self.fields[i])
 						if (v) then
-							if not (self.list[t[n]]) then
-								self.list[t[n]] = {}
-								self.list[t[n]].fname = fname
+							if (search_str == nil or search_str == "" or t[n]:match(search_str)) then
+								if not (self.list[t[n]]) then
+									self.list[t[n]] = {}
+									self.list[t[n]].fname = fname
+								end
+								self.list[t[n]][self.fields[i]] = v
 							end
-							self.list[t[n]][self.fields[i]] = v
 						end
 					end
 				end
