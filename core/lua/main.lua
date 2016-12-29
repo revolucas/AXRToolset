@@ -14,6 +14,7 @@ Marshal = require "marshal"
 Class = require "middleclass"
 require "utils"
 require "inifile"
+require "xmlfile"
 require "fs"
 ----------------------------------------------------
 -- Global Utils

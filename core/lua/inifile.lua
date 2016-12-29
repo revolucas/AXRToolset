@@ -1,7 +1,7 @@
 cIniFile = Class "cIniFile"
 function cIniFile:initialize(fname,simple_mode)
-	local cfg = io.open(fname,"a+")
-	if not (cfg) then
+	local cfg,err = io.open(fname,"a+")
+	if (cfg == nil or err) then
 		return
 	end
 	cfg:close()
