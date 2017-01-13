@@ -163,6 +163,7 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 	local file_types = {".dds","_bump.dds","_bump#.dds",".thm","_bump.thm","_bump#.thm",".ogm",".ini",".seq"}
 	local function on_execute(path,fname)
 		local root_dir = trim_directory(path)
+		
 		local fn = trim_ext(fname)
 		local key_name = root_dir.."\\"..fn
 		if (cop_to_soc[key_name]) then
@@ -199,7 +200,7 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 							--]]
 						
 							-- create new file and copy data
-							lfs.mkdir(output_path.."\\"..get_path(cop_to_soc[key_name]):sub(1,-2))
+							lfs.mkdir(output_path.."\\"..get_path(cop_to_soc[key_name]))
 							f = io.open(output_path.."\\"..cop_to_soc[key_name]..file_types[i],"wb")
 							if (f) then
 								f:write(data)
