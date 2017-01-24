@@ -118,26 +118,42 @@ function OnGenerate()
 					local ext = get_ext(fname)
 					if (ext == "xml") then 
 						for w in string.gmatch(data,"<visual>([/\\%-_%w]+)</visual>") do
-							outfile:SetValue("visual",trim(w)..".ogf","")
+							local visual_key = trim(w)..".ogf"
+							local missing = file_exists(inputpath.."\\meshes\\"..visual_key) and "" or "missing"
+							outfile:SetValue("visual",visual_key,missing)
 						end
 					else
 						for w in string.gmatch(data,"dynamics\\([#/\\%-_%w]+)") do 
-							outfile:SetValue("visual","dynamics\\"..trim(w)..".ogf","")
+							local visual_key = "dynamics\\"..trim(w)..".ogf"
+							local missing = file_exists(inputpath.."\\meshes\\"..visual_key) and "" or "missing"
+							outfile:SetValue("visual",visual_key,missing)
 						end
 						for w in string.gmatch(data,"equipments\\([#/\\%-_%w]+)") do 
-							outfile:SetValue("visual","equipments\\"..trim(w)..".ogf","")
+							local visual_key = "equipments\\"..trim(w)..".ogf"
+							local missing = file_exists(inputpath.."\\meshes\\"..visual_key) and "" or "missing"
+							outfile:SetValue("visual",visual_key,missing)
 						end
 						for w in string.gmatch(data,"actors\\([#/\\%-_%w]+)") do 
-							outfile:SetValue("visual","actors\\"..trim(w)..".ogf","")
+							local visual_key = "actors\\"..trim(w)..".ogf"
+							local missing = file_exists(inputpath.."\\meshes\\"..visual_key) and "" or "missing"
+							outfile:SetValue("visual",visual_key,missing)
 						end
 						for w in string.gmatch(data,"grenadier\\([#/\\%-_%w]+)") do 
-							outfile:SetValue("visual","grenadier\\"..trim(w)..".ogf","")
+							local visual_key = "grenadier\\"..trim(w)..".ogf"
+							local missing = file_exists(inputpath.."\\meshes\\"..visual_key) and "" or "missing"
+							outfile:SetValue("visual",visual_key,missing)
 						end
 						for w in string.gmatch(data,"monsters\\([#/\\%-_%w]+)") do 
-							outfile:SetValue("visual","monsters\\"..trim(w)..".ogf","")
+							local visual_key = "monsters\\"..trim(w)..".ogf"
+							local missing = file_exists(inputpath.."\\meshes\\"..visual_key) and "" or "missing"
+							outfile:SetValue("visual",visual_key,missing)
 						end
 						for w in string.gmatch(data,"([/\\%-_%w]+).ogf") do
-							outfile:SetValue("visual",trim(w)..".ogf","")
+							local visual_key = "dynamics\\"..trim(w)..".ogf"
+							local missing = file_exists(inputpath.."\\meshes\\"..visual_key)
+							if (missing) then
+								outfile:SetValue("visual",visual_key,"")
+							end
 						end
 					end
 				end
@@ -165,10 +181,12 @@ function OnGenerate()
 					data = f:read("*all")
 					f:close()
 					if (data) then
-						local look = {"act","artifact","briks","controller","corp","crete","decal","detail","door","ed","effects","fbr","flare","floor","food","fx","glas","glass","glow","grad","grenadier","grnd","hud","internal","intro","item","lights","map","mtl","mutantparts","pfx","prop","roof","shoker_mod","sign","sky","ston","terrain","tile","trees","ui","veh","vehicle","vine","wall","water","wind","wm","wood","wpn"}
+						local look = {"act","amik","r_pop","sgm","kdm_ammo","artifact","briks","controller","corp","crete","decal","detail","door","ed","effects","fbr","flare","floor","food","fx","glas","glass","glow","grad","grenadier","grnd","hud","internal","intro","item","lights","map","mtl","mutantparts","pfx","prop","roof","shoker_mod","sign","sky","ston","terrain","tile","trees","ui","veh","vehicle","vine","wall","water","wind","wm","wood","wpn"}
 						for i=1,#look do 
 							for w in string.gmatch(data, look[i].."\\([#/\\%-_%w]+)") do 
-								texturefile:SetValue("textures_used_by_existing",look[i].."\\"..trim(w)..".dds","")
+								local texture_key = look[i].."\\"..trim(w)..".dds"
+								local missing = file_exists(inputpath.."\\textures\\"..texture_key) and "" or "missing"
+								texturefile:SetValue("textures_used_by_existing",texture_key,missing)
 							end
 						end
 					end 
