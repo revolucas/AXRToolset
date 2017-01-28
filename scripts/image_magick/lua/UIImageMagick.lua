@@ -163,7 +163,6 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 	lfs.mkdir(output_path)
 
 	local search_pattern = trim(ahkGetVar("ImageMagickSearch"..tab))
-	MsgBox(search_pattern)
 	gSettings:SetValue("ImageMagick","search_pattern"..tab,search_pattern)
 	
 	local command_line_options = trim(ahkGetVar("ImageMagickMogrify"..tab))
