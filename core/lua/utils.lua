@@ -6,6 +6,33 @@ function rem_quotes(txt)
 	return txt
 end
 
+function trim_final_backslash(s)
+	local a,b = string.find(s,"\\",s:len())
+	if (a) then 
+		return string.sub(s,1,a-1)
+	end 
+	return s
+end
+
+function escape_lua_pattern(s)
+	local matches = {
+		["^"] = "%^",
+		["$"] = "%$",
+		["("] = "%(",
+		[")"] = "%)",
+		["%"] = "%%",
+		["."] = "%.",
+		["["] = "%[",
+		["]"] = "%]",
+		["*"] = "%*",
+		["+"] = "%+",
+		["-"] = "%-",
+		["?"] = "%?",
+		["\0"] = "%z"
+	}
+    return (s:gsub(".",matches))
+end
+
 function addTab(s,n)
 	local padding = {}
 	local l = string.len(s)
@@ -76,7 +103,12 @@ end
 
 function get_path(str,sep)
 	sep=sep or'\\'
-	return str:match("(.*"..sep..")")
+	str = str:reverse()
+	local a,b = string.find(str,sep)
+	if not (a) then 
+		return str:reverse()
+	end
+	return string.sub(str,b+1):reverse()
 end
 
 function trim_directory(str,sep)

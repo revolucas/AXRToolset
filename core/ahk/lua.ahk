@@ -163,9 +163,9 @@ lua_isuserdata(ByRef l, index)
    Return, DllCall("lua51\lua_isuserdata", "UInt", L, "Int", index, "Cdecl Int")
 }
 
-lua_lessthan(ByRef l, index)
+lua_lessthan(ByRef l, index1,index2)
 {
-   Return, DllCall("lua51\lua_lessthan", "UInt", L, "Int", index, "Cdecl Int")
+   Return, DllCall("lua51\lua_lessthan", "UInt", L, "Int", index1, "Int", index2, "Cdecl Int")
 }
 
 lua_load(ByRef l, reader, ByRef data, ByRef chunkname)

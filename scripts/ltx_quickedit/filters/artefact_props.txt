@@ -1,0 +1,9 @@
+health_restore_speed
+satiety_restore_speed
+power_restore_speed
+bleeding_restore_speed
+radiation_restore_speed
+psy_health_restore_speed
+additional_inventory_weight
+additional_inventory_weight2
+degrade_rate

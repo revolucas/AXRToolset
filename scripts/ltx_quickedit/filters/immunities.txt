@@ -1,0 +1,9 @@
+burn_immunity
+radiation_immunity
+telepatic_immunity
+chemical_burn_immunity
+shock_immunity
+wound_immunity
+fire_wound_immunity
+strike_immunity
+explosion_immunity

@@ -1,0 +1,9 @@
+burn_protection
+radiation_protection
+telepatic_protection
+chemical_burn_protection
+shock_protection
+wound_protection
+fire_wound_protection
+strike_protection
+explosion_protection
