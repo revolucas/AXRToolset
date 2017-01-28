@@ -43,7 +43,7 @@ function cImageMagick:Reinit()
 		self:Gui("Tab|%s",tabs[i])
 			self:Gui("Add|Text|x590 y60 w300 h40 cBlue vImageMagickLink%s gOnScriptControlAction|Click here for Mogrify command options",i)
 			self:Gui("Add|Text|x270 y365 w300 h40 cBlue vImageMagickLink2%s gOnScriptControlAction|Click for tutorial",i)
-			self:Gui("Add|Text|x590 y160 w300 h40|Mogrify is a very useful texture command line tool. Here is an example if you want re-mip textures using the Kaiser filter: -filter Kaiser",i)
+			self:Gui("Add|Text|x590 y160 w300 h40|Mogrify is a very useful texture command line tool. Here is an example if you want to resize textures using the Kaiser filter: -resize 50% -filter Kaiser",i)
 			-- GroupBox
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Path (Recursive)")
 			self:Gui("Add|GroupBox|x10 y150 w510 h75|Output Path")
