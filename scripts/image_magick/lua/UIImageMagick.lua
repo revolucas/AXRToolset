@@ -31,8 +31,8 @@ end
 function cImageMagick:Reinit()
 	inherited.Reinit(self)
 	
-	local tabs = {"Mogrify"}
-	Checks["1"] = {"CopyTHM"}
+	local tabs = {"Convert.exe"}
+	Checks["1"] = {"CopyTHM","EffectOnlyTexturesWithMipMaps"}
 	
 	-- below will be automated based on above tab definition and checks
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vImageMagickTab|%s",table.concat(tabs,"^"))
@@ -41,9 +41,9 @@ function cImageMagick:Reinit()
 		local i_s = tostring(i)
 		
 		self:Gui("Tab|%s",tabs[i])
-			self:Gui("Add|Text|x590 y60 w300 h40 cBlue vImageMagickLink%s gOnScriptControlAction|Click here for Mogrify command options",i)
+			self:Gui("Add|Text|x590 y60 w300 h40 cBlue vImageMagickLink%s gOnScriptControlAction|Click here for Convert command options",i)
 			self:Gui("Add|Text|x270 y365 w300 h40 cBlue vImageMagickLink2%s gOnScriptControlAction|Click for tutorial",i)
-			self:Gui("Add|Text|x590 y160 w300 h40|Mogrify is a very useful texture command line tool. Here is an example if you want to resize textures using the Kaiser filter: -resize 50% -filter Kaiser",i)
+			self:Gui("Add|Text|x590 y160 w300 h40|ImageMagick is a very useful texture command line tool. Here is an example if you want to resize textures using the Kaiser filter: -filter Kaiser -resize 50%",i)
 			-- GroupBox
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Path (Recursive)")
 			self:Gui("Add|GroupBox|x10 y150 w510 h75|Output Path")
@@ -54,7 +54,7 @@ function cImageMagick:Reinit()
 				local y = 445
 				--table.sort(Checks[i_s])
 				for n=1,#Checks[i_s] do
-					self:Gui("Add|CheckBox|x50 y%s w150 h22 %s vImageMagickCheck%s%s|%s",y,gSettings:GetValue("ImageMagick","check_"..Checks[i_s][n]..i_s,"") == "1" and "Checked" or "",Checks[i_s][n],i_s,Checks[i_s][n])
+					self:Gui("Add|CheckBox|x50 y%s w250 h22 %s vImageMagickCheck%s%s|%s",y,gSettings:GetValue("ImageMagick","check_"..Checks[i_s][n]..i_s,"") == "1" and "Checked" or "",Checks[i_s][n],i_s,Checks[i_s][n])
 					y = y + 20
 				end
 			end
@@ -111,7 +111,7 @@ function cImageMagick:OnScriptControlAction(hwnd,event,info) -- needed because i
 		
 		gSettings:Save()
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickLink"..tab)) then 
-		Run("http://www.imagemagick.org/script/mogrify.php")
+		Run("http://www.imagemagick.org/script/convert.php")
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickLink2"..tab)) then 
 		Run("http://wowwiki.wikia.com/wiki/Pattern_matching")
 	end
@@ -158,7 +158,7 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 	
 	Msg("ImageMagick:= Working...")
 	
-	local skip_xcopy = input_path == output_path
+	local use_mogrify = input_path == output_path
 
 	lfs.mkdir(output_path)
 
@@ -170,21 +170,43 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 	gSettings:Save()
 	
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\ImageMagick\]]
-	local cp = working_directory .. "mogrify.exe"
+	local cp = working_directory
+	if (use_mogrify) then 
+		cp = cp .. "mogrify.exe"
+	else 
+		cp = cp .. "convert.exe"
+	end
 	
 	local copy_thm = ahkGetVar("ImageMagickCheck"..Checks[tab][1]..tab) == "1"
+	local remip_only = ahkGetVar("ImageMagickCheck"..Checks[tab][2]..tab) == "1"
+
 	local function on_execute(path,fname)
 		local full_path = path.."\\"..fname
 		if (search_pattern == nil or search_pattern == "" or string.match(full_path,search_pattern)) then
-			local local_path = trim_final_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
-			if not (skip_xcopy) then
-				lfs.mkdir(get_path(local_path))
-				RunWait( strformat([[xcopy "%s" "%s" /y /i]],full_path,get_path(local_path)) , working_directory )
+			local skip = false
+			if (remip_only) then 
+				local dds = cDDS:new(full_path)
+				if (dds) then 
+					skip = not (bit.band(DDSD_MIPMAPCOUNT,dds.dwFlags) == DDSD_MIPMAPCOUNT)
+				end
 			end
-			RunWait( strformat([["%s" %s "%s"]],cp,command_line_options,local_path) , working_directory )
 			
-			if (copy_thm) then 
-				RunWait( strformat([[xcopy "%s" "%s" /y /i /q /c]],trim_ext(full_path)..".thm",get_path(local_path)) , working_directory )
+			if not (skip) then
+				local local_path = trim_final_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
+				
+				lfs.mkdir(get_path(local_path))
+				
+				Msg("%s converting",local_path)
+				
+				if (use_mogrify) then
+					RunWait( strformat([["%s" %s "%s"]],cp,command_line_options,local_path) , working_directory )
+				else
+					RunWait( strformat([["%s" "%s" %s "%s"]],cp,full_path,command_line_options,local_path) , working_directory )
+				end
+				
+				if (copy_thm) then
+					RunWait( strformat([[xcopy "%s" "%s" /y /i /q /c]],trim_ext(full_path)..".thm",get_path(local_path)) , working_directory )
+				end
 			end
 		end
 	end

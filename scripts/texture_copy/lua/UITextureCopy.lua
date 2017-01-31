@@ -31,9 +31,9 @@ end
 function cUITextureCopy:Reinit()
 	inherited.Reinit(self)
 	
-	local tabs = {"SoC->CoP rename","missing bump#"}
-	Checks["1"] = {"overwrite"}
-	
+	local tabs = {"SoC->CoP rename","missing bump#","resize bump half size"}
+	Checks["1"] = {"Overwrite"}
+	Checks["3"] = {"ResizeToFix"}
 	-- below will be automated based on above tab definition and checks
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vUITextureCopyTab|%s",table.concat(tabs,"^"))
 	
@@ -271,4 +271,182 @@ function cUITextureCopy:ActionExecute2(tab,input_path,output_path)
 	ltx:Save()
 	
 	Msg("TextureCopy:= Missing Bump# Finished!")
+end
+
+function cUITextureCopy:ActionExecute4(tab,input_path,output_path)
+	
+	Msg("TextureCopy:= Working...")
+	
+	local ltx = cIniFile:new(output_path.."\\bump_dimension_mismatch.ltx",true)
+	ltx.root = {}
+	
+	local force_resize = ahkGetVar("UITextureCopyCheck"..Checks[tab][1]..tab) == "1"
+	
+	local working_directory = ahkGetVar("A_WorkingDir").."\\bin\\ImageMagick\\"
+	local cp = working_directory .. "mogrify.exe"
+	
+	local function on_execute(path,fname)
+		if not (string.find(fname,"_bump")) then
+			Msg("processing %s",fname)
+			local full_path = path.."\\"..fname
+			local fn = trim_ext(fname)
+			
+			local bump_path_1 = path.."\\"..fn.."_bump.dds"
+			local bump_path_2 = path.."\\"..fn.."_bump#.dds"
+			
+			local WIDTH, HEIGHT
+			local dds
+			if (file_exists(bump_path_1)) then 
+				if not (dds) then 
+					dds = cBinaryData:new(full_path,20)
+					if (dds) then
+						dds:r_u32() -- header
+						dds:r_u32() -- size
+						dds:r_u32() -- flags
+						HEIGHT = dds:r_u32()
+						WIDTH = dds:r_u32()
+					end
+				end 
+				
+				if (HEIGHT and WIDTH) then
+					local bump_dds = cBinaryData:new(bump_path_1,20)
+					if (bump_dds) then 
+						bump_dds:r_u32() -- header
+						bump_dds:r_u32() -- size
+						bump_dds:r_u32() -- flags
+						local height = bump_dds:r_u32()
+						local width = bump_dds:r_u32()
+						if not (HEIGHT == height and WIDTH == width) then
+							ltx:SetValue("mismatch",bump_path_1,strformat("%sx%s should be %sx%s",width,height,WIDTH,HEIGHT))
+							if (force_resize) then 
+								RunWait( strformat([["%s" -filter Kaiser -resize "%sx%s" "%s"]],cp,WIDTH,HEIGHT,bump_path_1) , working_directory )
+							end
+						end
+					end
+				end
+			end 
+			
+			HEIGHT = nil
+			WIDTH = nil
+			if (file_exists(bump_path_2)) then 
+				if not (dds) then 
+					dds = cBinaryData:new(full_path,20)
+					if (dds) then
+						dds:r_u32() -- header
+						dds:r_u32() -- size
+						dds:r_u32() -- flags
+						HEIGHT = dds:r_u32()
+						WIDTH = dds:r_u32()
+					end
+				end 
+				
+				if (HEIGHT and WIDTH) then
+					local bump_dds = cBinaryData:new(bump_path_2,20)
+					if (bump_dds) then 
+						bump_dds:r_u32() -- header
+						bump_dds:r_u32() -- size
+						bump_dds:r_u32() -- flags
+						local height = bump_dds:r_u32()
+						local width = bump_dds:r_u32()
+						if not (HEIGHT == height and WIDTH == width) then
+							ltx:SetValue("mismatch",bump_path_2,strformat("%sx%s should be %sx%s",width,height,WIDTH,HEIGHT))
+							if (force_resize) then 
+								RunWait( strformat([["%s" -resize %sx%s -filter Kaiser "%s"]],cp,WIDTH,HEIGHT,bump_path_2) , working_directory )
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	
+	ltx:Save()
+	
+	Msg("TextureCopy:= Finished! Check %s!",output_path.."\\bump_dimension_mismatch.ltx")
+end
+
+function cUITextureCopy:ActionExecute3(tab,input_path,output_path)
+	
+	Msg("TextureCopy:= Working...")
+	
+	local force_resize = ahkGetVar("UITextureCopyCheck"..Checks[tab][1]..tab) == "1"
+	
+	local working_directory = ahkGetVar("A_WorkingDir").."\\bin\\ImageMagick\\"
+	local cp = working_directory .. "mogrify.exe"
+	
+	local function on_execute(path,fname)
+		if not (string.find(fname,"_bump")) then
+			Msg("processing %s",fname)
+			local full_path = path.."\\"..fname
+			local fn = trim_ext(fname)
+			
+			local bump_path_1 = path.."\\"..fn.."_bump.dds"
+			local bump_path_2 = path.."\\"..fn.."_bump#.dds"
+			
+			local WIDTH, HEIGHT
+			local dds
+
+			if (file_exists(bump_path_1)) then 
+				if not (dds) then 
+					dds = cBinaryData:new(full_path,128)
+					if (dds) then
+						dds:r_u32() -- header
+						dds:r_u32() -- size
+						dds:r_u32() -- flags
+						HEIGHT = dds:r_u32()
+						WIDTH = dds:r_u32()
+					end
+				end 
+				
+				if (HEIGHT and WIDTH) then
+					local bump_dds = cBinaryData:new(bump_path_1,128)
+					if (bump_dds) then
+						bump_dds:r_u32() -- header
+						bump_dds:r_u32() -- size
+						bump_dds:r_u32() -- flags
+						local h = bump_dds:r_u32()
+						local w = bump_dds:r_u32()
+						if (w ~= WIDTH/2 and h ~= HEIGHT/2) then
+							Msg("resizing %s",bump_path_1)
+							RunWait( strformat([["%s" -filter Kaiser -resize "%sx%s" "%s"]],cp,WIDTH/2,HEIGHT/2,bump_path_1) , working_directory )
+						end
+					end
+				end
+			end
+			
+			if (file_exists(bump_path_2)) then 
+				if not (dds) then 
+					dds = cBinaryData:new(full_path,128)
+					if (dds) then
+						dds:r_u32() -- header
+						dds:r_u32() -- size
+						dds:r_u32() -- flags
+						HEIGHT = dds:r_u32()
+						WIDTH = dds:r_u32()
+					end
+				end 
+				
+				if (HEIGHT and WIDTH) then
+					local bump_dds = cBinaryData:new(bump_path_2,128)
+					if (bump_dds) then
+						bump_dds:r_u32() -- header
+						bump_dds:r_u32() -- size
+						bump_dds:r_u32() -- flags
+						local h = bump_dds:r_u32()
+						local w = bump_dds:r_u32()
+						if (w ~= WIDTH/2 and h ~= HEIGHT/2) then
+							Msg("resizing %s",bump_path_2)
+							RunWait( strformat([["%s" -filter Kaiser -resize "%sx%s" "%s"]],cp,WIDTH/2,HEIGHT/2,bump_path_2) , working_directory )
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	
+	Msg("TextureCopy:= Finished!")
 end
