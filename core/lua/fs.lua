@@ -86,12 +86,15 @@ ETMaterial = {
 -- BinaryData
 ---------------------------------------------------------
 cBinaryData = Class "cBinaryData"
-function cBinaryData:initialize(fname,partial)
-
+function cBinaryData:initialize(fname,partial,start)
 	if (file_exists(fname)) then
 		local f, err = io.open(fname,"rb")
-		if (err) then 
+		if (f == nil or err) then 
 			error(err)
+		end
+		
+		if (start) then
+			f:read(start)
 		end
 	
 		self.data = {}
@@ -125,11 +128,11 @@ function cBinaryData:size()
 end
 
 function cBinaryData:w_tell()
-	return self.w_marker
+	return self.w_marker-1
 end 
 
 function cBinaryData:r_tell()
-	return self.r_marker
+	return self.r_marker-1
 end 
 
 function cBinaryData:r_seek(pos)
@@ -142,8 +145,17 @@ function cBinaryData:w_seek(pos)
 	self.w_marker = pos
 end 
 
+function cBinaryData:w_eof()
+	return self.w_marker+1 > self:size()
+end 
+
+function cBinaryData:r_eof()
+	return self.r_marker+1 > self:size()
+end 
+
+local read_t = {}
 function cBinaryData:r(dwSize)
-	local t = {}
+	clear(read_t)
 	local data
 	for i=1,dwSize do
 		data = self.data[self.r_marker]
@@ -151,7 +163,7 @@ function cBinaryData:r(dwSize)
 			break 
 		end
 		
-		table.insert(t, string.format("%02X",data) )
+		table.insert(read_t, string.format("%02X",data) )
 		
 		self.r_marker = self.r_marker + 1
 	end
@@ -161,8 +173,8 @@ function cBinaryData:r(dwSize)
 		self.r_marker = size 
 	end 
 	
-	table_reverse(t)
-	return table.concat(t)
+	table_reverse(read_t)
+	return table.concat(read_t)
 end
 
 function cBinaryData:r_u8()

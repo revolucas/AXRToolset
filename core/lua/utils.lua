@@ -299,11 +299,20 @@ end
 
 -- clears normal table
 function clear(t)
-	if (t and #t > 0) then
-		for i=#t,1 do 
-			table.remove(t,i)
-		end
+	while (#t > 0) do 
+		table.remove(t)
 	end
+end
+
+function toBits(num, bits)
+    -- returns a table of bits
+    local t={} -- will contain the bits
+    for b=bits,1,-1 do
+        rest=math.fmod(num,2)
+        t[b]=rest
+        num=(num-rest)/2
+    end
+    if num==0 then return t else return {'Not enough bits to represent this number'}end
 end
 
 function is_empty(t)

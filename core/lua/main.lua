@@ -16,6 +16,7 @@ require "utils"
 require "inifile"
 require "xmlfile"
 require "fs"
+require "dds"
 ----------------------------------------------------
 -- Global Utils
 ----------------------------------------------------

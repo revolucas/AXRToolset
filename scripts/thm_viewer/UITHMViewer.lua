@@ -63,7 +63,7 @@ function cUITHMViewer:Reinit()
 	self.list = self.list or {}
 	
 	local tabs = {"THM Viewer","THM Validater","THM Editor"}
-	Checks["2"] = {"resync_size","resync_format","resync_mipmaps","resync_bumpname"}
+	Checks["2"] = {"resync_size","resync_format","resync_mipmaps","resync_bumpname","resync_alpha"}
 	
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vUITHMViewerTab hwndUITHMViewerTab_H|%s",table.concat(tabs,"^"))
 	
@@ -193,17 +193,6 @@ function cUITHMViewer:Gui(...)
 	inherited.Gui(self,...)
 end
 
-local DDSFlags = {
-	[0x1] 		= "DDSD_CAPS",
-	[0x2] 		= "DDSD_HEIGHT",
-	[0x4] 		= "DDSD_WIDTH",
-	[0x8] 		= "DDSD_PITCH",
-	[0x1000] 	= "DDSD_PIXELFORMAT",
-	[0x20000] 	= "DDSD_MIPMAPCOUNT",
-	[0x80000] 	= "DDSD_LINEARSIZE",
-	[0x800000] 	= "DDSD_DEPTH"
-}
-
 function get_relative_path(str,path)
 	return trim(string.sub(path,str:len()+1))
 end
@@ -236,10 +225,16 @@ function cUITHMViewer:ActionExecute2(tab)
 	local opt_resync_size = ahkGetVar("UITHMViewerCheck"..Checks[tab][1]..tab) == "1"
 	local opt_resync_format = ahkGetVar("UITHMViewerCheck"..Checks[tab][2]..tab) == "1"
 	local opt_resync_mipmaps = ahkGetVar("UITHMViewerCheck"..Checks[tab][3]..tab) == "1"
-	local opt_advance_verify = ahkGetVar("UITHMViewerCheck"..Checks[tab][4]..tab) == "1"
+	local opt_advance_verify = false --ahkGetVar("UITHMViewerCheck"..Checks[tab][4]..tab) == "1"
 	--local opt_create_missing_thm = ahkGetVar("UITHMViewerCheck"..Checks[tab][6]..tab) == "1"
+	local opt_resync_alpha = ahkGetVar("UITHMViewerCheck"..Checks[tab][5]..tab) == "1"
 	
 	error_log = ""
+	
+	local ignore_list = {
+		["$noalphadxt5"] = true,
+		["$alphadxt1"] = true
+	}
 	
 	local files_resynced_count = 0
 	local function on_execute(path,fname)
@@ -247,92 +242,124 @@ function cUITHMViewer:ActionExecute2(tab)
 		if (thm:size() <= 0) then 
 			Msg("THM Validater := %s size is zero!",fname)
 		else 
-			Msg(fname)
 			local fn = trim_ext(fname)
-			local dds_path = path.."\\"..fn..".dds"
-			if not (file_exists(dds_path)) then
-				error_log = error_log .. strformat("%s.dds not found even though there is %s.thm by this name (normal behavior for textures in terrain directory)\n",fn,fn)
-			else 
-				local dds = cBinaryData:new(dds_path,128)
-				if (dds) then 
-					local needs_resync = false
-					dds:r_u32() -- header
-					dds:r_u32() -- size
-					dds:r_u32() -- flags
-					local DDSD_HEIGHT = dds:r_u32()
-					local DDSD_WIDTH = dds:r_u32()
-					if (DDSD_WIDTH ~= thm.params.texture_width or DDSD_HEIGHT ~= thm.params.texture_height) then
-						--Msg("%s [%sx%s] widthxheight mismatch dds=%sx%s",fn,thm.params.texture_width,thm.params.texture_height,DDSD_WIDTH,DDSD_HEIGHT)
-						error_log = error_log .. strformat("%s [%sx%s] widthxheight mismatch dds=%sx%s\n",fn,thm.params.texture_width,thm.params.texture_height,DDSD_WIDTH,DDSD_HEIGHT)
-						needs_resync = opt_resync_size or needs_resync
-					end
-					dds:r_u32() -- Pitch or Linear Size
-					dds:r_u32() -- Depth 
+			if not (ignore_list[fn] or string.find(fn,"ui_font_")) then
+				local dds_path = path.."\\"..fn..".dds"
+				if not (file_exists(dds_path)) then
+					error_log = error_log .. strformat("%s.dds not found even though there is %s.thm by this name (normal behavior for textures in terrain directory)\n",fn,fn)
+				else 
+					Msg(fname)
 					
-					local DDSD_MIPMAPCOUNT = dds:r_u32() -- MipMap count
-					if (DDSD_MIPMAPCOUNT > 0) then 
-						if not (string.find(thm.params.flags,"GenerateMipMaps")) then 
-							error_log = error_log .. strformat("%s GenerateMipMaps flag is off even though dds has %s mipmaps\n",fn,DDSD_MIPMAPCOUNT)
-							needs_resync = opt_resync_mipmaps or needs_resync
-						end
-					else 
-						if (string.find(thm.params.flags,"GenerateMipMaps")) then 
-							error_log = error_log .. strformat("%s GenerateMipMaps flag is enabled even though dds has %s mipmaps\n",fn,DDSD_MIPMAPCOUNT)
-							needs_resync = opt_resync_mipmaps or needs_resync
-						end
-					end
-					
-					dds:r_seek(dds:r_tell()+52)
-					
-					local DDSD_PIXELFORMAT = trim(dds:r_stringZ())
-					
-					if (DDSD_PIXELFORMAT == "") then 
-						--Msg("Error format is empty (try resave texture or texture is uncompressed) | %s %sx%s",fn,DDSD_WIDTH,DDSD_HEIGHT)
-						error_log = error_log .. strformat("Error format is empty (try resave texture or texture is uncompressed) | %s %sx%s\n",fn,DDSD_WIDTH,DDSD_HEIGHT)
-					else
-						if (DDSD_PIXELFORMAT ~= thm.params.texture_format) then
-							--Msg("%s has format %s but dds has format %s",fn,thm.params.texture_format,DDSD_PIXELFORMAT)
-							error_log = error_log .. strformat("%s has format %s but dds has format %s\n",fn,thm.params.texture_format,DDSD_PIXELFORMAT)
-							needs_resync = opt_resync_format or needs_resync
-						end
+					local dds = cDDS:new(dds_path)
+					if (dds) then 
+						local needs_resync = false
 						
-						if (string.find(fname,"_bump.dds") and not thm.params.texture_type == "BumpMap") then 
-							error_log = error_log .. strformat("%s has texture_type %s but dds has _bump.dds postfix. Should be BumpMap.\n",fn,thm.params.texture_type)
-							needs_resync = true
-							thm.params.texture_type = "BumpMap"
-						elseif (string.find(fname,"_bump#.dds") and not thm.params.texture_type == "Image") then 
-							error_log = error_log .. strformat("%s has texture_type %s but dds has _bump#.dds postfix. Should be Image.\n",fn,thm.params.texture_type)
-							needs_resync = true
-							thm.params.texture_type = "Image"
-						end 
-						
-						if (needs_resync) then 
-							if (opt_resync_size) then
-								thm.params.texture_width = DDSD_WIDTH
-								thm.params.texture_height = DDSD_HEIGHT
-							end 
-							
-							if (opt_resync_format) then
-								thm.params.texture_format = DDSD_PIXELFORMAT
+						if not(dds.dwMagic == DDS_MAGIC and dds.dwSize == 124 and dds.pixel_format.dwSize == 32) then 
+							error_log = error_log .. strformat("%s not a valid DDS format",fname)
+						else
+							-- CHECK DIMENSIONS
+							if (dds.dwWidth ~= thm.params.texture_width or dds.dwHeight ~= thm.params.texture_height) then
+								--Msg("%s [%sx%s] widthxheight mismatch dds=%sx%s",fn,thm.params.texture_width,thm.params.texture_height,dds.dwWidth,dds.dwHeight)
+								error_log = error_log .. strformat("%s [%sx%s] widthxheight mismatch dds=%sx%s\n",fn,thm.params.texture_width,thm.params.texture_height,dds.dwWidth,dds.dwHeight)
+								needs_resync = opt_resync_size or needs_resync
 							end
 							
-							if (opt_resync_mipmaps) then
-								if (DDSD_MIPMAPCOUNT > 0) then 
-									if not (string.find(thm.params.flags,"GenerateMipMaps")) then
-										thm.params.flags = thm.params.flags .. ",GenerateMipMaps"
-									end
-								else 
-									if (string.find(thm.params.flags,"GenerateMipMaps")) then 
-										thm.params.flags = string.gsub(thm.params.flags,"(GenerateMipMaps)","")
-									end
+							-- CHECK HAS ALPHA
+							local has_alpha = dds:HasAlpha()
+							if (has_alpha) then 
+								if not (string.find(thm.params.flags,"HasAlpha")) then
+									error_log = error_log .. strformat("%s HasAlpha flag is off even though dds has alpha\n",fn)
+									needs_resync = true
+								end
+							else 
+								if (string.find(thm.params.flags,"HasAlpha")) then
+									error_log = error_log .. strformat("%s HasAlpha flag is on even though dds has does not have alpha\n",fn)
+									needs_resync = true
 								end
 							end
 							
-							--thm.params.mip_filter = "Triangle"
+							-- CHECK MIPMAPS
+							local has_mipmaps = (bit.band(DDSD_MIPMAPCOUNT,dds.dwFlags) == DDSD_MIPMAPCOUNT)
+							if (has_mipmaps) then 
+								if not (string.find(thm.params.flags,"GenerateMipMaps")) then 
+									error_log = error_log .. strformat("%s GenerateMipMaps flag is off even though dds has %s mipmaps\n",fn,dds.dwMipMapCount)
+									needs_resync = opt_resync_mipmaps or needs_resync
+								end
+							else 
+								if (string.find(thm.params.flags,"GenerateMipMaps")) then 
+									error_log = error_log .. strformat("%s GenerateMipMaps flag is enabled even though dds has %s mipmaps\n",fn,dds.dwMipMapCount)
+									needs_resync = opt_resync_mipmaps or needs_resync
+								end
+							end
 							
-							thm:save()
-							--Msg("%s resynced with dds",fn)
-							files_resynced_count = files_resynced_count + 1
+							-- CHECK PIXEL FORMAT
+							local pixel_format = dds:PixelFormatIsDXT1() and "DXT1" or dds:PixelFormatIsDXT3() and "DXT3" or dds:PixelFormatIsDXT5() and "DXT5" or dds:PixelFormatIsRGBA() and "RGBA" or dds:PixelFormatIsRGB() and "RGB"
+							local has_pixelformat = pixel_format and (bit.band(DDSD_PIXELFORMAT,dds.dwFlags) == DDSD_PIXELFORMAT)
+							if (has_pixelformat) then
+								if (pixel_format == "DXT1" and has_alpha) then
+									pixel_format = "DXT1a"
+								end
+								if (thm.params.texture_format ~= pixel_format) then
+									--Msg("%s has format %s but dds has format %s",fn,thm.params.texture_format,dds.pixel_format.dwFourCC)
+									error_log = error_log .. strformat("%s has format %s but dds has format %s\n",fn,thm.params.texture_format,pixel_format)
+									needs_resync = opt_resync_format or needs_resync
+								end
+							else
+								--Msg("Error format is empty (try resave texture or texture is uncompressed) | %s %sx%s",fn,dds.dwWidth,dds.dwHeight)
+								error_log = error_log .. strformat("Error format is empty (try resave texture or texture is uncompressed) | %s %sx%s\n",fn,dds.dwWidth,dds.dwHeight)
+							end
+
+							-- CHECK BUMP MODE
+							if (string.find(fname,"_bump.dds") and not thm.params.texture_type == "BumpMap") then 
+								error_log = error_log .. strformat("%s has texture_type %s but dds has _bump.dds postfix. Should be BumpMap.\n",fn,thm.params.texture_type)
+								needs_resync = true
+								thm.params.texture_type = "BumpMap"
+							elseif (string.find(fname,"_bump#.dds") and not thm.params.texture_type == "Image") then 
+								error_log = error_log .. strformat("%s has texture_type %s but dds has _bump#.dds postfix. Should be Image.\n",fn,thm.params.texture_type)
+								needs_resync = true
+								thm.params.texture_type = "Image"
+							end
+							
+							if (needs_resync) then 
+								if (opt_resync_size) then
+									thm.params.texture_width = dds.dwWidth
+									thm.params.texture_height = dds.dwHeight
+								end 
+								
+								if (opt_resync_format and pixel_format) then
+									thm.params.texture_format = pixel_format
+								end
+								
+								if (opt_resync_alpha) then 
+									if (has_alpha) then 
+										if not (string.find(thm.params.flags,"HasAlpha")) then
+											thm.params.flags = thm.params.flags .. ",HasAlpha"
+										end
+									else
+										if (string.find(thm.params.flags,"HasAlpha")) then
+											thm.params.flags = string.gsub(thm.params.flags,"(HasAlpha)","")
+										end
+									end
+								end
+								
+								if (opt_resync_mipmaps) then
+									if (has_mipmaps) then
+										if not (string.find(thm.params.flags,"GenerateMipMaps")) then
+											thm.params.flags = thm.params.flags .. ",GenerateMipMaps"
+										end
+									else
+										if (string.find(thm.params.flags,"GenerateMipMaps")) then 
+											thm.params.flags = string.gsub(thm.params.flags,"(GenerateMipMaps)","")
+										end
+									end
+								end
+								
+								thm.params.mip_filter = "Kaiser"
+								
+								thm:save()
+								--Msg("%s resynced with dds",fn)
+								files_resynced_count = files_resynced_count + 1
+							end
 						end
 					end
 				end
@@ -411,13 +438,13 @@ function cUITHMViewer:ActionExecute2(tab)
 					end
 				end
 			end
-		elseif not (string.find(fname,"_bump")) then 
-			local thm = Xray.cTHM:new(thm_path)
-			if (thm:size() > 0) then 
-				if (string.find(thm.params.flags,"HasAlpha")) then 
-					error_log = error_log .. strformat("HasAlpha flag is set for %s.thm (diffuse texture). This could be normal.\n",fn)
-				end
-			end
+		--elseif not (string.find(fname,"_bump")) then 
+		--	local thm = Xray.cTHM:new(thm_path)
+		--	if (thm:size() > 0) then 
+		--		if (string.find(thm.params.flags,"HasAlpha")) then 
+		--			error_log = error_log .. strformat("HasAlpha flag is set for %s.thm (diffuse texture). This could be normal.\n",fn)
+		--		end
+		--	end
 		end
 	end
 
