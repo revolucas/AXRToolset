@@ -8,4 +8,6 @@ Plugins can be coded in lua with exported API from AutoHotkey. This gives an adv
 
 Wiki: https://github.com/revolucas/AXRToolset/wiki/
 
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=U9XUD5PFHYR48)
+
 
