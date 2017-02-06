@@ -63,7 +63,7 @@ function cUITHMViewer:Reinit()
 	self.list = self.list or {}
 	
 	local tabs = {"THM Viewer","THM Validater","THM Editor"}
-	Checks["2"] = {"resync_size","resync_format","resync_mipmaps","resync_bump_mode","resync_alpha"}
+	Checks["2"] = {"resync_size","resync_format","resync_mipmaps","resync_bump_mode","resync_alpha","remove_thm_of_missing_dds"}
 	
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vUITHMViewerTab hwndUITHMViewerTab_H|%s",table.concat(tabs,"^"))
 	
@@ -228,6 +228,7 @@ function cUITHMViewer:ActionExecute2(tab)
 	local opt_resync_bump_mode = ahkGetVar("UITHMViewerCheck"..Checks[tab][4]..tab) == "1"
 	--local opt_create_missing_thm = ahkGetVar("UITHMViewerCheck"..Checks[tab][6]..tab) == "1"
 	local opt_resync_alpha = ahkGetVar("UITHMViewerCheck"..Checks[tab][5]..tab) == "1"
+	local opt_remove_thm = ahkGetVar("UITHMViewerCheck"..Checks[tab][6]..tab) == "1"
 	
 	error_log = ""
 	
@@ -247,8 +248,12 @@ function cUITHMViewer:ActionExecute2(tab)
 				local dds_path = path.."\\"..fn..".dds"
 				if not (file_exists(dds_path)) then
 					if not (string.find(path,"terrain")) then
-						os.remove(path.."\\"..fname)
-						error_log = error_log .. strformat("%s.dds not found even though there is %s.thm by this name (normal behavior for textures in terrain directory) *THM REMOVED*\n",fn,fn)
+						if (opt_remove_thm) then
+							os.remove(path.."\\"..fname)
+							error_log = error_log .. strformat("%s.dds not found even though there is %s.thm by this name (normal behavior for textures in terrain directory) *THM REMOVED*\n",fn,fn)
+						else 
+							error_log = error_log .. strformat("%s.dds not found even though there is %s.thm by this name (normal behavior for textures in terrain directory)\n",fn,fn)
+						end
 					end
 				else 
 					Msg(fname)
