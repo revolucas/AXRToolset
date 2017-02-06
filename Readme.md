@@ -1,4 +1,5 @@
 #### AXRToolset
+---------
 by Alundaio                                         
                                                         
 AXRToolset is an AutoHotkey & Lua-based scripting engine that utilizes a Graphical User Interface to display
@@ -6,6 +7,14 @@ scripted plugins that do various automated tasks. Although the current plugins a
 
 Plugins can be coded in lua with exported API from AutoHotkey. This gives an advantage over using pure AHK, allowing you to use lua's natural ability for procedural and object-oriented programming and allows AHK to be executed from lua at run time without having to re-compile binaries. Using AHK fills in the gap of pretty much everything lua cannot do on it's own, like the advantage of creating simple GUIs, macros, File handling, OS hooks, etc.
 
-Wiki: https://github.com/revolucas/AXRToolset/wiki/
+####Wiki
+---------
+https://github.com/revolucas/AXRToolset/wiki/
+
+####Donations
+---------
+I devote a mind-blowing amount of hours to create free content, provide support and manage an ad-free community website and group projects. If you would like to support me in my passion for sharing and creating free software, mods and video games, I would really appreciate it.
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=U9XUD5PFHYR48)
 
 
