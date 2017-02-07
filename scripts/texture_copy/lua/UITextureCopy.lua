@@ -33,7 +33,7 @@ function cUITextureCopy:Reinit()
 	
 	local tabs = {"SoC->CoP rename","missing bump#","resize bump half size"}
 	Checks["1"] = {"Overwrite"}
-	Checks["3"] = {"ResizeToFix"}
+	--Checks["3"] = {"ResizeToFix"}
 	-- below will be automated based on above tab definition and checks
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vUITextureCopyTab|%s",table.concat(tabs,"^"))
 	
@@ -371,7 +371,7 @@ function cUITextureCopy:ActionExecute3(tab,input_path,output_path)
 	
 	Msg("TextureCopy:= Working...")
 	
-	local force_resize = ahkGetVar("UITextureCopyCheck"..Checks[tab][1]..tab) == "1"
+	--local force_resize = ahkGetVar("UITextureCopyCheck"..Checks[tab][1]..tab) == "1"
 	
 	local working_directory = ahkGetVar("A_WorkingDir").."\\bin\\ImageMagick\\"
 	local cp = working_directory .. "mogrify.exe"

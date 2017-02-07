@@ -44,6 +44,7 @@ function cImageMagick:Reinit()
 			self:Gui("Add|Text|x590 y60 w300 h40 cBlue vImageMagickLink%s gOnScriptControlAction|Click here for Convert command options",i)
 			self:Gui("Add|Text|x270 y365 w300 h40 cBlue vImageMagickLink2%s gOnScriptControlAction|Click for tutorial",i)
 			self:Gui("Add|Text|x590 y160 w300 h40|ImageMagick is a very useful texture command line tool. Here is an example if you want to resize textures using the Kaiser filter: -filter Kaiser -resize 50%",i)
+			self:Gui("Add|Text|x590 y365 w300 h40|Caveats: It will skip *.dds that are DXT1 with 1-bit alpha, you will need to use another application for these."
 			-- GroupBox
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Path (Recursive)")
 			self:Gui("Add|GroupBox|x10 y150 w510 h75|Output Path")
@@ -184,13 +185,22 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 		local full_path = path.."\\"..fname
 		if (search_pattern == nil or search_pattern == "" or string.match(full_path,search_pattern)) then
 			local skip = false
+			local dds = cDDS:new(full_path)
 			if (remip_only) then 
-				local dds = cDDS:new(full_path)
 				if (dds) then 
 					skip = not (bit.band(DDSD_MIPMAPCOUNT,dds.dwFlags) == DDSD_MIPMAPCOUNT)
 				end
 			end
 			
+			local output_format = dds and (dds.pixel_format.dwFourCC == "DXT5" and "dxt5" or  dds.pixel_format.dwFourCC == "DXT3" and "dxt5" or dds.pixel_format.dwFourCC == "DXT1" and "dxt1") or nil
+			if (output_format) then
+				command_line_options = command_line_options .. " -define dds:compression="..output_format.." "
+				if (output_format == "dxt1" and dds:HasAlpha()) then 
+					skip = true
+					Msg("DXT1a not supported skipping image")
+				end
+			end
+				
 			if not (skip) then
 				local local_path = trim_final_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
 				
