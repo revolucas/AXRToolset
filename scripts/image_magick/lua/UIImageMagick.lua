@@ -44,7 +44,7 @@ function cImageMagick:Reinit()
 			self:Gui("Add|Text|x590 y60 w300 h40 cBlue vImageMagickLink%s gOnScriptControlAction|Click here for Convert command options",i)
 			self:Gui("Add|Text|x270 y365 w300 h40 cBlue vImageMagickLink2%s gOnScriptControlAction|Click for tutorial",i)
 			self:Gui("Add|Text|x590 y160 w300 h40|ImageMagick is a very useful texture command line tool. Here is an example if you want to resize textures using the Kaiser filter: -filter Kaiser -resize 50%",i)
-			self:Gui("Add|Text|x590 y365 w300 h40|Caveats: It will skip *.dds that are DXT1 with 1-bit alpha, you will need to use another application for these."
+			self:Gui("Add|Text|x590 y365 w300 h40|Caveats: It will skip *.dds that are DXT1 with 1-bit alpha, you will need to use another application for these.")
 			-- GroupBox
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Path (Recursive)")
 			self:Gui("Add|GroupBox|x10 y150 w510 h75|Output Path")
