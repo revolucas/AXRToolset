@@ -262,8 +262,7 @@ textures\ = true
 	local function create_output(name,fname,out,prefix)
 	
 		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
-		
-		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,config_dir..pltx), working_directory )
+		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,pltx), config_dir )
 
 		lfs.mkdir(out)
 		
