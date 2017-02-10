@@ -56,7 +56,7 @@ function cUILTXQuickEdit:Reinit()
 			self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUILTXQuickEditSearch%s|",i)
 			
 			self:Gui("Add|GroupBox|x22 y555 w530 h75|%t_working_directory")
-			self:Gui("Add|Text|x560 y555 w200 h20|%t_click_to_edit")
+			self:Gui("Add|Text|x560 y555 w230 h20|%t_click_to_edit")
 			self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUILTXQuickEditBrowsePath%s|...",i)
 			self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUILTXQuickEditPath%s|",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUILTXQuickEditSaveSettings%s|%t_save_settings",i)

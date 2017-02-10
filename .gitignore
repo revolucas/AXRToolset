@@ -3,6 +3,7 @@
 *.bak
 *.bkp
 *.xr
+*.log
 .cmfid_gamedata
 errors.log
 xray_sections.ltx

@@ -70,7 +70,7 @@ function cUIOGFViewer:Reinit()
 		if (i == 1) then 
 			local filters = table.concat({"All"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
-				self:Gui("Add|Text|x550 y75 w200 h20|Right-Click to Edit!")
+				self:Gui("Add|Text|x550 y75 w230 h20|%t_click_to_edit")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUIOGFViewerLV%s|",i)
