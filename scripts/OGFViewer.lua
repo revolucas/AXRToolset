@@ -327,7 +327,7 @@ function cUIOGFViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 			return
 		end
 		local val
-		for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata","bones"}) do
+		for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata"}) do
 			val = ahkGetVar("UIOGFViewerModifyEdit2"..field)
 			if (ogf[field]) then
 				if (field == "motion_refs2" or field == "bones") then 
