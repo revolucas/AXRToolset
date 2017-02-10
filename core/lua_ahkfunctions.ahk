@@ -193,6 +193,19 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "HexToFloat", RegisterCallback("HexToFloat","C"))
     lua_register(l, "FloatToHex", RegisterCallback("FloatToHex","C"))
    lua_register(l, "Unicode2Ansi", RegisterCallback("Unicode2Ansi_script","C"))
+   
+   lua_register(l,"UpdateScrollBars",RegisterCallback("UpdateScrollBars_script","C"))
+}
+
+UpdateScrollBars_script(L)
+{
+   arg1 := lua_tostring(L,1)
+   arg2 := lua_tostring(L,2)
+   arg3 := lua_tostring(L,3)
+   
+   UpdateScrollBars(arg1,arg2,arg3)
+   
+   return 0
 }
 
 DebugMsg(L)

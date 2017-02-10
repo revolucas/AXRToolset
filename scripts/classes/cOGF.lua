@@ -141,7 +141,7 @@ function cOGF:OGF_S_BONE_NAMES(loading)
 			if (cnt > 0) then
 				self.bones = {}
 				for i=1,cnt do 
-					self.bones[self:r_stringZ()] = self:r_stringZ()
+					self.bones[self:r_stringZ()] = {parent=self:r_stringZ()}
 					self:r(60)
 				end
 			end
@@ -160,6 +160,35 @@ function cOGF:OGF_S_BONE_NAMES(loading)
 			end
 			self:replace_chunk(OGF_S_BONE_NAMES,chunk)
 		end
+	end
+end
+
+function cOGF:OGF_S_IKDATA(loading)
+	if (loading) then 
+		if (self.bones) then
+			local main_chunk = self:open_chunk(OGF_S_IKDATA)
+			if (main_chunk) then 
+				for name,data in pairs(self.bones) do
+					data.game_mtl_name = self:r_stringZ()
+					data.type = self:r_u16()
+					data.flags = self:r_u16() --Flags16 flags; // 2
+					data.box = {}
+					for i=1,15 do -- Fobb box; // 15*4
+						table.insert(data.box,self:r_float())
+					end
+					data.sphere = {} -- Fsphere; //4*4
+					for i=1,4 do
+						table.insert(data.sphere,self:r_float())
+					end
+					data.cylinder = {}
+					for i=1,8 do -- Fcylinder cylinder; // 8*4
+						table.insert(data.cylinder,self:r_float())
+					end
+				end
+			end
+		end
+	else
+
 	end
 end
 

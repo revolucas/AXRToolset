@@ -177,6 +177,18 @@ xrOGF_SMParamsVersion = 4
 xrOGF_FormatVersion = 4
 
 MAX_ANIM_SLOT =	48
+-- Level
+fsL_HEADER = 1
+fsL_SHADERS = 2
+fsL_VISUALS = 3
+fsL_PORTALS = 4 				-- Portal polygons
+fsL_LIGHT_DYNAMIC = 6
+fsL_GLOWS = 7 					-- All glows inside level
+fsL_SECTORS = 8 				-- All sectors on level
+fsL_VB = 9						-- Static geometry
+fsL_IB = 10
+fsL_SWIS = 11					-- collapse info, usually for trees
+fsL_forcedword = 0xFFFFFFFF
 ----------------------------------------------------
 -- Global Utils
 ----------------------------------------------------

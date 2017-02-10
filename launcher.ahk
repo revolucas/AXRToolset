@@ -1,6 +1,9 @@
 #NoEnv
 #SingleInstance, force
 
+OnMessage(0x115, "OnScroll") ; WM_VSCROLL
+OnMessage(0x114, "OnScroll") ; WM_HSCROLL
+
 #include core\debug.ahk
 #include core\lua.ahk
 #include core\lua_ahkfunctions.ahk
@@ -22,3 +25,4 @@ if lua_isstring(L,-1) {
 return
 
 #include core\label_actions.ahk
+#include core\message_handlers.ahk

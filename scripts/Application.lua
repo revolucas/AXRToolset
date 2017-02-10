@@ -53,9 +53,8 @@ function cMainMenu:Reinit()
 		
 		local langs = Language.ini:GetSections()
 		self:Gui("Add|DropDownList|gOnScriptControlAction x25 y180 w220 h30 R40 H300 vApplicationLanguage|"..table.concat(langs,"^"))
-		
-	self:Gui("Show|w1024 h720|AXR Toolset")
 	
+	self:Gui("Show|w1024 h720|AXR Toolset")
 	GuiControl(self.ID,"","ApplicationGamedataPath",gSettings:GetValue("core","Gamedata_Path") or "")
 	GuiControl(self.ID,"ChooseString","ApplicationLanguage",gSettings:GetValue("core","language") or "")
 end 

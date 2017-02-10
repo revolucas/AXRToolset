@@ -298,7 +298,7 @@ function cUIOGFViewerModify:Reinit()
 	--self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyOpenDDS2|%t_open .DDS")
 	--self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyCopy2|%t_copy")
 	--self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyPaste2|%t_paste")
-	
+	self:Gui("+Resize +MaxSize1000x800 +0x200000")
 	self:Gui("Show|center|%t_edit_values")
 	self:Gui("Default")
 end

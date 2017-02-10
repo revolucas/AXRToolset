@@ -705,6 +705,7 @@ function cUITHMViewerModify:Reinit()
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyOpenDDS|%t_open .DDS")
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyCopy|%t_copy")
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyPaste|%t_paste")
+	self:Gui("+Resize +MaxSize1000x800 +0x200000")
 	self:Gui("Show|center|%t_edit_values")
 	self:Gui("Default")
 end
@@ -840,7 +841,7 @@ function cUITHMViewerModify2:Reinit()
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyOpenDDS2|%t_open .DDS")
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyCopy2|%t_copy")
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUITHMViewerModifyPaste2|%t_paste")
-	
+	self:Gui("+Resize +MaxSize1000x800 +0x200000")
 	self:Gui("Show|center|%t_edit_values")
 	self:Gui("Default")
 end
