@@ -274,10 +274,14 @@ function cUIOGFViewerModify:Reinit()
 
 	
 	local y = 125+35
-	for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata"}) do
+	for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata","bones"}) do
 		if (params[field] and params[field] ~= "") then
 			self:Gui("Add|Text|x5 y%s w300 h30|Skeleton %s",y,field)
-			self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
+			if (field == "userdata") then
+				self:Gui("Add|Edit|x200 y%s w800 h90 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
+			else
+				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
+			end
 			y = y + 30
 		end
 
@@ -331,10 +335,10 @@ function cUIOGFViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 			return
 		end
 		local val
-		for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata"}) do
+		for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata","bones"}) do
 			val = ahkGetVar("UIOGFViewerModifyEdit2"..field)
 			if (ogf[field]) then
-				if (field == "motion_refs2") then 
+				if (field == "motion_refs2" or field == "bones") then 
 					ogf[field] = str_explode(val,",")
 				else
 					ogf[field] = trim(val)
@@ -345,7 +349,7 @@ function cUIOGFViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 				for i,child in ipairs(ogf.children) do 
 					val = ahkGetVar("UIOGFViewerModifyEdit2_child"..i.."_"..field)
 					if (val and child[field]) then
-						if (field == "motion_refs2") then
+						if (field == "motion_refs2" or field == "bones") then
 							child[field] = val ~= "" and str_explode(val,",") or {}
 						else
 							child[field] = trim(val)

@@ -238,5 +238,13 @@ function cOGF:params()
 		t.modif_name = self.description.modif_name or ""
 		t.modif_time = self.description.modif_time or ""
 	end
+	if (self.bones) then 
+		local new = {}
+		for k,v in pairs(self.bones) do 
+			table.insert(new,k)
+		end
+		table.sort(new)
+		t.bones = table.concat(new,",")
+	end
 	return t
 end
