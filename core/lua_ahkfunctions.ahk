@@ -191,6 +191,7 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "LVGetNext", RegisterCallback("LVGetNext","C"))
    lua_register(l, "LVModify", RegisterCallback("LVModify","C"))
    lua_register(l, "HexToFloat", RegisterCallback("HexToFloat","C"))
+    lua_register(l, "FloatToHex", RegisterCallback("FloatToHex","C"))
    lua_register(l, "Unicode2Ansi", RegisterCallback("Unicode2Ansi_script","C"))
 }
 
@@ -2469,24 +2470,27 @@ LVTop(L)
    Return 0
 }
 
-MCodeLz( ByRef B,H) {  ; Hex2Bin() of Hex2Bin()/Bin2Hex() by Laszlo Hars
-   Static H2B            ; www.autohotkey.com/forum/viewtopic.php?p=180469#180469
-   If !H2B  ; C Source/Author Notes:  www.autohotkey.com/forum/viewtopic.php?p=162089#162089
-    VarSetCapacity(H2B,74,0), NumPut(0x168A0C24748B56,H2B,0,"Int64")
-    , NumPut(0x8B573B74D28446,H2B, 7,"Int64"), NumPut(0xC0C28A530C247C,H2B,14,"Int64")
-    , NumPut(0x8AE9F609B106E8,H2B,21,"Int64"), NumPut(0x8804E1C0CA02C8,H2B,28,"Int64")
-    , NumPut(0x74D28446168A0F,H2B,35,"Int64"), NumPut(0xB306E8C0C28A1A,H2B,42,"Int64")
-    , NumPut(0x020FE280EBF609,H2B,49,"Int64"), NumPut(0x168A0788C10AC2,H2B,56,"Int64")
-    , NumPut(0x5BCD75D2844647,H2B,63,"Int64"), NumPut(0x00C35E5F,H2B,70)
-   Return VarSetCapacity( B,StrLen(H)//2), DllCall( &H2B, Str,B, Str,H, "CDecl UInt" )
+HexToFloat(L) 
+{
+   arg1 := lua_tonumber(L, 1)
+   
+   v := (1-2*(d>>31)) * (2**((d>>23 & 255)-127)) * (1+(d & 8388607)/8388608) ; 2**23
+   
+   lua_pushnumber(L,v)
+   Return, 1
 }
 
-HexToFloat(L)
-{
-   arg1 := lua_tostring(L,1)
-   MCodeLz(Data,arg1)
-   v := NumGet( Data,0,"Float" )
+FloatToHex(L) {
+   
+   f := lua_tonumber(L, 1)
+   
+   form := A_FormatInteger
+   SetFormat Integer, HEX
+   v := DllCall("MulDiv", Float,f, Int,1, Int,1, UInt)
+   SetFormat Integer, %form%
+   
    lua_pushnumber(L,v)
+   
    Return, 1
 }
 

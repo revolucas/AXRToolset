@@ -85,7 +85,11 @@ function startsWith(text,prefix)
 end
 
 function trim(s)
-	return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+	return s and (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
+function clamp(val, min, max)
+	return val < min and min or val > max and max or val
 end
 
 function get_path(str,sep)
@@ -441,8 +445,9 @@ end
 
 
 function hex2float (c)
-    if c == 0 then return 0.0 end
-    local c = string.gsub(string.format("%X", c),"(..)",function (x) return string.char(tonumber(x, 16)) end)
+	if c == 0 then return 0.0 end
+	c = string.gsub(string.format("%X", c),"(..)",function (x) return string.char(tonumber(x, 16)) end)
+
     local b1,b2,b3,b4 = string.byte(c, 1, 4)
     local sign = b1 > 0x7F
     local expo = (b1 % 0x80) * 0x2 + math.floor(b2 / 0x80)

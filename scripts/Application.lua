@@ -133,4 +133,43 @@ function cMainMenu:Show(bool)
 	end
 	recurse_subdirectories_and_execute(i_p,{"dds"},on_execute)
 	--]]
+	--local path = [[E:\STALKER\Games\COP_COC_db_converter\unpacked\meshes\actors\stalker_neutral\stalker_neutral_0.ogf]]
+	--[[
+	local ogf = cOGF(path)
+ 	Msg(ogf.format_version)
+	Msg(ogf.type)
+	Msg(ogf.shader_id)
+	if (ogf.texture) then
+		Msg(ogf.texture.name)
+		Msg(ogf.texture.shader)
+	end
+	if (ogf.lod_path) then 
+		Msg(lod_path)
+	end
+	if (ogf.motion_refs) then
+		Msg(ogf.motion_refs)
+	end
+	if (ogf.motion_refs2) then 
+		for i,v in ipairs(ogf.motion_refs2) do 
+			Msg(v)
+		end
+	end
+	if (ogf.description) then 
+		for k,v in pairs(ogf.description) do 
+			Msg("%s=%s",k,v)
+		end
+	end
+	if (ogf.userdata) then 
+		Msg(ogf.userdata)
+	end 
+	
+	if (ogf.children) then 
+		for i,v in ipairs(ogf.children) do
+			Msg(v.format_version)
+			if (v.texture) then
+				Msg(v.texture.name)
+			end
+		end
+	end
+	]]
 end

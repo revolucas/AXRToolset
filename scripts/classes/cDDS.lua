@@ -1,36 +1,3 @@
-DDS_MAGIC = 0x20534444
-
--- dwFlags
-DDSD_CAPS                    = 0x00000001 
-DDSD_HEIGHT                  = 0x00000002 
-DDSD_WIDTH                   = 0x00000004 
-DDSD_PITCH                   = 0x00000008 
-DDSD_PIXELFORMAT             = 0x00001000 
-DDSD_MIPMAPCOUNT             = 0x00020000 
-DDSD_LINEARSIZE              = 0x00080000 
-DDSD_DEPTH                   = 0x00800000 
-
--- pixel_format.dwFlags
-DDPF_ALPHAPIXELS             = 0x00000001 
-DDPF_FOURCC                  = 0x00000004 
-DDPF_INDEXED                 = 0x00000020 
-DDPF_RGB                     = 0x00000040 
-
--- dwCaps1
-DDSCAPS_COMPLEX              = 0x00000008 
-DDSCAPS_TEXTURE              = 0x00001000 
-DDSCAPS_MIPMAP               = 0x00400000 
-
---  dwCaps2
-DDSCAPS2_CUBEMAP             = 0x00000200 
-DDSCAPS2_CUBEMAP_POSITIVEX   = 0x00000400 
-DDSCAPS2_CUBEMAP_NEGATIVEX   = 0x00000800 
-DDSCAPS2_CUBEMAP_POSITIVEY   = 0x00001000 
-DDSCAPS2_CUBEMAP_NEGATIVEY   = 0x00002000 
-DDSCAPS2_CUBEMAP_POSITIVEZ   = 0x00004000 
-DDSCAPS2_CUBEMAP_NEGATIVEZ   = 0x00008000 
-DDSCAPS2_VOLUME              = 0x00200000
-
 Class "cDDS"
 function cDDS:initialize(fname)
 	self.fname = fname

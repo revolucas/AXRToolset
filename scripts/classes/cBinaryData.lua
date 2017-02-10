@@ -1,93 +1,10 @@
-THM_CHUNK_VERSION		= 0x0810
-THM_CHUNK_DATA			= 0x0811
-THM_CHUNK_TEXTUREPARAM	= 0x0812
-THM_CHUNK_TYPE			= 0x0813
-THM_CHUNK_TEXTURE_TYPE	= 0x0814
-THM_CHUNK_DETAIL_EXT	= 0x0815
-THM_CHUNK_MATERIAL		= 0x0816
-THM_CHUNK_BUMP			= 0x0817
-THM_CHUNK_EXT_NORMALMAP	= 0x0818
-THM_CHUNK_FADE_DELAY	= 0x0819
-THM_TEXTURE_VERSION		= 0x0012
-CFS_CompressMark 		= bit.lshift(1,31) --2147483648
-
-ETType = {
-    	[0] = "Image",
-		[1] = "CubeMap",
-        [2] = "BumpMap",
-        [3] = "NormalMap",
-        [4] = "Terrain"
-}
-
-ETMIPFilter = {	
-			[0] = "Box",
-			[1] = "Cubic",
-			[2] = "Point",
-			[3] = "Triangle",
-			[4] = "Quadratic",
-			[5] = "Advanced",
-			[6] = "Catrom",
-			[7] = "Mitchell",
-			[8] = "Gaussian",
-			[9] = "Sinc",
-			[10] = "Bessel",
-			[11] = "Hanning",
-			[12] = "Hamming",
-			[13] = "Blackman",
-			[14] = "Kaiser"
-}
-
-ETFormat = {
-			[0] = "DXT1",
-			[1] = "DXT1a",
-			[2] = "DXT3",
-			[3] = "DXT5",
-			[4] = "4444",
-			[5] = "1555",
-			[6] = "565",
-			[7] = "RGB",
-			[8] = "RGBA",
-			[9] = "NVHS",
-			[10] = "NVHU",
-			[11] = "A8",
-			[12] = "L8",
-			[13] = "A8L8"
-}
-
-ETFlags = {
-		[0] = "",
-		[1] = "GenerateMipMaps",
-		[2] = "BinaryAlpha",
-		[16] = "AlphaBorder",
-		[32] = "ColorBorder",
-		[64] = "FadeToColor",
-		[128] = "FadeToAlpha",
-		[256] = "DitherColor",
-		[512] = "DitherEachMIPLevel",
-		[8388608] = "DiffuseDetail",
-		[16777216] = "ImplicitLighted",
-		[33554432] = "HasAlpha",
-		[67108864] = "BumpDetail"
-}
-
-ETBumpMode = {
-	[1] = "None",
-	[2] = "Use",
-	[3] = "UseParalax"
-}
-
-ETMaterial = {
-	[0] = "OrenNayerBlin",
-	[1] = "BlinPhong",
-	[2] = "PhongMetal",
-	[3] = "OrenNayarMetal"
-}
 ---------------------------------------------------------
 -- BinaryData
 ---------------------------------------------------------
 Class "cBinaryData"
-function cBinaryData:initialize(fname,partial,start)
-	if (file_exists(fname)) then
+function cBinaryData:initialize(fname,partial,start,chunk)
+	self.data = {}
+	if (fname and file_exists(fname)) then
 		local f, err = io.open(fname,"rb")
 		if (f == nil or err) then 
 			error(err)
@@ -96,8 +13,7 @@ function cBinaryData:initialize(fname,partial,start)
 		if (start) then
 			f:read(start)
 		end
-	
-		self.data = {}
+
 		local byte
 		local r_tell = 0
 		while true do
@@ -113,14 +29,17 @@ function cBinaryData:initialize(fname,partial,start)
 		end
 		f:close()
 	else
-		self.data = {}
+		if (chunk) then
+			local pos = start or 1
+			local size = partial or chunk:size()
+			for i=pos,pos+size-1 do
+				table.insert(self.data,chunk.data[i] or 0)
+			end
+		end
 	end
-	
 	self.w_marker = 1
 	self.r_marker = 1
 	self.fname = fname
-	
-	return self
 end
 
 function cBinaryData:size()
@@ -135,14 +54,24 @@ function cBinaryData:r_tell()
 	return self.r_marker-1
 end 
 
+function cBinaryData:r_advance(pos)
+	self.r_marker = self.r_marker+pos
+	clamp(self.r_marker,1,#self.data)
+end 
+
+function cBinaryData:w_advance(pos)
+	self.w_marker = self.w_marker+pos
+	clamp(self.w_marker,1,#self.data)
+end
+
 function cBinaryData:r_seek(pos)
-	assert(pos <= self:size() and pos > 0)
 	self.r_marker = pos
+	clamp(self.r_marker,1,#self.data)
 end 
 
 function cBinaryData:w_seek(pos)
-	assert(pos <= self:size()+1 and pos > 0)
 	self.w_marker = pos
+	clamp(self.w_marker,1,#self.data)
 end 
 
 function cBinaryData:w_eof()
@@ -163,17 +92,16 @@ function cBinaryData:r(dwSize)
 			break 
 		end
 		
-		table.insert(read_t, string.format("%02X",data) )
+		table.insert(read_t,1,string.format('%02X',data))
 		
 		self.r_marker = self.r_marker + 1
 	end
 	
 	local size = self:size()
 	if (self.r_marker > size) then 
-		self.r_marker = size 
+		self.r_marker = size
 	end 
 	
-	table_reverse(read_t)
 	return table.concat(read_t)
 end
 
@@ -214,6 +142,19 @@ function cBinaryData:w_u32(val)
 	end
 end 
 
+function cBinaryData:r_u64()
+	local v = self:r(8)
+	return v and tonumber(v,16)
+end
+
+function cBinaryData:w_u64(val)
+	local t = number2bytes(val,8)
+	for i=1,#t do
+		self.data[self.w_marker] = t[i]
+		self.w_marker = self.w_marker + 1
+	end
+end 
+
 function cBinaryData:r_float()
 	local v = self:r_u32()
 	return v and hex2float(v)
@@ -233,16 +174,12 @@ function cBinaryData:find_chunk(ID)
 	local size = self:size()
 	local dwType,dwSize
 	while true do
-		dwType = self:r_u32()
-		if not (dwType) then 
-			return 0 
-		end
-		
-		dwSize = self:r_u32()
-		if not (dwSize) then
+		dwType,dwSize = self:r_u32(),self:r_u32()
+		if not (dwType and dwSize) then 
 			return 0
 		end
 
+		--Msg("ID=%s size=%s",dwType,dwSize)
 		if (dwType == ID) then
 			return dwSize
 		end
@@ -258,10 +195,103 @@ function cBinaryData:find_chunk(ID)
 	return 0
 end
 
+function cBinaryData:open_chunk(ID)
+	self.r_marker = 1
+	
+	local size = self:size()
+	local dwType,dwSize
+	while true do
+		dwType,dwSize = self:r_u32(),self:r_u32()
+		if not (dwType and dwSize) then 
+			return nil
+		end
+
+		if (dwType == ID) then
+			if (dwSize > 0) then
+				return cBinaryData(nil,dwSize,self.r_marker,self)
+			end 
+			return nil
+		end
+		
+		self.r_marker = self.r_marker + dwSize
+		if (self.r_marker > size) then 
+			self.r_marker = size
+			return nil
+		elseif (self.r_marker == size) then 
+			return nil
+		end
+	end
+	return
+end 
+
+function cBinaryData:printf(pos,cnt)
+	local ln = ""
+	local size = cnt or self:size()
+	for i=1,size do
+		local byte = self.data[pos-1+i]
+		if not (byte) then
+			break
+		end
+		ln = ln .. string.format('%02X',byte) .. " "
+		if (i % 16 == 0) then 
+			Msg(ln)
+			ln = ""
+		end
+	end
+	Msg(ln)
+end
+
+function cBinaryData:replace_chunk(ID,chunk)
+	self.r_marker = 1
+	
+	local size = self:size()
+	local dwType,dwSize
+	while true do
+		dwType,dwSize = self:r_u32(),self:r_u32()
+		if not (dwType and dwSize) then 
+			return
+		end
+
+		if (dwType == ID) then
+			if (dwSize > 0) then
+				-- set new size
+				local newsize = chunk:size()
+				if (newsize ~= dwSize) then
+					Msg("ID=%s newsize=%s dwSize=%s",ID,newsize,dwSize)
+					self:w_seek(self.r_marker-4)
+					self:w_u32(newsize)
+				end		
+				
+				-- insert more bytes
+				for i=1,newsize-dwSize do
+					table.insert(self.data,self.r_marker,0)
+				end
+				
+				-- overwrite data
+				for i=1,newsize do
+					if (chunk.data[i]) then
+						self.data[self:r_tell()+i] = chunk.data[i]
+					end
+				end
+			end
+			return
+		end
+		
+		self.r_marker = self.r_marker + dwSize
+		if (self.r_marker > size) then 
+			self.r_marker = size
+			return
+		elseif (self.r_marker == size) then 
+			return
+		end
+	end
+end
+
 function cBinaryData:r_chunk(ID)
-	local dwSize = tonumber(self:find_chunk(ID),16) or 0
+	local dwSize = self:find_chunk(ID)
 	if (dwSize > 0) then
-		return tonumber(self:r(dwSize),16) or 0
+		local v = self:r(dwSize)
+		return v and tonumber(v,16) or 0
 	end
 	return dwSize
 end
@@ -306,18 +336,51 @@ function cBinaryData:w_stringZ(str)
 	self.w_marker = self.w_marker + 1
 end
 
+function cBinaryData:r_string(cnt)
+	clear(read_t)
+	local data
+	for i=1,cnt do
+		data = self.data[self.r_marker]
+		if not (data) then 
+			break 
+		end
+		
+		table.insert(read_t, data)
+		
+		self.r_marker = self.r_marker + 1
+	end
+	
+	local size = self:size()
+	if (self.r_marker > size) then 
+		self.r_marker = size 
+	end
+	
+	return data and #data > 0 and string.char(unpack(data)) or ""
+end 
+
+function cBinaryData:w_string(str)
+	local len = str:len()
+	for i=1,len do 
+		self.data[self.w_marker] = string.byte(str,i)
+		self.w_marker = self.w_marker + 1
+	end
+	self.w_marker = self.w_marker + 1
+end
+
 function cBinaryData:save(to_fname)
 	local fname = to_fname or self.fname
-	local f,err = io.open(fname,"wb")
-	if (err) then 
-		error(err)
+	if (fname) then
+		local f,err = io.open(fname,"wb")
+		if (err) then 
+			error(err)
+		end
+		
+		local t = {}
+		for i=1,#self.data do 
+			table.insert(t,string.char(self.data[i]))
+		end
+		
+		f:write(table.concat(t))
+		f:close()
 	end
-	
-	local t = {}
-	for i=1,#self.data do 
-		table.insert(t,string.char(self.data[i]))
-	end
-	
-	f:write(table.concat(t))
-	f:close()
 end

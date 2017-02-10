@@ -9,7 +9,7 @@ do
 			return result
 		end
 		
-		local chunk = loadfile("scripts\\classes\\"..k..".lua")
+		local chunk, errormsg = loadfile("scripts\\classes\\"..k..".lua")
 		if (chunk) then
 			local status, err = pcall(chunk)
 			if (err) then
@@ -18,7 +18,7 @@ do
 			return rawget(_G,k)
 		end
 		
-		chunk = loadfile("scripts\\"..k..".lua")
+		chunk, errormsg = loadfile("scripts\\"..k..".lua")
 		if (chunk) then
 			local env = setmetatable({},getmetatable(_G))
 			setfenv(chunk,env)
