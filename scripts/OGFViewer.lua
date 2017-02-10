@@ -8,14 +8,6 @@ http://stackoverflow.com/questions/24002210/cannot-update-listview
 --]]
 
 local Checks = {}
-local thm_fields = {	"version","texture_format","flags","border_color",
-					"fade_color","fade_amount","mip_filter","texture_width",
-					"texture_height","texture_type","detail_name","detail_scale",
-					"material","material_weight","bump_height","bump_mode","bump_name",
-					"normal_map_name","fade_delay"
-}
-table.sort(thm_fields)
-
 local clipboard = {}
 -----------------------------------------------------------------
 -- 
@@ -278,7 +270,7 @@ function cUIOGFViewerModify:Reinit()
 		if (params[field] and params[field] ~= "") then
 			self:Gui("Add|Text|x5 y%s w300 h30|Skeleton %s",y,field)
 			if (field == "userdata") then
-				self:Gui("Add|Edit|x200 y%s w800 h90 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
+				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
 			else
 				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
 			end
@@ -291,7 +283,7 @@ function cUIOGFViewerModify:Reinit()
 				if (child_params[field] and child_params[field] ~= "") then
 					self:Gui("Add|Text|x5 y%s w300 h30|Mesh%s %s",y,i,field)
 					if (field == "userdata") then
-						self:Gui("Add|Edit|x200 y%s w800 h90 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
+						self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
 					else
 						self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
 					end
