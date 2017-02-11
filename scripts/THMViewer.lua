@@ -571,8 +571,10 @@ function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 				if not (self.thm[fname]) then
 					self.thm[fname] = cTHM(path.."\\"..fname)
 				end
-				
-				self.list[fname] = self.thm[fname].params
+				if (self.thm[fname]) then
+					self.list[fname] = self.thm[fname].params
+					self.list[fname].__fullpath = path.."\\"..fname
+				end
 			end
 		end
 	end
@@ -694,10 +696,12 @@ function cUITHMViewerModify:Reinit()
 	local tab = ahkGetVar("UITHMViewerTab")
 
 	local y = 35
-	for field,v in pairs(list) do 
-		self:Gui("Add|Text|x5 y%s w300 h30|%s",y,field)
-		self:Gui("Add|Edit|x200 y%s w800 h30 vUITHMViewerModifyEdit%s|%s",y,field,v)
-		y = y + 30
+	for field,v in pairs(list) do
+		if (field ~= "__fullpath") then
+			self:Gui("Add|Text|x5 y%s w300 h30|%s",y,field)
+			self:Gui("Add|Edit|x200 y%s w800 h30 vUITHMViewerModifyEdit%s|%s",y,field,v)
+			y = y + 30
+		end
 	end
  
 	self:Gui("Add|Button|gOnScriptControlAction x12 default vUITHMViewerModifyAccept|%t_accept")
@@ -730,13 +734,20 @@ function cUITHMViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 		local fname = wnd.listItemSelected
 		local list = assert(wnd.list[fname])
 	
-		for field,v in pairs(list) do 
-			local val = ahkGetVar("UITHMViewerModifyEdit"..field)
-			if (val) then
-				wnd.thm[fname].params[field] = tonumber(val) or val
+		for field,v in pairs(list) do
+			if (field ~= "__fullpath") then
+				local val = ahkGetVar("UITHMViewerModifyEdit"..field)
+				if (val) then
+					wnd.thm[fname].params[field] = tonumber(val) or val
+				end
 			end
 		end
-
+		
+		if not (wnd.thm[fname]) then 
+			Msg("Error: wnd.thm[%s] is nil!",fname)
+			return 
+		end 
+		
 		wnd.thm[fname]:save()
 
 		local a = {}
@@ -752,27 +763,32 @@ function cUITHMViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyOpenDDS")) then 
 		local wnd = Get()
 		local fname = wnd.listItemSelected
-		local list = assert(wnd.list[fname])
-		local full_path = list[1].."\\"..fname
-		
-		os.execute(strformat([[start "" "%s"]],full_path))
+		if not (wnd.list[fname]) then
+			Msg("Copy failed")
+			return 
+		end
+		os.execute(strformat([[start "" "%s"]],trim_ext(wnd.list[fname].__fullpath)..".dds"))
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyCopy")) then
 		local wnd = Get()
 		local fname = wnd.listItemSelected
-		local list = assert(wnd.list[fname])
-		local thm_path = list[1].."\\"..list[2]
-		
-		local t = wnd.thm[thm_path].params
-		for k,v in pairs(t) do
-			clipboard[k] = v
+		if not (wnd.list[fname]) then
+			Msg("Copy failed")
+			return
+		end
+		for k,v in pairs(wnd.list[fname]) do
+			if (k ~= "__fullpath") then
+				clipboard[k] = v
+			end
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyPaste")) then
 		local wnd = Get()
 		local fname = wnd.listItemSelected
-		local list = assert(wnd.list[fname])
-		local thm_path = list[1].."\\"..list[2]
-		for k,v in pairs(clipboard) do 
-			wnd.thm[thm_path].params[k] = v
+		if not (wnd.list[fname]) then
+			Msg("Paste failed")
+			return 
+		end
+		for k,v in pairs(clipboard) do
+			wnd.list[fname][k] = v
 		end
 		
 		local selected = fname
