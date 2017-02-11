@@ -46,6 +46,7 @@ function cOGF:OGF_TEXTURE(loading)
 		if (chunk) then
 			chunk:w_stringZ(trim(self.texture))
 			chunk:w_stringZ(trim(self.shader))
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_TEXTURE,chunk)
 		end
 	end
@@ -74,6 +75,7 @@ function cOGF:OGF_S_DESC(loading)
 			chunk:w_u32(self.description.create_time)
 			chunk:w_stringZ(trim(self.description.modif_name))
 			chunk:w_u32(self.description.modif_time)
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_DESC,chunk)
 		end
 	end
@@ -88,6 +90,7 @@ function cOGF:OGF_S_MOTION_REFS(loading)
 		local chunk = self:open_chunk(OGF_S_MOTION_REFS)
 		if (chunk) then
 			chunk:w_stringZ(trim(self.motion_refs))
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_MOTION_REFS,chunk)
 		end
 	end
@@ -114,7 +117,8 @@ function cOGF:OGF_S_MOTION_REFS2(loading)
 			chunk:w_u32(cnt)
 			for i=1,cnt do
 				chunk:w_stringZ(trim(self.motion_refs2[i]))
-			end	
+			end
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_MOTION_REFS2,chunk)
 		end
 	end
@@ -129,6 +133,7 @@ function cOGF:OGF_S_LODS(loading)
 		local chunk = self:open_chunk(OGF_S_LODS)
 		if (chunk) then
 			chunk:w_stringZ(trim(self.lod_path))
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_LODS,chunk)
 		end
 	end
@@ -158,6 +163,7 @@ function cOGF:OGF_S_BONE_NAMES(loading)
 				chunk:w_stringZ(trim(k))
 				chunk:w_stringZ(trim(v))
 			end
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_BONE_NAMES,chunk)
 		end
 	end
@@ -201,6 +207,7 @@ function cOGF:OGF_S_USERDATA(loading)
 		local chunk = self:open_chunk(OGF_S_USERDATA)
 		if (chunk) then
 			chunk:w_stringZ(trim(self.userdata))
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_USERDATA,chunk)
 		end
 	end
@@ -220,13 +227,16 @@ function cOGF:OGF_CHILDREN(loading)
 	elseif (self.children) then
 		local main_chunk = self:open_chunk(OGF_CHILDREN)
 		if (main_chunk and main_chunk:size() > 0) then
+			local total_size = 0
  			for i,child in ipairs(self.children) do
 				child:save()
 				local chunk = main_chunk:open_chunk(i-1)
 				if (chunk) then
 					main_chunk:replace_chunk(i-1,child)
+					total_size = total_size + child:size() + 8
 				end
 			end
+			main_chunk:resize(total_size)
 			self:replace_chunk(OGF_CHILDREN,main_chunk)
 		end
 	end

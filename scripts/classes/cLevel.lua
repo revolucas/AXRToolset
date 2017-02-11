@@ -35,6 +35,7 @@ function cLevel:fsL_SHADERS(loading)
 			for i=1,cnt do
 				chunk:w_stringZ(trim(self.shaders[i]))
 			end
+			chunk:resize(chunk:w_tell())
 			self:replace_chunk(fsL_SHADERS,chunk)
 		end
 	end

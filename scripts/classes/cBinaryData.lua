@@ -241,6 +241,12 @@ function cBinaryData:printf(pos,cnt)
 	Msg(ln)
 end
 
+function cBinaryData:resize(size)
+	while (#self.data > size) do 
+		table.remove(self.data)
+	end
+end 
+
 function cBinaryData:replace_chunk(ID,chunk)
 	self.r_marker = 1
 	
@@ -264,12 +270,14 @@ function cBinaryData:replace_chunk(ID,chunk)
 				
 				-- insert more bytes
 				if (newsize > dwSize) then
+					Msg("resizing chunk, adding %s bytes",newsize-dwSize)
 					for i=1,newsize-dwSize do
 						table.insert(self.data,self.r_marker,0)
 					end
-				else
-					for i=1,dwSize-newsize do 
-						table.remove(self.data,self.r_marker+1)
+				elseif (newsize < dwSize) then
+					Msg("resizing chunk, remove %s bytes",dwSize-newsize)
+					for i=1,dwSize-newsize do
+						table.remove(self.data,self.r_marker)
 					end
 				end
 				
