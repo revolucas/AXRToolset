@@ -519,5 +519,5 @@ function table_reverse(tbl)
 end
 
 function Msg(s,...)
-	DebugMsg(strformat(s,...))
+	DebugMsg(strformat(s,...).."\n")
 end

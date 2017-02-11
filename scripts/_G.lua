@@ -265,7 +265,7 @@ function ApplicationBegin()
 	recurse_subdirectories_and_execute(node,{"lua"},on_execute)
 	--]]
 	
-	Msg("AXR Toolset by Alundaio")
+	Msg("------AXR Toolset by Alundaio------")
 	
 	for file in lfs.dir(node) do
 		if (file ~= ".." and file ~= ".") then

@@ -1,5 +1,6 @@
 ﻿DebugMessage(str)
 {
+    ConvertStringToAnsi(str)
     global h_stdout
     DebugConsoleInitialize()  ; start console window if not yet started
     str .= "`n" ; add line feed
@@ -19,8 +20,12 @@ DebugConsoleInitialize()
     DllCall("AttachConsole", int, -1, int)
     DllCall("AllocConsole", int)
 
-    dllcall("SetConsoleTitle", "str","AXR Toolset Console")    ; Set the name. Example. Probably could use a_scriptname here 
+    dllcall("SetConsoleTitle", "Str","AXR Toolset Console")    ; Set the name. Example. Probably could use a_scriptname here 
     h_Stdout := DllCall("GetStdHandle", "int", -11) ; get the handle
     WinSet, Bottom,, ahk_id %h_stout%      ; make sure it's on the bottom
     return
+}
+
+ConvertStringToAnsi(ByRef string) {
+    NumPut(0, &string + StrPut(copy := string, &string, "CP0"), "char")
 }
