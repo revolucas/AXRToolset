@@ -2,7 +2,7 @@
 --
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("Generate Mesh List","UIGenMeshListShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_gen_mesh","UIGenMeshListShow",GetAndShow)
 end
 
 UI = nil
@@ -38,13 +38,13 @@ function cUIGenMeshList:Reinit()
 	-- Buttons 
 	self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUIGenMeshListBrowseInputPath|...")
 
-	self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUIGenMeshListExecute|%t_execute")
+	self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUIGenMeshListExecute|%t_execute")
 	
 	-- Editbox 
 	self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUIGenMeshListInputPath|")
 
 
-	self:Gui("Show|w1024 h720|Generate Mesh List")
+	self:Gui("Show|w1024 h720|%t_plugin_gen_mesh")
 	
 	GuiControl(self.ID,"","UIGenMeshListInputPath", gSettings:GetValue("mesh_list","path") or "")
 end

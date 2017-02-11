@@ -2,7 +2,7 @@
 --
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("Trader Editor","UITraderEditorShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_trader_edit","UITraderEditorShow",GetAndShow)
 end
 
 UI = nil
@@ -51,9 +51,9 @@ function cUITraderEditor:Reinit()
 	self:Gui("Tab|%t_death_config_editor")
 		self:Gui("Add|Text|x22 y49 w140 h20|%t_section:")
 		self:Gui("Add|DropDownList|gOnScriptControlAction x22 y69 w320 h30 R40 H300 vUITraderEditorSection2|"..valid_sections)	
-		self:Gui("Add|Text|x550 y75 w230 h20|%t_click_to_edit")
+		self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
 		self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITraderEditorLV2|file^keep_items^item_count^base^stalker^bandit^killer^dolg^freedom^army^monolith^csky^ecolog")
-	self:Gui("Show|w1024 h720|Trade Editor")
+	self:Gui("Show|w1024 h720|%t_plugin_trader_edit")
 	self:Gui("Default")
 		
 	LV("LV_Delete",self.ID)

@@ -2,7 +2,7 @@
 --
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("Artefact Properties","UIArtefactPropsShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_artefact_prop","UIArtefactPropsShow",GetAndShow)
 end
 
 ---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ function cUIArtefactProps:Reinit()
 	-- Editbox 
 	--self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUIArtefactPropsInputPath|")
 	
-	self:Gui("Show|w1024 h720|Artefact Properties")
+	self:Gui("Show|w1024 h720|%t_plugin_artefact_prop")
 	
 	GuiControl(self.ID,"","UIArtefactPropsInputPath", gSettings:GetValue("artefact_props","input_path") or "")
 end

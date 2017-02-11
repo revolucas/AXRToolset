@@ -2,7 +2,7 @@
 -- 
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("LTX QuickEdit","UILTXQuickEditShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_ltx_quick","UILTXQuickEditShow",GetAndShow)
 end
 
 UI = nil
@@ -59,10 +59,10 @@ function cUILTXQuickEdit:Reinit()
 			self:Gui("Add|Text|x560 y555 w230 h20|%t_click_to_edit")
 			self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUILTXQuickEditBrowsePath%s|...",i)
 			self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUILTXQuickEditPath%s|",i)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUILTXQuickEditSaveSettings%s|%t_save_settings",i)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUILTXQuickEditSaveSettings%s|%t_save_settings",i)
 		GuiControl(self.ID,"","UILTXQuickEditPath"..i, gSettings:GetValue("ltx_quickedit","path"..i) or "")
 	end
-	self:Gui("Show|w1024 h720|LTX QuickEdit")
+	self:Gui("Show|w1024 h720|%t_ltx_quick")
 
 	LV("LV_Delete",self.ID)
 	clear(self.list)

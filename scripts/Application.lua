@@ -1,4 +1,4 @@
-function OnApplicationBegin()
+﻿function OnApplicationBegin()
 	MainMenu = cMainMenu()
 	CallbackRegister("OnApplicationBeginEnd",OnApplicationBeginEnd)
 end
@@ -31,28 +31,34 @@ function cMainMenu:Reinit()
 		-- Buttons 
 		-- register plugin buttons
 		for name,t in spairs(self.plugins) do 
-			self:Gui("Add|Button|gOnScriptControlAction x370 y%s w230 h20 v%s|%s",self.y,name,t.text)
+			self:Gui("Add|Button|gOnScriptControlAction x370 y%s w230 h20 v%s|%s",self.y,name,Language.translate(t.text))
 			self.y = self.y + 25
 		end
 	
 		-- GroupBox
 		self:Gui("Add|GroupBox|x360 y50 w250 h660|%t_plugins_launcher")
-	
+		self:Gui("Add|GroupBox|x720 y50 w155|%t_lang")
+		
+		self:Gui("Add|Picture|gOnScriptControlAction x730 y70 vApplicationSelectEnglish|icons/english.png")
+		self:Gui("Add|Picture|gOnScriptControlAction x765 y70 vApplicationSelectFrench|icons/french.png")
+		self:Gui("Add|Picture|gOnScriptControlAction x800 y70 vApplicationSelectRussian|icons/russian.png")
+		self:Gui("Add|Picture|gOnScriptControlAction x835 y70 vApplicationSelectSpanish|icons/spanish.png")	
+		
 	self:Gui("Tab|%t_settings")
 	
 		-- GroupBox
 		self:Gui("Add|GroupBox|x10 y50 w510 h75|%t_gamedata %t_path")
-		self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_lang")
+		--self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_lang")
 	
 		-- Buttons 
 		self:Gui("Add|Button|gOnScriptControlAction x485 y80 w25 h20 vApplicationBrowseGamedata|...")
-		self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vApplicationSaveSettings|%t_save_settings")
+		self:Gui("Add|Button|gOnScriptControlAction x485 y680 w120 h20 vApplicationSaveSettings|%t_save_settings")
 	
 		-- Editbox 
 		self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vApplicationGamedataPath|") -- Edit System.ltx
 		
-		local langs = Language.ini:GetSections()
-		self:Gui("Add|DropDownList|gOnScriptControlAction x25 y180 w220 h30 R40 H300 vApplicationLanguage|"..table.concat(langs,"^"))
+		--local langs = Language.ini:GetSections()
+		--self:Gui("Add|DropDownList|gOnScriptControlAction x25 y180 w220 h30 R40 H300 vApplicationLanguage|"..table.concat(langs,"^"))
 	
 	self:Gui("Show|w1024 h720|AXR Toolset")
 	GuiControl(self.ID,"","ApplicationGamedataPath",gSettings:GetValue("core","Gamedata_Path") or "")
@@ -76,10 +82,32 @@ function cMainMenu:OnScriptControlAction(hwnd,event,info)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSaveSettings")) then 
 		self:Gui("Submit|NoHide")
 		gSettings:SetValue("core","Gamedata_Path",ahkGetVar("ApplicationGamedataPath"))
-		gSettings:SetValue("core","language",ahkGetVar("ApplicationLanguage"))
+		--gSettings:SetValue("core","language",ahkGetVar("ApplicationLanguage"))
 		gSettings:Save()
-		MainMenu:Show(false)
-		MainMenu:Show(true)
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectEnglish")) then 
+		self:Gui("Submit|NoHide")
+		gSettings:SetValue("core","language","english")
+		gSettings:Save()
+		MainMenu:Destroy()
+		MainMenu:Create()
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectFrench")) then
+		self:Gui("Submit|NoHide")
+		gSettings:SetValue("core","language","french")
+		gSettings:Save()
+		MainMenu:Destroy()
+		MainMenu:Create()
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectRussian")) then
+		self:Gui("Submit|NoHide")
+		gSettings:SetValue("core","language","russian")
+		gSettings:Save()
+		MainMenu:Destroy()
+		MainMenu:Create()
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectSpanish")) then
+		self:Gui("Submit|NoHide")
+		gSettings:SetValue("core","language","spanish")
+		gSettings:Save()
+		MainMenu:Destroy()
+		MainMenu:Create()
 	end
 	
 	for name,t in pairs(self.plugins) do 

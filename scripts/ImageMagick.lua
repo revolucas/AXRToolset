@@ -4,7 +4,7 @@ local Checks = {}
 --
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("ImageMagick","ImageMagickShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_image_magick","ImageMagickShow",GetAndShow)
 end
 ---------------------------------------------------------------------------
 UI = nil
@@ -63,8 +63,8 @@ function cImageMagick:Reinit()
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vImageMagickBrowseInputPath%s|...",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vImageMagickBrowseOutputPath%s|...",i)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vImageMagickSaveSettings%s|%t_save_settings",i)	
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vImageMagickExecute%s|%t_execute",i)		
+			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vImageMagickSaveSettings%s|%t_save_settings",i)	
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vImageMagickExecute%s|%t_execute",i)		
 			
 			-- Editbox 
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vImageMagickInputPath%s|",i)
@@ -77,7 +77,7 @@ function cImageMagick:Reinit()
 		GuiControl(self.ID,"","ImageMagickMogrify"..i, gSettings:GetValue("ImageMagick","command_line"..i) or "")
 		GuiControl(self.ID,"","ImageMagickSearch"..i, gSettings:GetValue("ImageMagick","search_pattern"..i) or "")
 	end
-	self:Gui("Show|w1024 h720|ImageMagick")
+	self:Gui("Show|w1024 h720|%t_plugin_image_magick")
 end
 
 function cImageMagick:OnGuiClose(idx) -- needed because it's registered to callback

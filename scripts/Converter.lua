@@ -4,7 +4,7 @@ local Checks = {}
 --
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("Converter","UIConverterShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_converter","UIConverterShow",GetAndShow)
 end
 ---------------------------------------------------------------------------
 UI = nil
@@ -59,8 +59,8 @@ function cUIConverter:Reinit()
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUIConverterBrowseInputPath%s|...",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUIConverterBrowseOutputPath%s|...",i)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUIConverterSaveSettings%s|%t_save_settings",i)	
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUIConverterExecute%s|%t_execute",i)		
+			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUIConverterSaveSettings%s|%t_save_settings",i)	
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUIConverterExecute%s|%t_execute",i)		
 			
 			-- Editbox 
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUIConverterInputPath%s|",i)
@@ -69,7 +69,7 @@ function cUIConverter:Reinit()
 		GuiControl(self.ID,"","UIConverterInputPath"..i, gSettings:GetValue("converter","input_path"..i) or "")
 		GuiControl(self.ID,"","UIConverterOutputPath"..i, gSettings:GetValue("converter","output_path"..i) or "")
 	end
-	self:Gui("Show|w1024 h720|Converter")
+	self:Gui("Show|w1024 h720|%t_plugin_converter")
 end
 
 function cUIConverter:OnGuiClose(idx) -- needed because it's registered to callback

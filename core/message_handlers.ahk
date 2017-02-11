@@ -1,4 +1,4 @@
-#IfWinActive
+﻿#IfWinActive
 UpdateScrollBars(GuiNum, GuiWidth, GuiHeight)
 {
     static SIF_RANGE=0x1, SIF_PAGE=0x2, SIF_DISABLENOSCROLL=0x8, SB_HORZ=0, SB_VERT=1

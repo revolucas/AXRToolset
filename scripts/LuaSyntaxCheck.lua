@@ -2,7 +2,7 @@
 --
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("Lua Syntax Check","UILuaSyntaxCheckShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_lua_check","UILuaSyntaxCheckShow",GetAndShow)
 end
 
 UI = nil
@@ -37,15 +37,15 @@ function cUILuaSyntaxCheck:Reinit()
 			
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUILuaSyntaxCheckBrowseInputPath%s|...",n)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUILuaSyntaxCheckSaveSettings%s|%t_save_settings",n)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUILuaSyntaxCheckExecute%s|%t_execute",n)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUILuaSyntaxCheckSaveSettings%s|%t_save_settings",n)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUILuaSyntaxCheckExecute%s|%t_execute",n)
 			
 			-- Editbox 
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUILuaSyntaxCheckInputPath%s|",n)
 		
 		GuiControl(self.ID,"","UILuaSyntaxCheckInputPath"..n, gSettings:GetValue("lua_syntax_check","path"..n) or "")
 	end
-	self:Gui("Show|w1024 h720|Lua Syntax Check")
+	self:Gui("Show|w1024 h720|%t_plugin_lua_check")
 end
 
 function cUILuaSyntaxCheck:OnGuiClose(idx) -- needed because it's registered to callback

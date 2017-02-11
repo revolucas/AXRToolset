@@ -3,7 +3,7 @@ local DBChecks = {"ai","anims","configs","scripts","xr","shaders","spawns","leve
 -- 
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("DB Tool","UICoCDBToolShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_db_tool","UICoCDBToolShow",GetAndShow)
 end
 
 UI = nil
@@ -33,14 +33,14 @@ function cUICoCDBTool:Reinit()
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vUICoCDBToolTab|%t_unpacker^%t_repacker 1^%t_repacker 2^%t_repacker 3^%t_repacker 4^%t_repacker 5^%t_repacker 6^%t_repacker 7^%t_repacker 8^%t_repacker 9^%t_repacker 10")
 	self:Gui("Tab|%t_unpacker")
 		-- GroupBox
-		self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Path (Recursive)")
-		self:Gui("Add|GroupBox|x10 y150 w510 h75|Output Path")
+		self:Gui("Add|GroupBox|x10 y50 w510 h75|%t_input_path")
+		self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_output_path")
 		
 		-- Buttons 
 		self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath|...")
 		self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath|...")
-		self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUICoCDBToolSaveSettings0|%t_save_settings")	
-		self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUICoCDBToolExecute|%t_execute")		
+		self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUICoCDBToolSaveSettings0|%t_save_settings")	
+		self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUICoCDBToolExecute|%t_execute")		
 		
 		-- Editbox 
 		self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUICoCDBToolInputPath|")
@@ -66,8 +66,8 @@ function cUICoCDBTool:Reinit()
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath%s|...",n)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath%s|...",n)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUICoCDBToolSaveSettings%s|%t_save_settings",n)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUICoCDBToolExecute%s|%t_execute",n)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUICoCDBToolSaveSettings%s|%t_save_settings",n)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUICoCDBToolExecute%s|%t_execute",n)
 			
 			-- Editbox 
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUICoCDBToolInputPath%s|",n)
@@ -76,7 +76,7 @@ function cUICoCDBTool:Reinit()
 		GuiControl(self.ID,"","UICoCDBToolInputPath"..n, gSettings:GetValue("dbtool","path"..n) or "")
 		GuiControl(self.ID,"","UICoCDBToolOutputPath"..n, gSettings:GetValue("dbtool","output_path"..n) or "")
 	end
-	self:Gui("Show|w1024 h720|DB Tool")
+	self:Gui("Show|w1024 h720|%t_plugin_db_tool")
 end
 
 function cUICoCDBTool:OnGuiClose(idx) -- needed because it's registered to callback

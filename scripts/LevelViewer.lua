@@ -13,7 +13,7 @@ local clipboard = {}
 -- 
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("Level Viewer","UILevelViewerShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_level_viewer","UILevelViewerShow",GetAndShow)
 end
 
 UI = nil
@@ -63,7 +63,7 @@ function cUILevelViewer:Reinit()
 		if (i == 1) then 
 			local filters = table.concat({"All"},"^")
 			self:Gui("Tab|%s",tabs[i])
-				self:Gui("Add|Text|x550 y75 w230 h20|%t_click_to_edit")
+				self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUILevelViewerLV%s|",i)
@@ -75,7 +75,7 @@ function cUILevelViewer:Reinit()
 				
 				-- Buttons 
 				self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUILevelViewerBrowsePath%s|...",i)
-				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUILevelViewerSaveSettings%s|%t_save_settings",i)
+				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUILevelViewerSaveSettings%s|%t_save_settings",i)
 				
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUILevelViewerPath%s|",i)
@@ -84,7 +84,7 @@ function cUILevelViewer:Reinit()
 		end
 	end
 
-	self:Gui("Show|w1024 h720|Level Viewer")
+	self:Gui("Show|w1024 h720|%t_plugin_level_viewer")
 
 	LV("LV_Delete",self.ID)
 	clear(self.list)

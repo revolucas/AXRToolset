@@ -1,4 +1,4 @@
-DebugMessage(str)
+﻿DebugMessage(str)
 {
     global h_stdout
     DebugConsoleInitialize()  ; start console window if not yet started

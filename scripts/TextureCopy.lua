@@ -4,7 +4,7 @@ local Checks = {}
 --
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("TextureCopy","UITextureCopyShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_texture_copy","UITextureCopyShow",GetAndShow)
 end
 ---------------------------------------------------------------------------
 UI = nil
@@ -57,8 +57,8 @@ function cUITextureCopy:Reinit()
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITextureCopyBrowseInputPath%s|...",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUITextureCopyBrowseOutputPath%s|...",i)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUITextureCopySaveSettings%s|%t_save_settings",i)	
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUITextureCopyExecute%s|%t_execute",i)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUITextureCopySaveSettings%s|%t_save_settings",i)	
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUITextureCopyExecute%s|%t_execute",i)
 			
 			-- Editbox 
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUITextureCopyInputPath%s|",i)
@@ -67,7 +67,7 @@ function cUITextureCopy:Reinit()
 		GuiControl(self.ID,"","UITextureCopyInputPath"..i, gSettings:GetValue("TextureCopy","input_path"..i) or "")
 		GuiControl(self.ID,"","UITextureCopyOutputPath"..i, gSettings:GetValue("TextureCopy","output_path"..i) or "")
 	end
-	self:Gui("Show|w1024 h720|TextureCopy")
+	self:Gui("Show|w1024 h720|%t_plugin_texture_copy")
 end
 
 function cUITextureCopy:OnGuiClose(idx) -- needed because it's registered to callback

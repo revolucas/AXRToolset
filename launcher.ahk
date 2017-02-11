@@ -1,4 +1,4 @@
-#NoEnv
+﻿#NoEnv
 #SingleInstance, force
 
 OnMessage(0x115, "OnScroll") ; WM_VSCROLL

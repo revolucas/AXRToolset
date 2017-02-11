@@ -2,7 +2,7 @@
 -- 
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("LTX Tidier","UITidierShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_ltx_tidier","UITidierShow",GetAndShow)
 end
 
 UI = nil
@@ -37,13 +37,13 @@ function cUITidier:Reinit()
 	-- Buttons 
 	self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITidierBrowseInputPath|...")
 	self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUITidierBrowseOutputPath|...")
-	self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUITidierExecute|Tidy")
+	self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUITidierExecute|%t_execute")
 	
 	-- Editbox 
 	self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUITidierInputPath|")
 	self:Gui("Add|Edit|gOnScriptControlAction x25 y180 w450 h20 vUITidierOutputPath|")
 	
-	self:Gui("Show|w1024 h720|LTX Tidier")
+	self:Gui("Show|w1024 h720|%t_plugin_ltx_tidier")
 	
 	GuiControl(self.ID,"","UITidierInputPath", gSettings:GetValue("ltx_tidier","input_path") or "")
 	GuiControl(self.ID,"","UITidierOutputPath", gSettings:GetValue("ltx_tidier","output_path") or "")

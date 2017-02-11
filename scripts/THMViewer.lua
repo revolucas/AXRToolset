@@ -21,7 +21,7 @@ local clipboard = {}
 -- 
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("THM Viewer","UITHMViewerShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_thm_viewer","UITHMViewerShow",GetAndShow)
 end
 
 UI = nil
@@ -72,7 +72,7 @@ function cUITHMViewer:Reinit()
 		if (i == 1) then
 			local filters = table.concat({"All","Diffuse","Bump"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
-				self:Gui("Add|Text|x550 y75 w230 h20|%t_click_to_edit")
+				self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITHMViewerLV%s|filename^%s",i,table.concat(thm_fields,"^"))
@@ -84,7 +84,7 @@ function cUITHMViewer:Reinit()
 				
 				-- Buttons 
 				self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUITHMViewerBrowsePath%s|...",i)
-				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUITHMViewerSaveSettings%s|%t_save_settings",i)
+				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUITHMViewerSaveSettings%s|%t_save_settings",i)
 				
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUITHMViewerPath%s|",i)
@@ -105,8 +105,8 @@ function cUITHMViewer:Reinit()
 			
 				-- Buttons 
 				self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITHMViewerBrowsePath%s|...",i)
-				self:Gui("Add|Button|gOnScriptControlAction x485 y655 w90 h20 vUITHMViewerSaveSettings%s|%t_save_settings",i)
-				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUITHMViewerExecute%s|%t_execute",i)
+				self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUITHMViewerSaveSettings%s|%t_save_settings",i)
+				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUITHMViewerExecute%s|%t_execute",i)
 				
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUITHMViewerPath%s|",i)
@@ -115,7 +115,7 @@ function cUITHMViewer:Reinit()
 		elseif (i == 3) then 
 			local filters = table.concat({"All","Diffuse","Bump","MissingTHM"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
-				self:Gui("Add|Text|x550 y75 w200 h20|Right-Click to Edit!")
+				self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITHMViewerLV%s|",i)
@@ -127,7 +127,7 @@ function cUITHMViewer:Reinit()
 				
 				-- Buttons 
 				self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUITHMViewerBrowsePath%s|...",i)
-				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUITHMViewerSaveSettings%s|%t_save_settings",i)
+				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUITHMViewerSaveSettings%s|%t_save_settings",i)
 				
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUITHMViewerPath%s|",i)
@@ -136,7 +136,7 @@ function cUITHMViewer:Reinit()
 		end
 	end
 	
-	self:Gui("Show|w1024 h720|THM Viewer")
+	self:Gui("Show|w1024 h720|%t_plugin_thm_viewer")
 
 	LV("LV_Delete",self.ID)
 	clear(self.list)

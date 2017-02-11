@@ -13,7 +13,7 @@ local clipboard = {}
 -- 
 -----------------------------------------------------------------
 function OnApplicationBegin()
-	Application.AddPluginButton("OGF Viewer","UIOGFViewerShow",GetAndShow)
+	Application.AddPluginButton("t_plugin_ogf_viewer","UIOGFViewerShow",GetAndShow)
 end
 
 UI = nil
@@ -62,7 +62,7 @@ function cUIOGFViewer:Reinit()
 		if (i == 1) then 
 			local filters = table.concat({"All"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
-				self:Gui("Add|Text|x550 y75 w230 h20|%t_click_to_edit")
+				self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUIOGFViewerLV%s|",i)
@@ -74,7 +74,7 @@ function cUIOGFViewer:Reinit()
 				
 				-- Buttons 
 				self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUIOGFViewerBrowsePath%s|...",i)
-				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w90 h20 vUIOGFViewerSaveSettings%s|%t_save_settings",i)
+				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUIOGFViewerSaveSettings%s|%t_save_settings",i)
 				
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUIOGFViewerPath%s|",i)
@@ -83,7 +83,7 @@ function cUIOGFViewer:Reinit()
 		end
 	end
 	
-	self:Gui("Show|w1024 h720|OGF Viewer")
+	self:Gui("Show|w1024 h720|%t_plugin_ogf_viewer")
 
 	LV("LV_Delete",self.ID)
 	clear(self.list)

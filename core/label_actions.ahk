@@ -1,4 +1,4 @@
-Dummy:
+﻿Dummy:
 ;do nothing
 Return
 

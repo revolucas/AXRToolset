@@ -1,4 +1,4 @@
-lua_registerAhkFunction(ByRef l)
+﻿lua_registerAhkFunction(ByRef l)
 {
    lua_register(l, "DebugMsg", RegisterCallback("DebugMsg","C"))
    

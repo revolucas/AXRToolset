@@ -1,4 +1,4 @@
-lua_LoadDLL(dll)
+﻿lua_LoadDLL(dll)
 {
    return, DllCall("LoadLibrary", "str", dll)
 }
@@ -74,12 +74,12 @@ lua_getfenv(ByRef l, index)
 
 lua_getfield(ByRef L, index, name)
 {
-   Return, DllCall("lua51\lua_getfield", "UInt", L, "Int", index, "Str", name, "Cdecl")
+   Return, DllCall("lua51\lua_getfield", "UInt", L, "Int", index, "AStr", name, "Cdecl")
 }
 
 lua_getglobal(ByRef L, name)
 {
-   ;Return, DllCall("lua51\lua_getfield", "UInt", L, "Int", -10002, "Str", name, "Cdecl")
+   ;Return, DllCall("lua51\lua_getfield", "UInt", L, "Int", -10002, "AStr", name, "Cdecl")
    Return, lua_getfield(L, -10002, name)
 }
 
@@ -283,7 +283,7 @@ lua_pushnumber(ByRef l, no)
 
 lua_pushstring(ByRef l, ByRef str)
 {
-   Return, DllCall("lua51\lua_pushstring", "UInt", l, "Str", str, "Cdecl")
+   Return, DllCall("lua51\lua_pushstring", "UInt", l, "AStr", str, "Cdecl")
 }
 
 lua_pushthread(ByRef l)
@@ -323,7 +323,7 @@ lua_rawseti(ByRef l, index, n)
 
 lua_register(ByRef l, name, funcAddr)
 {
-   ;Return, DllCall("lua51\lua_register", "UInt", l, "Str", name, "UInt", funcAddr, "Cdecl")
+   ;Return, DllCall("lua51\lua_register", "UInt", l, "AStr", name, "UInt", funcAddr, "Cdecl")
    lua_pushcfunction(l, funcAddr)
    lua_setglobal(l, name)
 }
@@ -355,12 +355,12 @@ lua_setfenv(ByRef l, index)
 
 lua_setfield(ByRef L, index, name)
 {
-   Return, DllCall("lua51\lua_setfield", "UInt", L, "Int", index, "Str", name, "Cdecl")
+   Return, DllCall("lua51\lua_setfield", "UInt", L, "Int", index, "AStr", name, "Cdecl")
 }
 
 lua_setglobal(ByRef L, name)
 {
-   ;Return, DllCall("lua51\lua_setfield", "UInt", L, "Int", -10002, "Str", name, "Cdecl")
+   ;Return, DllCall("lua51\lua_setfield", "UInt", L, "Int", -10002, "AStr", name, "Cdecl")
    Return, lua_setfield(L, -10002, name)
 }
 
@@ -401,7 +401,8 @@ lua_tointeger(ByRef l, no)
 
 lua_tolstring(ByRef l, no, size)
 {
-   Return, DllCall("lua51\lua_tolstring", "UInt", l, "Int", no, "Int", size, "Cdecl Str")
+	strptr := DllCall("lua51\lua_tolstring", "UInt", l, "Int", no, "Int", size, "Cdecl Ptr")
+	Return StrGet(strptr, "UTF-8")
 }
 
 lua_tonumber(ByRef l, no)
@@ -416,7 +417,7 @@ lua_topointer(ByRef l, no)
 
 lua_tostring(ByRef l, no)
 {
-   ;Return, DllCall("lua51\lua_tostring", "UInt", l, "Int", no, "Cdecl Str")
+   ;Return, DllCall("lua51\lua_tostring", "UInt", l, "Int", no, "Cdecl AStr")
    Return, lua_tolstring(l, no, 0)
 }
 
@@ -437,7 +438,7 @@ lua_type(ByRef l, no)
 
 lua_typename(ByRef l, tp)
 {
-   Return, DllCall("lua51\lua_typename", "UInt", l, "Int", tp, "Cdecl Str")
+   Return, DllCall("lua51\lua_typename", "UInt", l, "Int", tp, "Cdecl AStr")
 }
 
 lua_xmove(ByRef from, ByRef to, n)
@@ -505,7 +506,7 @@ luaL_buffinit(ByRef l, ByRef Buffer)
 
 luaL_callmeta(ByRef l, obj, ByRef e)
 {
-   Return, DllCall("lua51\luaL_callmeta", "UInt", l, "Int", obj, "Str", e, "Cdecl Int")
+   Return, DllCall("lua51\luaL_callmeta", "UInt", l, "Int", obj, "AStr", e, "Cdecl Int")
 }
 
 luaL_checkany(ByRef l, narg)
@@ -530,7 +531,7 @@ luaL_checklong(ByRef l, no)
 
 luaL_checklstring(ByRef l, no, ByRef len)
 {
-   Return, DllCall("lua51\luaL_checklstring", "UInt", l, "Int", no, "UInt", len, "Cdecl Str")
+   Return, DllCall("lua51\luaL_checklstring", "UInt", l, "Int", no, "UInt", len, "Cdecl AStr")
 }
 
 luaL_checknumber(ByRef l, no)
@@ -545,7 +546,7 @@ luaL_checkoption(ByRef l, no, ByRef def, ByRef lst)
 
 luaL_checkstack(ByRef l, no, ByRef msg)
 {
-   Return, DllCall("lua51\luaL_checkstack", "UInt", l, "Int", no, "Str", msg, "Cdecl")
+   Return, DllCall("lua51\luaL_checkstack", "UInt", l, "Int", no, "AStr", msg, "Cdecl")
 }
 
 luaL_checkstring(ByRef l, narg)
@@ -560,61 +561,61 @@ luaL_checktype(ByRef l, no, t)
 
 luaL_checkudata(ByRef l, no, ByRef tname)
 {
-   Return, DllCall("lua51\luaL_checkudata", "UInt", l, "Int", no, "Str", tname, "Cdecl")
+   Return, DllCall("lua51\luaL_checkudata", "UInt", l, "Int", no, "AStr", tname, "Cdecl")
 }
 
 luaL_dofile(ByRef l, file)
 {
-   ;Return, DllCall("lua51\luaL_dofile", "UInt", l, "Str", file, "Cdecl Int")
+   ;Return, DllCall("lua51\luaL_dofile", "UInt", l, "AStr", file, "Cdecl Int")
    luaL_loadfile(l, file)
    Return % lua_pCall(l, 0, -1, 0)
 }
 
 luaL_dostring(ByRef l, ByRef str)
 {
-   ;Return, DllCall("lua51\luaL_dostring", "UInt", l, "Str", str, "Cdecl Int")
+   ;Return, DllCall("lua51\luaL_dostring", "UInt", l, "AStr", str, "Cdecl Int")
    luaL_loadstring(l, str)
    Return % lua_pCall(l, 0, -1, 0)
 }
 
 luaL_error(ByRef l, ByRef str)
 {
-   Return, DllCall("lua51\luaL_error", "UInt", l, "Str", str, "Cdecl Int")
+   Return, DllCall("lua51\luaL_error", "UInt", l, "AStr", str, "Cdecl Int")
 }
 
 luaL_getmetafield(ByRef l, no, ByRef e)
 {
-   Return, DllCall("lua51\luaL_getmetafield", "UInt", l, "Int", no, "Str", e, "Cdecl Int")
+   Return, DllCall("lua51\luaL_getmetafield", "UInt", l, "Int", no, "AStr", e, "Cdecl Int")
 }
 
 luaL_getmetatable(ByRef l, ByRef tname)
 {
-   Return, DllCall("lua51\luaL_getmetatable", "UInt", l, "Str", tname, "Cdecl")
+   Return, DllCall("lua51\luaL_getmetatable", "UInt", l, "AStr", tname, "Cdecl")
 }
 
 luaL_gsub(ByRef l, ByRef s, ByRef p, ByRef r)
 {
-   Return, DllCall("lua51\luaL_gsub", "UInt", l, "UInt", s, "UInt", p, "UInt", r, "Cdecl Str")
+   Return, DllCall("lua51\luaL_gsub", "UInt", l, "UInt", s, "UInt", p, "UInt", r, "Cdecl AStr")
 }
 
 luaL_loadbuffer(ByRef l, ByRef buff, sz, ByRef name)
 {
-   Return, DllCall("lua51\luaL_loadbuffer", "UInt", l, "UInt", buff, "Int", sz, "Str", name, "Cdecl Int")
+   Return, DllCall("lua51\luaL_loadbuffer", "UInt", l, "UInt", buff, "Int", sz, "AStr", name, "Cdecl Int")
 }
 
 luaL_loadfile(ByRef l, file)
 {
-   Return, DllCall("lua51\luaL_loadfile", "UInt", l, "Str", file, "Cdecl Int")
+   Return, DllCall("lua51\luaL_loadfile", "UInt", l, "AStr", file, "Cdecl Int")
 }
 
 luaL_loadstring(ByRef l, ByRef s)
 {
-   Return, DllCall("lua51\luaL_loadstring", "UInt", l, "Str", s, "Cdecl Int")
+   Return, DllCall("lua51\luaL_loadstring", "UInt", l, "AStr", s, "Cdecl Int")
 }
 
 luaL_newmetatable(ByRef l, ByRef tname)
 {
-   Return, DllCall("lua51\luaL_newmetatable", "UInt", l, "Str", tname, "Cdecl Int")
+   Return, DllCall("lua51\luaL_newmetatable", "UInt", l, "AStr", tname, "Cdecl Int")
 }
 
 luaL_newstate()
