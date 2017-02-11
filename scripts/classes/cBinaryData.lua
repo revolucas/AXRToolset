@@ -263,8 +263,14 @@ function cBinaryData:replace_chunk(ID,chunk)
 				end		
 				
 				-- insert more bytes
-				for i=1,newsize-dwSize do
-					table.insert(self.data,self.r_marker,0)
+				if (newsize > dwSize) then
+					for i=1,newsize-dwSize do
+						table.insert(self.data,self.r_marker,0)
+					end
+				else
+					while (dwSize > newsize) do 
+						table.remove(self.data,self.r_marker+1)
+					end
 				end
 				
 				-- overwrite data
