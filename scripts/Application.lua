@@ -27,7 +27,7 @@ function cMainMenu:Reinit()
 	
 	self:Gui("Add|Tab2|x0 y0 w1024 h720|%t_plugins^%t_settings")
 	self:Gui("Tab|%t_plugins")
-	
+		self:Gui("Add|Text|x22 y695 w140 h20|v1.00.00")
 		-- Buttons 
 		-- register plugin buttons
 		for name,t in spairs(self.plugins) do 
