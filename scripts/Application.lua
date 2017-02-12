@@ -98,8 +98,8 @@ function cMainMenu:OnScriptControlAction(hwnd,event,info)
 					local root = trim_directory(working_directory)
 					lfs.mkdir("temp")
 					DownloadFile("https://github.com/revolucas/AXRToolset/archive/master.zip","temp\\"..version_name..".zip",true,true)
-					Msg(working_directory.."\\"..version_name..".zip")
 					if (file_exists(working_directory.."\\temp\\"..version_name..".zip")) then
+						gSettings:Save("configs\\settings.ltx.bak")
 						local cp = working_directory .. "\\bin\\7za.exe"
 						RunWait( strformat('%s x %s -y -aoa -o"%s"',cp,"temp\\"..version_name..".zip",working_directory.."\\temp\\"), working_directory)
 						Run( strformat('robocopy /s /move "%s" "%s"',working_directory.."\\temp\\AXRToolset-master",working_directory),working_directory)

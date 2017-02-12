@@ -252,6 +252,12 @@ end
 function ApplicationBegin()
 	math.randomseed(os.time())
 	
+	if (file_exists("configs\\settings.ltx.bak")) then
+		FileDelete("configs\\settings.ltx")
+		FileMove("configs\\settings.ltx.bak","configs\\settings.ltx")
+		FileDelete("configs\\settings.ltx.bak")
+	end
+	
 	gSettings = cIniFile("configs\\settings.ltx",true)
 	if not (gSettings) then
 		Msg("Error: configuration is missing for axr_lua_engine!")
