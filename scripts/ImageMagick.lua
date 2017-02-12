@@ -165,7 +165,7 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 	local search_pattern = trim(ahkGetVar("ImageMagickSearch"..tab))
 	gSettings:SetValue("ImageMagick","search_pattern"..tab,search_pattern)
 	
-	local command_line_options = trim(ahkGetVar("ImageMagickMogrify"..tab))
+	local user_command_line_options = trim(ahkGetVar("ImageMagickMogrify"..tab))
 	gSettings:SetValue("ImageMagick","command_line"..tab,command_line_options)
 	gSettings:Save()
 	
@@ -190,10 +190,10 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 					skip = not (bit.band(DDSD_MIPMAPCOUNT,dds.dwFlags) == DDSD_MIPMAPCOUNT)
 				end
 			end
-			
+			local command_line_options = ""
 			local output_format = dds and (dds.pixel_format.dwFourCC == "DXT5" and "dxt5" or  dds.pixel_format.dwFourCC == "DXT3" and "dxt5" or dds.pixel_format.dwFourCC == "DXT1" and "dxt1") or nil
 			if (output_format) then
-				command_line_options = command_line_options .. " -define dds:compression="..output_format.." "
+				command_line_options = user_command_line_options .. " -define dds:compression="..output_format.." "
 				if (output_format == "dxt1" and dds:HasAlpha()) then 
 					skip = true
 					Msg("DXT1a not supported skipping image")
