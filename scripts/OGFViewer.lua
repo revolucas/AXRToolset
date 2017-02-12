@@ -62,7 +62,7 @@ function cUIOGFViewer:Reinit()
 		if (i == 1) then 
 			local filters = table.concat({"All"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
-				self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
+				self:Gui("Add|Text|x560 y555 w230 h20 cRed|%t_click_to_edit")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUIOGFViewerLV%s|",i)
@@ -78,6 +78,9 @@ function cUIOGFViewer:Reinit()
 				
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUIOGFViewerPath%s|",i)
+				
+				self:Gui("Add|Text|x400 y50 w200 h20|%t_pattern_matching:")
+				self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUIOGFViewerSearch%s|",i)
 				
 			GuiControl(self.ID,"","UIOGFViewerPath"..i, gSettings:GetValue("ogf_viewer","path"..i) or "")
 		end
@@ -112,8 +115,13 @@ function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 				GetAndShowModify(tab).modify_row = row
 			end
 		end
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerSection"..tab)) then 	
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerSection"..tab)) then
 		self:FillListView(tab)
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerSearch"..tab)) then 
+		local selected = trim(ahkGetVar("UIOGFViewerSearch"..tab))
+		if (selected and selected ~= "") then 
+			self:FillListView(tab)
+		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerBrowsePath"..tab)) then
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("ogf_viewer","path"..tab) or ""))
 		if (dir and dir ~= "") then
@@ -145,13 +153,11 @@ end
 
 _INACTION = nil
 
-function cUIOGFViewer:FillListView(tab,selected,dir,skip)
+function cUIOGFViewer:FillListView(tab)
 	LVTop(self.ID,"UIOGFViewerLV"..tab)
 	LV("LV_Delete",self.ID)
 	
-	if not (skip) then
-		empty(self.list)
-	end
+	empty(self.list)
 
 	local selected = trim(ahkGetVar("UIOGFViewerSection"..tab))
 	if (selected == nil or selected == "") then 
@@ -181,12 +187,15 @@ function cUIOGFViewer:FillListView1(tab,selected,dir,skip)
 	local fields = {"filename"}
 	for i=1,#fields do 
 		LV("LV_InsertCol",self.ID,tostring(i),"",fields[i])
-	end 
+	end
 
 	LV("LV_ModifyCol",self.ID,"1","AutoHdr")
 	
+	local search_str = trim(ahkGetVar("UIOGFViewerSearch"..tab))
 	local function on_execute(path,fname)
-		self.list[fname] = path.."\\"..fname
+		if (search_str == nil or search_str == "" or fname:match(search_str)) then
+			self.list[fname] = path.."\\"..fname
+		end
 	end
 	
 	file_for_each(dir,{"ogf"},on_execute)
