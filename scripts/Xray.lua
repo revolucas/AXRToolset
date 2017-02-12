@@ -270,7 +270,7 @@ function translate_string(string_name,gamedata_path)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(gamedata_path.."\\configs\\text\\eng",{"xml"},on_execute)
+	file_for_each(gamedata_path.."\\configs\\text\\eng",{"xml"},on_execute)
 	
 	return translated_list[string_name] or string_name
 end

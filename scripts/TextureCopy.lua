@@ -214,7 +214,7 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute)
 	
 	Msg("TextureCopy:= (SoC->CoP) Finished!")
 end
@@ -266,7 +266,7 @@ function cUITextureCopy:ActionExecute2(tab,input_path,output_path)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute)
 	
 	ltx:Save()
 	
@@ -360,7 +360,7 @@ function cUITextureCopy:ActionExecute4(tab,input_path,output_path)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute)
 	
 	ltx:Save()
 	
@@ -446,7 +446,7 @@ function cUITextureCopy:ActionExecute3(tab,input_path,output_path)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute)
 	
 	Msg("TextureCopy:= Finished!")
 end

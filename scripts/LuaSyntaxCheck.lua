@@ -106,7 +106,7 @@ function cUILuaSyntaxCheck:ActionSubmit(tab)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(input_path,{"script","lua"},on_execute)
+	file_for_each(input_path,{"script","lua"},on_execute)
 	
 	Msg("Lua Syntax Check:= Finished!")
 	

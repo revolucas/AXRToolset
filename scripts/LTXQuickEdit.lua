@@ -62,7 +62,7 @@ function cUILTXQuickEdit:Reinit()
 			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUILTXQuickEditSaveSettings%s|%t_save_settings",i)
 		GuiControl(self.ID,"","UILTXQuickEditPath"..i, gSettings:GetValue("ltx_quickedit","path"..i) or "")
 	end
-	self:Gui("Show|w1024 h720|%t_ltx_quick")
+	self:Gui("Show|w1024 h720|%t_plugin_ltx_quick")
 
 	LV("LV_Delete",self.ID)
 	clear(self.list)
@@ -121,7 +121,7 @@ function cUILTXQuickEdit:GetFilterList()
 	local function on_execute(path,fname)
 		table.insert(t,fname)
 	end
-	recurse_subdirectories_and_execute("configs\\filters",{"txt"},on_execute)
+	file_for_each("configs\\filters",{"txt"},on_execute)
 	return table.concat(t,"^")
 end
 
@@ -141,9 +141,9 @@ function cUILTXQuickEdit:FillListView(tab)
 		return MsgBox("Please select a valid working directory")
 	end
 	
-	local f = io.open("scripts\\ltx_quickedit\\filters\\"..selected,"rb")
+	local f = io.open("configs\\filters\\"..selected,"rb")
 	if not (f) then 
-		return Msg("failed to open %s","scripts\\ltx_quickedit\\filters"..selected)
+		return Msg("failed to open %s","configs\\filters"..selected)
 	end 
 
 	local data = f:read("*all")
@@ -202,7 +202,7 @@ function cUILTXQuickEdit:FillListView(tab)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(dir,{"ltx"},on_execute)
+	file_for_each(dir,{"ltx"},on_execute)
 	
 	for k,t in pairs(self.list) do
 		local a = {}

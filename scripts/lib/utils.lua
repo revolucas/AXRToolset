@@ -188,7 +188,7 @@ function file_to_table(fname,parent,simple)
 	return root
 end
 
-function recurse_subdirectories_and_execute(node,ext,func,...)
+function file_for_each(node,ext,func,nonrecursive,...)
 	local stack = {}
 	local deepest
 	while not deepest do
@@ -200,10 +200,10 @@ function recurse_subdirectories_and_execute(node,ext,func,...)
 					if (mode == "file") then
 						for i=1,#ext do
 							if (get_ext(file) == ext[i]) then
-								func(node,file,...)
+								func(node,file,fullpath,...)
 							end
 						end
-					elseif (mode == "directory") then
+					elseif (mode == "directory" and nonrecursive ~= true) then
 						if not (file_exists(fullpath.."\\.ignore")) then
 							table.insert(stack,fullpath)
 						end

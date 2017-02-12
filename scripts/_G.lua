@@ -262,7 +262,7 @@ function ApplicationBegin()
 	local function on_execute(path,fname)
 		Run('bin\\luac5.1.exe -p "'..ahkGetVar("A_WorkingDir").."\\"..path.."\\"..fname..'"')
 	end
-	recurse_subdirectories_and_execute(node,{"lua"},on_execute)
+	file_for_each(node,{"lua"},on_execute)
 	--]]
 	
 	Msg("------AXR Toolset by Alundaio------")

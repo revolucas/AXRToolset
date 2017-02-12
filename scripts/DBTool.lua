@@ -357,7 +357,7 @@ function ActionUnpack()
 	
 	Msg("DB Tool:= Unpacking...")
 	
-	recurse_subdirectories_and_execute(input_path,{"db","db0","db1","db2","db3","db4","db5","db6","db7","db8","db9","db10"},on_execute)
+	file_for_each(input_path,{"db","db0","db1","db2","db3","db4","db5","db6","db7","db8","db9","db10"},on_execute)
 	
 	table.sort(patches)
 	

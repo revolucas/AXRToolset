@@ -162,7 +162,7 @@ function OnGenerate()
 		end
 	end 
 
-	recurse_subdirectories_and_execute(inputpath,{"ltx","xml","spawn"},on_execute_ltx)
+	file_for_each(inputpath,{"ltx","xml","spawn"},on_execute_ltx)
 	
 	local function on_execute(path,fname)
 		local key = string.gsub(path,inputpath.."\\meshes\\", "")
@@ -199,7 +199,7 @@ function OnGenerate()
 	
 	Msg("Generating 'unused' mesh list")
 	
-	recurse_subdirectories_and_execute(inputpath.."\\meshes",{"ogf"},on_execute)		
+	file_for_each(inputpath.."\\meshes",{"ogf"},on_execute)		
 	
 	outfile:Save()
 	texturefile:Save()

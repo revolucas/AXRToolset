@@ -158,7 +158,7 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 	
 	Msg("Converter:= (OGF) Working...")
 	
-	recurse_subdirectories_and_execute(input_path,{"ogf"},on_execute)	
+	file_for_each(input_path,{"ogf"},on_execute)	
 	
 	Msg("Converter:= (OGF) Finished!")
 end
@@ -182,7 +182,7 @@ function cUIConverter:ActionExecute2(tab,input_path,output_path)
 	
 	Msg("Converter:= (OMF) Working...")
 	
-	recurse_subdirectories_and_execute(input_path,{"omf"},on_execute)	
+	file_for_each(input_path,{"omf"},on_execute)	
 	
 	Msg("Converter:= (OMF) Finished!")
 end
@@ -197,7 +197,7 @@ function cUIConverter:ActionExecute3(tab,input_path,output_path)
 	
 	Msg("Converter:= (DDS) Working...")
 	
-	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)	
+	file_for_each(input_path,{"dds"},on_execute)	
 	
 	Msg("Converter:= (DDS) Finished!")
 end
@@ -212,7 +212,7 @@ function cUIConverter:ActionExecute4(tab,input_path,output_path)
 	
 	Msg("Converter:= (OGF->SMD) Working...")
 	
-	recurse_subdirectories_and_execute(input_path,{"ogf"},on_execute)	
+	file_for_each(input_path,{"ogf"},on_execute)	
 	
 	Msg("Converter:= (OGF->SMD) Finished!")
 end

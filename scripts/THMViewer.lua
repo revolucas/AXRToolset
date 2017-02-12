@@ -411,7 +411,7 @@ function cUITHMViewer:ActionExecute2(tab)
 	end
 	
 	Msg("THM Validater := Checking...")
-	recurse_subdirectories_and_execute(input_path,{"thm"},on_execute)
+	file_for_each(input_path,{"thm"},on_execute)
 	
 	local function on_execute_2(path,fname)
 		Msg(fname)
@@ -487,7 +487,7 @@ function cUITHMViewer:ActionExecute2(tab)
 
 	Msg("THM Validater := Checking DDS...")
 	
-	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute_2)
+	file_for_each(input_path,{"dds"},on_execute_2)
 
 	
 	if (files_resynced_count > 0) then
@@ -572,7 +572,7 @@ function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(dir,{"thm"},on_execute)
+	file_for_each(dir,{"thm"},on_execute)
 	
 	table.sort(self.list)
 
@@ -619,7 +619,7 @@ function cUITHMViewer:FillListView3(tab,selected,dir,skip)
 	end
 	
 	if not (skip) then
-		recurse_subdirectories_and_execute(dir,{"dds"},on_execute)
+		file_for_each(dir,{"dds"},on_execute)
 	end
 	
 	for fname,t in pairs(self.list) do

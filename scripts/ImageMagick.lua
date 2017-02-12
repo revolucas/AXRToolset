@@ -221,7 +221,7 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 		end
 	end
 	
-	recurse_subdirectories_and_execute(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute)
 	
 	Msg("ImageMagick:= Finished!")
 end

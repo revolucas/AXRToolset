@@ -189,7 +189,7 @@ function cUIOGFViewer:FillListView1(tab,selected,dir,skip)
 		self.list[fname] = path.."\\"..fname
 	end
 	
-	recurse_subdirectories_and_execute(dir,{"ogf"},on_execute)
+	file_for_each(dir,{"ogf"},on_execute)
 	
 	for k,v in pairs(self.list) do
 		LV("LV_ADD",self.ID,"",k)

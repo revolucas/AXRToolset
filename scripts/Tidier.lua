@@ -91,6 +91,6 @@ function cUITidier:DoTidy(i_path,o_path)
 		end
 	end 
 	Msg("LTX Tidier:= Begin")
-	recurse_subdirectories_and_execute(i_path,{"ltx"},on_execute)
+	file_for_each(i_path,{"ltx"},on_execute)
 	Msg("LTX Tidier:= End")
 end

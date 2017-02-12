@@ -152,7 +152,7 @@ function cUITraderEditor:FillListView(typ)
 			end
 		end
 		
-		recurse_subdirectories_and_execute(dir.."\\configs\\misc\\trade",{"ltx"},on_execute)
+		file_for_each(dir.."\\configs\\misc\\trade",{"ltx"},on_execute)
 	else
 		-- death configs 
 		local fname = "death_generic.ltx"
