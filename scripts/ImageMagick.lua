@@ -107,7 +107,7 @@ function cImageMagick:OnScriptControlAction(hwnd,event,info) -- needed because i
 		gSettings:SetValue("ImageMagick","input_path"..tab,input_path)
 		gSettings:SetValue("ImageMagick","output_path"..tab,output_path)
 		gSettings:SetValue("ImageMagick","command_line"..tab,trim(ahkGetVar("ImageMagickMogrify"..tab)))
-		gSettings:SetValue("ImageMagick","command_line"..tab, trim(ahkGetVar("ImageMagickSearch"..tab)))
+		gSettings:SetValue("ImageMagick","search_pattern"..tab, trim(ahkGetVar("ImageMagickSearch"..tab)))
 		
 		gSettings:Save()
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickLink"..tab)) then 
