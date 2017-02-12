@@ -72,7 +72,7 @@ function cUITHMViewer:Reinit()
 		if (i == 1) then
 			local filters = table.concat({"All","Diffuse","Bump"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
-				self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
+				self:Gui("Add|Text|x560 y555 w230 h20 cRed|%t_click_to_edit")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITHMViewerLV%s|filename^%s",i,table.concat(thm_fields,"^"))
@@ -88,6 +88,11 @@ function cUITHMViewer:Reinit()
 				
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUITHMViewerPath%s|",i)
+			
+				self:Gui("Add|Text|x400 y50 w200 h20|%t_pattern_matching:")
+				self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUITHMViewerSearch%s|",i)
+				self:Gui("Add|Button|gOnScriptControlAction x555 y69 w20 h20 vUITHMViewerSearchButton%s|>",i)
+				
 				
 			GuiControl(self.ID,"","UITHMViewerPath"..i, gSettings:GetValue("thm_viewer","path"..i) or "")
 		elseif (i == 2) then
@@ -132,6 +137,9 @@ function cUITHMViewer:Reinit()
 				-- Editbox 
 				self:Gui("Add|Edit|gOnScriptControlAction x30 y600 w450 h20 vUITHMViewerPath%s|",i)
 				
+				self:Gui("Add|Text|x400 y50 w200 h20|%t_pattern_matching:")
+				self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUITHMViewerSearch%s|",i)
+				
 			GuiControl(self.ID,"","UITHMViewerPath"..i, gSettings:GetValue("thm_viewer","path"..i) or "")
 		end
 	end
@@ -167,6 +175,11 @@ function cUITHMViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerSection"..tab)) then 	
 		self:FillListView(tab)
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerSearchButton"..tab)) then 	
+		local selected = trim(ahkGetVar("UITHMViewerSearch"..tab))
+		if (selected and selected ~= "") then 
+			self:FillListView(tab)
+		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerBrowsePath"..tab)) then
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("thm_viewer","path"..tab) or ""))
 		if (dir and dir ~= "") then
@@ -547,6 +560,7 @@ function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 
 	LV("LV_ModifyCol",self.ID,"1","AutoHdr")
 	
+	local search_str = trim(ahkGetVar("UITHMViewerSearch"..tab))
 	local ignore_paths = {}
 	local function on_execute(path,fname)
 		local check_path = trim_directory(path)
@@ -561,12 +575,14 @@ function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 			end 
 			
 			if (show) then
-				if not (self.thm[fname]) then
-					self.thm[fname] = cTHM(path.."\\"..fname)
-				end
-				if (self.thm[fname]) then
-					self.list[fname] = self.thm[fname].params
-					self.list[fname].__fullpath = path.."\\"..fname
+				if (search_str == nil or search_str == "" or fname:match(search_str)) then
+					if not (self.thm[fname]) then
+						self.thm[fname] = cTHM(path.."\\"..fname)
+					end
+					if (self.thm[fname]) then
+						self.list[fname] = self.thm[fname].params
+						self.list[fname].__fullpath = path.."\\"..fname
+					end
 				end
 			end
 		end
@@ -593,6 +609,7 @@ function cUITHMViewer:FillListView3(tab,selected,dir,skip)
 	
 	LV("LV_ModifyCol",self.ID,"1","AutoHdr")
 	
+	local search_str = trim(ahkGetVar("UITHMViewerSearch"..tab))
 	local ignore_paths = {}
 	local function on_execute(path,fname)
 		local check_path = trim_directory(path)
@@ -612,8 +629,10 @@ function cUITHMViewer:FillListView3(tab,selected,dir,skip)
 			end
 			
 			if (show) then
-				local fn = trim_ext(fname)
-				self.list[fname] = {path,fn..".thm",file_exists(path.."\\"..fn..".thm") == true}
+				if (search_str == nil or search_str == "" or fname:match(search_str)) then
+					local fn = trim_ext(fname)
+					self.list[fname] = {path,fn..".thm",file_exists(path.."\\"..fn..".thm") == true}
+				end
 			end
 		end
 	end

@@ -54,6 +54,7 @@ function cUILTXQuickEdit:Reinit()
 			self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUILTXQuickEditLV%s|%t_section",i)
 			self:Gui("Add|Text|x400 y50 w200 h20|%t_pattern_matching:")
 			self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUILTXQuickEditSearch%s|",i)
+			self:Gui("Add|Button|gOnScriptControlAction x555 y69 w20 h20 vUILTXQuickEditSearchButton%s|>",i)
 			
 			self:Gui("Add|GroupBox|x22 y555 w530 h75|%t_working_directory")
 			self:Gui("Add|Text|x560 y555 w230 h20|%t_click_to_edit")
@@ -104,7 +105,7 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 			gSettings:SetValue("ltx_quickedit","path"..tab,path)
 			gSettings:Save()
 		end
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditSearch"..tab)) then
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditSearchButton"..tab)) then
 		local selected = trim(ahkGetVar("UILTXQuickEditSection"..tab))
 		if (selected and selected ~= "") then
 			self:FillListView(tab)
