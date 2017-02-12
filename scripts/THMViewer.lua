@@ -139,6 +139,7 @@ function cUITHMViewer:Reinit()
 				
 				self:Gui("Add|Text|x400 y50 w200 h20|%t_pattern_matching:")
 				self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUITHMViewerSearch%s|",i)
+				self:Gui("Add|Button|gOnScriptControlAction x555 y69 w20 h20 vUITHMViewerSearchButton%s|>",i)
 				
 			GuiControl(self.ID,"","UITHMViewerPath"..i, gSettings:GetValue("thm_viewer","path"..i) or "")
 		end
