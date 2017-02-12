@@ -75,7 +75,7 @@ function cUITextureCopy:OnGuiClose(idx) -- needed because it's registered to cal
 end 
 
 function cUITextureCopy:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UITextureCopyTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UITextureCopyBrowseInputPath"..tab)) then
@@ -89,7 +89,6 @@ function cUITextureCopy:OnScriptControlAction(hwnd,event,info) -- needed because
 			GuiControl(self.ID,"","UITextureCopyOutputPath"..tab,dir)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITextureCopyExecute"..tab)) then
-		self:Gui("Submit|NoHide")
 		self:ActionExecute(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITextureCopySaveSettings"..tab)) then
 		local input_path = ahkGetVar("UITextureCopyInputPath"..tab)

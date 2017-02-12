@@ -37,6 +37,7 @@
    lua_register(l, "FileMoveDir", RegisterCallback("FileMoveDir","C"))
    lua_register(l, "FileRecycle", RegisterCallback("FileRecycle","C"))
    lua_register(l, "FileRecycleEmpty", RegisterCallback("FileRecycleEmpty","C"))
+   lua_register(l, "FileExist", RegisterCallback("FileExist_script","C"))
    lua_register(l, "FileRemoveDir", RegisterCallback("FileRemoveDir","C"))
    lua_register(l, "FileSetAttrib", RegisterCallback("FileSetAttrib","C"))
    lua_register(l, "FileSetTime", RegisterCallback("FileSetTime","C"))
@@ -195,6 +196,42 @@
    lua_register(l, "Unicode2Ansi", RegisterCallback("Unicode2Ansi_script","C"))
    
    lua_register(l,"UpdateScrollBars",RegisterCallback("UpdateScrollBars_script","C"))
+   lua_register(l,"URLDownloadToVar",RegisterCallback("URLDownloadToVar","C"))
+   lua_register(l,"Unzip",RegisterCallback("Unzip","C"))
+   lua_register(l,"DownloadFile",RegisterCallback("DownloadFile","C"))
+}
+
+FileExist_script(L)
+{
+   arg1 := lua_tostring(L,1)
+   
+   lua_pushboolean(L,FileExist(arg1))
+   
+   Return 1
+}
+
+URLDownloadToVar(L)
+{
+   URL := lua_tostring(L,1)
+   WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+  
+   try
+   {
+      WebRequest.Open("GET", url)
+   }
+   catch error
+   {
+      MsgBox(error.Message)
+      lua_pushstring(L,error.Message)
+      return 1
+   }
+   
+   WebRequest.Send()
+   
+   lua_pushstring(L,WebRequest.ResponseText)
+   WebRequest := ""
+   
+   Return 1
 }
 
 UpdateScrollBars_script(L)
@@ -1372,6 +1409,55 @@ UrlDownloadToFile(L)
    UrlDownloadToFile, %arg1%, %arg2%
 
    return 0
+}
+
+DownloadFile(L)
+{   
+   UrlToFile := lua_tostring(L, 1)
+   SaveFileAs := lua_tostring(L, 2)
+   Overwrite := lua_toboolean(L, 3)
+   UseProgressBar := lua_toboolean(L, 4)  
+
+    ;Check if the file already exists and if we must not overwrite it
+      If (!Overwrite && FileExist(SaveFileAs))
+          Return 0
+    ;Check if the user wants a progressbar
+      If (UseProgressBar) {
+          ;Initialize the WinHttpRequest Object
+            WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+          ;Download the headers
+            WebRequest.Open("HEAD", UrlToFile)
+            WebRequest.Send()
+          ;Store the header which holds the file size in a variable:
+            FinalSize := WebRequest.GetResponseHeader("Content-Length")
+          ;Create the progressbar and the timer
+            Progress, H80, , Downloading..., %UrlToFile%
+            SetTimer, __UpdateProgressBar, 100
+      }
+    ;Download the file
+      UrlDownloadToFile, %UrlToFile%, %SaveFileAs%
+    ;Remove the timer and the progressbar because the download has finished
+      If (UseProgressBar) {
+          Progress, Off
+          SetTimer, __UpdateProgressBar, Off
+      }
+    Return 0
+    
+    ;The label that updates the progressbar
+      __UpdateProgressBar:
+          ;Get the current filesize and tick
+            CurrentSize := FileOpen(SaveFileAs, "r").Length ;FileGetSize wouldn't return reliable results
+            CurrentSizeTick := A_TickCount
+          ;Calculate the downloadspeed
+            Speed := Round((CurrentSize/1024-LastSize/1024)/((CurrentSizeTick-LastSizeTick)/1000)) . " Kb/s"
+          ;Save the current filesize and tick for the next time
+            LastSizeTick := CurrentSizeTick
+            LastSize := FileOpen(SaveFileAs, "r").Length
+          ;Calculate percent done
+            PercentDone := Round(CurrentSize/FinalSize*100)
+          ;Update the ProgressBar
+            Progress, %PercentDone%, %PercentDone%`% Done, Downloading...  (%Speed%), Downloading %SaveFileAs% (%PercentDone%`%)
+      Return 0
 }
 
 WinActivate(L)

@@ -54,13 +54,13 @@ function cUIGenMeshList:OnGuiClose(idx) -- needed because it's registered to cal
 end 
 
 function cUIGenMeshList:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIGenMeshListBrowseInputPath")) then
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("mesh_list","path") or ""))
 		if (dir and dir ~= "") then
 			GuiControl(self.ID,"","UIGenMeshListInputPath",dir)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIGenMeshListExecute")) then
-		self:Gui("Submit|NoHide")
 		OnGenerate()
 	end
 end

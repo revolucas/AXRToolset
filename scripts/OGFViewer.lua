@@ -98,7 +98,7 @@ function cUIOGFViewer:OnGuiClose(idx) -- needed because it's registered to callb
 end 
 
 function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UIOGFViewerTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerLV"..tab)) then
@@ -324,8 +324,7 @@ function cUIOGFViewerModify:Destroy()
 end
 
 function cUIOGFViewerModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UIOGFViewerTab") or "1"
 		
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerModifyAccept2")) then

@@ -50,6 +50,7 @@ function cUIArtefactProps:OnGuiClose(idx) -- needed because it's registered to c
 end 
 
 function cUIArtefactProps:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIArtefactPropsBrowseInputPath")) then
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("artefact_props","input_path") or ""))
 		if (dir and dir ~= "") then

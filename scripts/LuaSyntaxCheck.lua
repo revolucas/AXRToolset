@@ -53,7 +53,7 @@ function cUILuaSyntaxCheck:OnGuiClose(idx) -- needed because it's registered to 
 end 
 
 function cUILuaSyntaxCheck:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UILuaSyntaxCheckTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UILuaSyntaxCheckBrowseInputPath"..tab)) then
@@ -62,7 +62,6 @@ function cUILuaSyntaxCheck:OnScriptControlAction(hwnd,event,info) -- needed beca
 			GuiControl(self.ID,"","UILuaSyntaxCheckInputPath"..tab,dir)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILuaSyntaxCheckExecute"..tab)) then
-		self:Gui("Submit|NoHide")
 		self:ActionSubmit(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILuaSyntaxCheckSaveSettings"..tab)) then
 		gSettings:SetValue("lua_syntax_check","path"..tab,ahkGetVar("UILuaSyntaxCheckInputPath"..tab) or "")

@@ -84,7 +84,7 @@ function cUICoCDBTool:OnGuiClose(idx) -- needed because it's registered to callb
 end 
 
 function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UICoCDBToolTab") or "1"
 	
 	if (tab == "1") then 
@@ -99,7 +99,6 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 				GuiControl(self.ID,"","UICoCDBToolOutputPath",dir)
 			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute")) then
-			self:Gui("Submit|NoHide")
 			ActionUnpack()
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings0")) then
 			local input_path = ahkGetVar("UICoCDBToolInputPath")
@@ -122,7 +121,6 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 				GuiControl(self.ID,"","UICoCDBToolOutputPath"..tab,dir)
 			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute"..tab)) then
-			self:Gui("Submit|NoHide")
 			ActionSubmit(tab)
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings"..tab)) then
 			local input_path = ahkGetVar("UICoCDBToolInputPath"..tab)

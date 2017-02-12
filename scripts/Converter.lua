@@ -77,7 +77,7 @@ function cUIConverter:OnGuiClose(idx) -- needed because it's registered to callb
 end 
 
 function cUIConverter:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UIConverterTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIConverterBrowseInputPath"..tab)) then
@@ -91,7 +91,6 @@ function cUIConverter:OnScriptControlAction(hwnd,event,info) -- needed because i
 			GuiControl(self.ID,"","UIConverterOutputPath"..tab,dir)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIConverterExecute"..tab)) then
-		self:Gui("Submit|NoHide")
 		self:ActionExecute(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIConverterSaveSettings"..tab)) then
 		local input_path = ahkGetVar("UIConverterInputPath"..tab)

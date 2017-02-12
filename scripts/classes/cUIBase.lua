@@ -65,7 +65,7 @@ function cUIBase:Reinit()
 end
 
 function cUIBase:OnScriptControlAction()
-
+	self:Gui("Submit|NoHide")
 end
 
 function cUIBase:Gui(str,...)

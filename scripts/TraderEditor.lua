@@ -65,8 +65,7 @@ function cUITraderEditor:OnGuiClose(idx) -- needed because it's registered to ca
 end 
 
 function cUITraderEditor:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UITraderEditorTab") or "1"
 		
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UITraderEditorLV"..tab)) then
@@ -286,8 +285,8 @@ function cUITraderEditorModify:Destroy()
 end
 
 function cUITraderEditorModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIModifyAccept")) then
-		self:Gui("Submit|NoHide")
 		local tab = ahkGetVar("UITraderEditorTab")
 		
 		local wnd = Get()

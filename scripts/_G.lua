@@ -11,6 +11,7 @@ bit = require "bit"
 ----------------------------------------------------
 -- scripts\lib\
 ----------------------------------------------------
+SOFTWARE_VERSION = require("scripts.lib.version")
 require "scripts.lib.utils"
 ----------------------------------------------------
 -- Global vars 

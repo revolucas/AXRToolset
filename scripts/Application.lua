@@ -1,4 +1,5 @@
 ﻿function OnApplicationBegin()
+	FileRemoveDir("temp","1")
 	MainMenu = cMainMenu()
 	CallbackRegister("OnApplicationBeginEnd",OnApplicationBeginEnd)
 end
@@ -27,7 +28,7 @@ function cMainMenu:Reinit()
 	
 	self:Gui("Add|Tab2|x0 y0 w1024 h720|%t_plugins^%t_settings")
 	self:Gui("Tab|%t_plugins")
-		self:Gui("Add|Text|x22 y695 w140 h20|v1.00.00")
+		self:Gui("Add|Text|x22 y695 w140 h20|v"..string.format("%1d.%01d.%02d",unpack(SOFTWARE_VERSION)))
 		-- Buttons 
 		-- register plugin buttons
 		for name,t in spairs(self.plugins) do 
@@ -43,6 +44,8 @@ function cMainMenu:Reinit()
 		self:Gui("Add|Picture|gOnScriptControlAction x765 y70 vApplicationSelectFrench|icons/french.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x800 y70 vApplicationSelectRussian|icons/russian.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x835 y70 vApplicationSelectSpanish|icons/spanish.png")	
+		
+		self:Gui("Add|Button|gOnScriptControlAction x745 y110 vApplicationCheckUpdates|%t_check_updates")
 		
 	self:Gui("Tab|%t_settings")
 	
@@ -72,12 +75,44 @@ end
 function cMainMenu:OnScriptControlAction(hwnd,event,info)
 	if (hwnd == "") then 
 		return 
-	end 
+	end
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationBrowseGamedata")) then 
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("core","Gamedata_Path") or ""))
 		if (dir and dir ~= "") then
 			GuiControl(self.ID,"","ApplicationGamedataPath",dir)
+		end
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationCheckUpdates")) then 
+		local txt = URLDownloadToVar("https://raw.githubusercontent.com/revolucas/AXRToolset/master/scripts/lib/version.lua")
+		if (txt and txt ~= "") then 
+			local ver = assert(loadstring(txt))()
+			if not ver then
+				return Msg("Failed to get version")
+			end
+ 			if (ver[1] > SOFTWARE_VERSION[1] or ver[2] > SOFTWARE_VERSION[2] or ver[3] > SOFTWARE_VERSION[3]) then
+				local version_name = string.format("%1d.%01d.%02d",unpack(ver))
+				
+				local mb = cUIMsgBox("9",Language.translate("t_update_yes_no"),Language.translate("t_update_available").. " v" .. version_name,function()
+					local working_directory = ahkGetVar("A_WorkingDir")
+					local root = trim_directory(working_directory)
+					lfs.mkdir("temp")
+					DownloadFile("https://github.com/revolucas/AXRToolset/archive/master.zip","temp\\"..version_name..".zip",true,true)
+					Msg(working_directory.."\\"..version_name..".zip")
+					if (file_exists(working_directory.."\\temp\\"..version_name..".zip")) then
+						local cp = working_directory .. "\\bin\\7za.exe"
+						RunWait( strformat('%s x %s -y -aoa -o"%s"',cp,"temp\\"..version_name..".zip",working_directory.."\\temp\\"), working_directory)
+						Run( strformat('robocopy /s /move "%s" "%s"',working_directory.."\\temp\\AXRToolset-master",working_directory),working_directory)
+						GoSub("OnExit")
+					else
+						MsgBox(strformat(Language.translate("t_update_fail_download")))
+					end
+				end)
+				
+				mb:Show(true)
+			else
+				MsgBox(Language.translate("t_no_update_available"))
+			end
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSaveSettings")) then 
 		self:Gui("Submit|NoHide")
@@ -160,7 +195,8 @@ function cMainMenu:Show(bool)
 	end
 	file_for_each(i_p,{"dds"},on_execute)
 	--]]
---[[ 	local ltx = cIniFile("debug_visual.ltx")
+	--[[
+	local ltx = cIniFile("debug_visual.ltx")
 	local ipath = [ [E:\STALKER\Games\COP_COC_db_converter\unpacked\meshes\actors] ]
 	local function on_execute(path,fname,fullpath)
 		local relative_path = trim_ext("actors"..trim_final_backslash(string.gsub(fullpath,escape_lua_pattern(ipath),"")))
@@ -179,6 +215,10 @@ function cMainMenu:Show(bool)
 						table.insert(ogf.motion_refs2,"actors\\tolstyak_animation")
 						ogf:save()
 					end
+				elseif (ogf.motion_refs ~= "") then 
+					if not (string.find(ogf.motion_refs,"actors\\tolstyak_animation")) then
+						ogf.motion_refs = ogf.motion_refs .. ",actors\\tolstyak_animation"
+					end
 				else 
 					MsgBox(strformat("%s doesn't have motion_refs2? Can this be right?",fname))
 				end
@@ -186,5 +226,6 @@ function cMainMenu:Show(bool)
 		end
 	end
 		
-	file_for_each(ipath,{"ogf"},on_execute) ]]
+	file_for_each(ipath,{"ogf"},on_execute)
+	--]]
 end

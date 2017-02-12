@@ -74,7 +74,7 @@ function cUILTXQuickEdit:OnGuiClose(idx) -- needed because it's registered to ca
 end 
 
 function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UILTXQuickEditTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditLV"..tab)) then
@@ -302,8 +302,7 @@ function cUILTXQuickEditModify:Destroy()
 end
 
 function cUILTXQuickEditModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UILTXQuickEditTab") or "1"
 		
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UIModifyAccept")) then

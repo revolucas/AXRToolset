@@ -95,7 +95,7 @@ function cUILevelViewer:OnGuiClose(idx) -- needed because it's registered to cal
 end 
 
 function cUILevelViewer:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UILevelViewerTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UILevelViewerLV"..tab)) then
@@ -127,7 +127,6 @@ function cUILevelViewer:OnScriptControlAction(hwnd,event,info) -- needed because
 			gSettings:Save()
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILevelViewerExecute"..tab)) then
-		self:Gui("Submit|NoHide")
 		if (self["ActionExecute"..tab]) then
 			self["ActionExecute"..tab](self,tab)
 		else 
@@ -334,8 +333,7 @@ function cUILevelViewerModify:Destroy()
 end
 
 function cUILevelViewerModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UILevelViewerTab") or "1"
 		
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UILevelViewerModifyAccept2")) then

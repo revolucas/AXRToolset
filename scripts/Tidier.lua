@@ -54,6 +54,7 @@ function cUITidier:OnGuiClose(idx) -- needed because it's registered to callback
 end 
 
 function cUITidier:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UITidierBrowseInputPath")) then
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("ltx_tidier","input_path") or ""))
 		if (dir and dir ~= "") then
@@ -65,7 +66,6 @@ function cUITidier:OnScriptControlAction(hwnd,event,info) -- needed because it's
 			GuiControl(self.ID,"","UITidierOutputPath",dir)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITidierExecute")) then
-		self:Gui("Submit|NoHide")
 		local i_path = ahkGetVar("UITidierInputPath")
 		local o_path = ahkGetVar("UITidierOutputPath")	
 		if (i_path and i_path ~= "" and o_path and o_path ~= "") then

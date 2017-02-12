@@ -156,7 +156,7 @@ function cUITHMViewer:OnGuiClose(idx) -- needed because it's registered to callb
 end 
 
 function cUITHMViewer:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UITHMViewerTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerLV"..tab)) then
@@ -193,7 +193,6 @@ function cUITHMViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 			gSettings:Save()
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerExecute"..tab)) then
-		self:Gui("Submit|NoHide")
 		if (self["ActionExecute"..tab]) then
 			self["ActionExecute"..tab](self,tab)
 		else 
@@ -738,8 +737,7 @@ function cUITHMViewerModify:Destroy()
 end
 
 function cUITHMViewerModify:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UITHMViewerTab") or "1"
 		
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyAccept")) then
@@ -886,8 +884,7 @@ function cUITHMViewerModify2:Destroy()
 end
 
 function cUITHMViewerModify2:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("UITHMViewerTab") or "1"
 		
 	if (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyAccept2")) then

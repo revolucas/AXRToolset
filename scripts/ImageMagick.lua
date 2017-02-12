@@ -85,7 +85,7 @@ function cImageMagick:OnGuiClose(idx) -- needed because it's registered to callb
 end 
 
 function cImageMagick:OnScriptControlAction(hwnd,event,info) -- needed because it's registered to callback
-	self:Gui("Submit|NoHide")
+	self.inherited[1].OnScriptControlAction(self,hwnd,event,info)
 	local tab = ahkGetVar("ImageMagickTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickBrowseInputPath"..tab)) then
@@ -99,7 +99,6 @@ function cImageMagick:OnScriptControlAction(hwnd,event,info) -- needed because i
 			GuiControl(self.ID,"","ImageMagickOutputPath"..tab,dir)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickExecute"..tab)) then
-		self:Gui("Submit|NoHide")
 		self:ActionExecute(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickSaveSettings"..tab)) then
 		local input_path = ahkGetVar("ImageMagickInputPath"..tab)
