@@ -214,18 +214,7 @@ URLDownloadToVar(L)
 {
    URL := lua_tostring(L,1)
    WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-  
-   try
-   {
-      WebRequest.Open("GET", url)
-   }
-   catch error
-   {
-      MsgBox(error.Message)
-      lua_pushstring(L,error.Message)
-      return 1
-   }
-   
+   WebRequest.Open("GET", url)
    WebRequest.Send()
    
    lua_pushstring(L,WebRequest.ResponseText)
