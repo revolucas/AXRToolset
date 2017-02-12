@@ -166,7 +166,7 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 	gSettings:SetValue("ImageMagick","search_pattern"..tab,search_pattern)
 	
 	local user_command_line_options = trim(ahkGetVar("ImageMagickMogrify"..tab))
-	gSettings:SetValue("ImageMagick","command_line"..tab,command_line_options)
+	gSettings:SetValue("ImageMagick","command_line"..tab,user_command_line_options)
 	gSettings:Save()
 	
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\ImageMagick\]]
