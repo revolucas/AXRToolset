@@ -31,8 +31,9 @@ end
 function cImageMagick:Reinit()
 	self.inherited[1].Reinit(self)
 	
-	local tabs = {"Convert.exe"}
+	local tabs = {Language.translate("t_directory"),Language.translate("t_single_files")}
 	Checks["1"] = {"t_copy_thm","t_only_with_mipmaps"}
+	Checks["2"] = {"t_copy_thm"}
 	
 	-- below will be automated based on above tab definition and checks
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vImageMagickTab|%s",table.concat(tabs,"^"))
@@ -41,15 +42,16 @@ function cImageMagick:Reinit()
 		local i_s = tostring(i)
 		
 		self:Gui("Tab|%s",tabs[i])
-			self:Gui("Add|Text|x590 y60 w300 h40 cBlue vImageMagickLink%s gOnScriptControlAction|%t_command_line_tut",i)
 			self:Gui("Add|Text|x270 y365 w300 h40 cBlue vImageMagickLink2%s gOnScriptControlAction|%t_click_for_tut",i)
-			self:Gui("Add|Text|x590 y160 w300 h40|%t_image_magic_tut",i)
-			self:Gui("Add|Text|x590 y365 w300 h40|%t_image_magic_cons")
+			self:Gui("Add|Text|x555 y75 w300 h40 cBlue vImageMagickLink%s gOnScriptControlAction|1. %t_command_line_tut",i)
+			self:Gui("Add|Text|x555 y120 w300 h40|2. %t_image_magic_tut",i)
+			self:Gui("Add|Text|x555 y175 w300 h40|3. %t_image_magic_cons")
 			-- GroupBox
-			self:Gui("Add|GroupBox|x10 y50 w510 h75|%t_input_path")
-			self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_output_path")
+			self:Gui("Add|GroupBox|x10 y50 w510 h75|%s",i==1 and "%t_input_path" or "%t_single_files")
+			self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_output_path (%t_optional)")
 			self:Gui("Add|GroupBox|x10 y250 w510 h75|%t_command_line_options")
 			self:Gui("Add|GroupBox|x10 y350 w510 h75|%t_pattern_matching")
+			self:Gui("Add|GroupBox|x550 y50 w450 h275|")
 			
 			if (Checks[i_s]) then
 				local y = 445
@@ -60,13 +62,13 @@ function cImageMagick:Reinit()
 				end
 			end
 			
-			-- Buttons 
+			-- Buttons
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vImageMagickBrowseInputPath%s|...",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vImageMagickBrowseOutputPath%s|...",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vImageMagickSaveSettings%s|%t_save_settings",i)	
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vImageMagickExecute%s|%t_execute",i)		
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vImageMagickExecute%s|%t_execute",i)
 			
-			-- Editbox 
+			-- Editbox
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vImageMagickInputPath%s|",i)
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y180 w450 h20 vImageMagickOutputPath%s|",i)
 			self:Gui("Add|Edit|gOnScriptControlAction x25 y280 w450 h20 vImageMagickMogrify%s|",i)
@@ -89,9 +91,17 @@ function cImageMagick:OnScriptControlAction(hwnd,event,info) -- needed because i
 	local tab = ahkGetVar("ImageMagickTab") or "1"
 	
 	if (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickBrowseInputPath"..tab)) then
-		local dir = FileSelectFolder("*"..(gSettings:GetValue("ImageMagick","input_path"..tab) or ""))
-		if (dir and dir ~= "") then
-			GuiControl(self.ID,"","ImageMagickInputPath"..tab,dir)
+		if (tab == "1") then
+			local dir = FileSelectFolder("*"..(gSettings:GetValue("ImageMagick","input_path"..tab) or ""))
+			if (dir and dir ~= "") then
+				GuiControl(self.ID,"","ImageMagickInputPath"..tab,dir)
+			end
+		else 
+			local f = FileSelectFile("M3","","Select one or more images","*.dds")
+			if (f and f ~= "") then
+				f = f:gsub("\n","|")
+				GuiControl(self.ID,"","ImageMagickInputPath"..tab,f)
+			end
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickBrowseOutputPath"..tab)) then 
 		local dir = FileSelectFolder("*"..(gSettings:GetValue("ImageMagick","output_path"..tab) or ""))
@@ -124,17 +134,13 @@ function cImageMagick:ActionExecute(tab)
 		return 
 	end
 	
-	local input_path = ahkGetVar("ImageMagickInputPath"..tab)
+	local input_path = trim(ahkGetVar("ImageMagickInputPath"..tab))
 	if (input_path == nil or input_path == "") then 
 		MsgBox("Incorrect Path!")
 		return 
-	end 
-	
-	local output_path = ahkGetVar("ImageMagickOutputPath"..tab)
-	if (output_path == nil or output_path == "") then 
-		MsgBox("Incorrect Output Path!")
-		return 
 	end
+	
+	local output_path = trim(ahkGetVar("ImageMagickOutputPath"..tab))
 
 	if (Checks[tab]) then
 		for i=1,#Checks[tab] do 
@@ -149,18 +155,13 @@ function cImageMagick:ActionExecute(tab)
 	
 	_INACTION = true
 	
-	self:ActionExecuteMain(tab,input_path,output_path)
+	self["ActionExecute"..tab](self,tab,input_path,output_path)
 	
 	_INACTION = false
 end
 
-function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
-	
+function cImageMagick:ActionExecute1(tab,input_path,output_path)
 	Msg("ImageMagick:= Working...")
-	
-	local use_mogrify = input_path == output_path
-
-	lfs.mkdir(output_path)
 
 	local search_pattern = trim(ahkGetVar("ImageMagickSearch"..tab))
 	gSettings:SetValue("ImageMagick","search_pattern"..tab,search_pattern)
@@ -171,17 +172,23 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 	
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\ImageMagick\]]
 	local cp = working_directory
-	if (use_mogrify) then 
+
+	if (output_path == "") then
+		output_path = input_path
+	end
+	
+	local use_mogrify = input_path == output_path
+	if (use_mogrify) then
 		cp = cp .. "mogrify.exe"
-	else 
+	else
+		lfs.mkdir(output_path)
 		cp = cp .. "convert.exe"
 	end
 	
 	local copy_thm = ahkGetVar("ImageMagickCheck"..Checks[tab][1]..tab) == "1"
 	local remip_only = ahkGetVar("ImageMagickCheck"..Checks[tab][2]..tab) == "1"
 
-	local function on_execute(path,fname)
-		local full_path = path.."\\"..fname
+	local function on_execute(path,fname,full_path)
 		if (search_pattern == nil or search_pattern == "" or string.match(full_path,search_pattern)) then
 			local skip = false
 			local dds = cDDS(full_path)
@@ -221,6 +228,79 @@ function cImageMagick:ActionExecuteMain(tab,input_path,output_path)
 	end
 	
 	file_for_each(input_path,{"dds"},on_execute)
+	
+	Msg("ImageMagick:= Finished!")
+end
+
+function cImageMagick:ActionExecute2(tab,input_path,output_path)
+	Msg("ImageMagick:= Working...")
+
+	local search_pattern = trim(ahkGetVar("ImageMagickSearch"..tab))
+	gSettings:SetValue("ImageMagick","search_pattern"..tab,search_pattern)
+	
+	local user_command_line_options = trim(ahkGetVar("ImageMagickMogrify"..tab))
+	gSettings:SetValue("ImageMagick","command_line"..tab,user_command_line_options)
+	gSettings:Save()
+	
+	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\ImageMagick\]]
+	local cp = working_directory
+	
+	local file_list = str_explode(input_path,"|")
+	
+	input_path = file_list[1]
+	
+	if (output_path == "") then
+		output_path = input_path
+	end
+	
+	local use_mogrify = input_path == output_path
+	if (use_mogrify) then
+		cp = cp .. "mogrify.exe"
+	else
+		lfs.mkdir(output_path)
+		cp = cp .. "convert.exe"
+	end
+	
+	local copy_thm = ahkGetVar("ImageMagickCheck"..Checks[tab][1]..tab) == "1"
+
+	local function on_execute(path,fname)
+		local full_path = path.."\\"..fname
+		if (search_pattern == nil or search_pattern == "" or string.match(full_path,search_pattern)) then
+			local skip = false
+			local dds = cDDS(full_path)
+			local command_line_options = user_command_line_options
+			local output_format = dds and (dds.pixel_format.dwFourCC == "DXT5" and "dxt5" or  dds.pixel_format.dwFourCC == "DXT3" and "dxt5" or dds.pixel_format.dwFourCC == "DXT1" and "dxt1") or nil
+			if (output_format) then
+				command_line_options = command_line_options .. " -define dds:compression="..output_format.." "
+				if (output_format == "dxt1" and dds:HasAlpha()) then 
+					skip = true
+					Msg("DXT1a not supported skipping image")
+				end
+			end
+				
+			if not (skip) then
+				local local_path = trim_final_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
+				
+				lfs.mkdir(get_path(local_path))
+				
+				Msg("%s converting",local_path)
+				
+				if (use_mogrify) then
+					RunWait( strformat([["%s" %s "%s"]],cp,command_line_options,local_path) , working_directory )
+				else
+					RunWait( strformat([["%s" "%s" %s "%s"]],cp,full_path,command_line_options,local_path) , working_directory )
+				end
+				
+				if (copy_thm) then
+					RunWait( strformat([[xcopy "%s" "%s" /y /i /q /c]],trim_ext(full_path)..".thm",get_path(local_path)) , working_directory )
+				end
+			end
+		end
+	end
+	
+	for i=2,#file_list do 
+		on_execute(input_path,file_list[i])
+	end
 	
 	Msg("ImageMagick:= Finished!")
 end

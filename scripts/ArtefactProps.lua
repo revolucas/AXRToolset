@@ -115,9 +115,9 @@ function cUIArtefactProps:Arte(i_path)
 			str = str .. "\n"
 		end
 	end
-	Msg("artefact_props:= Finished! (check logs\\artefact_props.txt)")
+	Msg("artefact_props:= Finished! (check logs\\artefact_props.log)")
 	
-	local f = io.open("logs\\artefact_props.txt","wb+")
+	local f = io.open("logs\\artefact_props.log","wb+")
 	if (f) then 
 		f:write(str)
 		f:close()

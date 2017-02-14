@@ -1,4 +1,4 @@
-﻿function OnApplicationBegin()
+function OnApplicationBegin()
 	FileRemoveDir("temp","1")
 	MainMenu = cMainMenu()
 	CallbackRegister("OnApplicationBeginEnd",OnApplicationBeginEnd)
@@ -177,6 +177,7 @@ function cMainMenu:Show(bool)
 	end
 	--]]
 	--xml:Save()
+	-------------- copies dxta out of textures folder to output
 	--[[
 	local i_p = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\textures"
 	local o_p = "E:\\STALKER\\Games\\COP_COC_db_converter\\dxt1a"
@@ -195,9 +196,10 @@ function cMainMenu:Show(bool)
 	end
 	file_for_each(i_p,{"dds"},on_execute)
 	--]]
+	---------------- Applies fat fix omf
 	--[[
 	local ltx = cIniFile("debug_visual.ltx")
-	local ipath = [ [E:\STALKER\Games\COP_COC_db_converter\unpacked\meshes\actors] ]
+	local ipath = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\meshes\\actors"
 	local function on_execute(path,fname,fullpath)
 		local relative_path = trim_ext("actors"..trim_final_backslash(string.gsub(fullpath,escape_lua_pattern(ipath),"")))
 		if (ltx:GetValue("visual_at_cursor",relative_path)) then
@@ -227,5 +229,77 @@ function cMainMenu:Show(bool)
 	end
 		
 	file_for_each(ipath,{"ogf"},on_execute)
+	Msg("done")
+	--]]
+	--[[
+	local tpath = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\textures"
+	local ipath = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\meshes\\monsters"
+	lfs.mkdir("E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\textures\\monsters")
+	local function on_execute(path,fname,fullpath)
+		local relative_path = trim_ext("monsters"..trim_final_backslash(string.gsub(fullpath,escape_lua_pattern(ipath),"")))
+		local ogf = cOGF(fullpath)
+		if (ogf) then
+			Msg("scanning...%s",fname)
+			for i,child in ipairs(ogf.children) do 
+				if (child.texture) then
+					local tfullpath = tpath.."\\"..child.texture
+					child.texture = "monsters\\"..trim_directory(child.texture)
+					if (file_exists(tfullpath..".dds")) then 
+						Msg("moving...%s",tfullpath..".dds")
+						RunWait(strformat('robocopy "%s" "%s" %s /MOV',get_path(tfullpath..".dds"),tpath.."\\monsters",trim_directory(tfullpath..".dds")))
+					end
+					if (file_exists(tfullpath..".thm")) then
+						local thm = cTHM(tfullpath..".thm")
+						if (thm and thm.params.bump_name and file_exists(tpath.."\\"..thm.params.bump_name..".dds")) then
+							local bump_path = tpath.."\\"..thm.params.bump_name
+							thm.params.bump_name = "monsters\\"..trim_directory(thm.params.bump_name)
+							thm:save()
+							Msg("moving...%s",bump_path..".dds")
+							RunWait(strformat('robocopy "%s" "%s" %s /MOV',get_path(bump_path..".dds"),tpath.."\\monsters",trim_directory(bump_path..".dds")))
+							if (file_exists(bump_path..".thm")) then
+								RunWait(strformat('robocopy "%s" "%s" %s /MOV',get_path(bump_path..".thm"),tpath.."\\monsters",trim_directory(bump_path..".thm")))
+							end
+							if (file_exists(bump_path.."#.dds")) then
+								Msg("moving...%s",bump_path.."#.dds")
+								RunWait(strformat('robocopy "%s" "%s" %s /MOV',get_path(bump_path.."#.dds"),tpath.."\\monsters",trim_directory(bump_path.."#.dds")))
+							end
+						end
+						Msg("moving...%s",tfullpath..".thm")
+						RunWait(strformat('robocopy "%s" "%s" %s /MOV',get_path(tfullpath..".thm"),tpath.."\\monsters",trim_directory(tfullpath..".thm")))
+					end
+				end
+			end
+			ogf:save()
+		end
+	end
+		
+	file_for_each(ipath,{"ogf"},on_execute)
+	Msg("done")
+	--]]
+	-- rename act_specnaz_glass to act_stalker_head_glass_02
+	--[[
+	local tpath = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\textures"
+	local ipath = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\meshes\\actors"
+	lfs.mkdir("E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\textures\\monsters")
+	local function on_execute(path,fname,fullpath)
+		Msg(fname)
+		local ogf = cOGF(fullpath)
+		if (ogf) then
+			local found = false
+			for i,child in ipairs(ogf.children) do 
+				if (child.texture and child.texture == "act\\act_specnaz_glass") then
+					child.texture = "act\\act_stalker_head_glass_02"
+					found = true
+				end
+			end
+			if (found) then
+				Msg("%s replacing texture",fname)
+				ogf:save()
+			end
+		end
+	end
+		
+	file_for_each(ipath,{"ogf"},on_execute)
+	Msg("done")
 	--]]
 end

@@ -69,8 +69,8 @@ function cUIBase:OnScriptControlAction()
 end
 
 function cUIBase:Gui(str,...)
-	str = Language.format(str)
 	str = strformat(str,...)
+	str = Language.format(str)
 	local p = str_explode(str,"|") -- separate string into subcommands using |
 	p[1] = self.ID .. ":" .. p[1]
 	p[4] = p[4] and p[4]:gsub("%^","|") -- replace ^ with | because AHK separator is | but we use that to separate subcommands

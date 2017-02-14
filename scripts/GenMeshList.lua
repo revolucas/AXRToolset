@@ -75,17 +75,17 @@ function OnGenerate()
 	gSettings:SetValue("mesh_list","path",inputpath)
 	gSettings:Save()
 		
-	local outfile = cIniFile(".\\logs\\mesh_list.txt",true)
+	local outfile = cIniFile(".\\logs\\mesh_list.log",true)
 	if not (outfile) then 
-		MsgBox("failed to create logs\\mesh_list.txt for output")
+		MsgBox("failed to create logs\\mesh_list.log for output")
 		return 
 	end	
 	
 	empty(outfile.root)
 	
-	local texturefile = cIniFile(".\\logs\\texture_list.txt",true)
+	local texturefile = cIniFile(".\\logs\\texture_list.log",true)
 	if not (texturefile) then 
-		MsgBox("failed to create logs\\texture_list.txt for output")
+		MsgBox("failed to create logs\\texture_list.log for output")
 		return 
 	end	
 	

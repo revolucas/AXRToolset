@@ -504,14 +504,14 @@ function cUITHMViewer:ActionExecute2(tab)
 
 	
 	if (files_resynced_count > 0) then
-		Msg("THM Validater := Finished! %s *.thm resynced. (check thm_viewer_log.txt)",files_resynced_count)
+		Msg("THM Validater := Finished! %s *.thm resynced. (check thm_viewer.log)",files_resynced_count)
 	else
-		Msg("THM Validater := Finished! (check logs\\thm_viewer_log.txt)")
+		Msg("THM Validater := Finished! (check logs\\thm_viewer.log)")
 	end
 
-	local thm_log, err = io.open("logs\\thm_viewer_log.txt","wb")
+	local thm_log, err = io.open("logs\\thm_viewer.log","wb")
 	if (err) then 
-		error("failed to create thm_viewer_log.txt |"..err)
+		error("failed to create thm_viewer.log |"..err)
 	end
 	thm_log:write(table.concat(errors))
 	thm_log:close()

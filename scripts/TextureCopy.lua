@@ -56,7 +56,9 @@ function cUITextureCopy:Reinit()
 				
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITextureCopyBrowseInputPath%s|...",i)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUITextureCopyBrowseOutputPath%s|...",i)
+			if (i ~= 2) then
+				self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUITextureCopyBrowseOutputPath%s|...",i)
+			end
 			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUITextureCopySaveSettings%s|%t_save_settings",i)	
 			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUITextureCopyExecute%s|%t_execute",i)
 			
@@ -244,7 +246,7 @@ function cUITextureCopy:ActionExecute2(tab,input_path,output_path)
 			local relative_path = trim_texture_dir(path)
 			local tname = trim_bump_ext(fn)
 			ltx:SetValue("missing_bump#",relative_path.."\\"..fn.."#.dds","")
-			
+			--[[
 			if (file_exists(path.."\\"..tname..".dds")) then 
 				local f = io.open(path.."\\"..tname..".dds","rb")
 				if (f) then
@@ -262,6 +264,7 @@ function cUITextureCopy:ActionExecute2(tab,input_path,output_path)
 					end 
 				end
 			end
+			--]]
 		end
 	end
 	
@@ -269,7 +272,7 @@ function cUITextureCopy:ActionExecute2(tab,input_path,output_path)
 	
 	ltx:Save()
 	
-	Msg("TextureCopy:= Missing Bump# Finished!")
+	Msg("TextureCopy:= Missing Bump# Finished! check logs\\missing_bumps.log")
 end
 
 function cUITextureCopy:ActionExecute4(tab,input_path,output_path)
