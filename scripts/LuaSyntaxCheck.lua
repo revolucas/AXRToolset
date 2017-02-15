@@ -36,7 +36,7 @@ function cUILuaSyntaxCheck:Reinit()
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Directory")
 			
 			-- Checkbox
-			self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUILuaSyntaxBrowseRecur%s|%s",gSettings:GetValue("lua_syntax_check","check_browse_recur"..i,"") == "1" and "Checked" or "",i,"%t_recursive")
+			self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUILuaSyntaxBrowseRecur%s|%s",gSettings:GetValue("lua_syntax_check","check_browse_recur"..n,"") == "1" and "Checked" or "",n,"%t_recursive")
 			
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUILuaSyntaxCheckBrowseInputPath%s|...",n)

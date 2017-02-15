@@ -253,9 +253,7 @@ function ApplicationBegin()
 	math.randomseed(os.time())
 	
 	if (file_exists("configs\\settings.ltx.bak")) then
-		FileDelete("configs\\settings.ltx")
-		FileMove("configs\\settings.ltx.bak","configs\\settings.ltx")
-		FileDelete("configs\\settings.ltx.bak")
+		FileMove("configs\\settings.ltx.bak","configs\\settings.ltx","1")
 	end
 	
 	gSettings = cIniFile("configs\\settings.ltx",true)

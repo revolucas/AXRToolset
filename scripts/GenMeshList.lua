@@ -38,7 +38,7 @@ function cUIGenMeshList:Reinit()
 	
 	-- Buttons 
 	self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUIGenMeshListBrowseInputPath|...")
-
+	self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUIGenMeshListSaveSettings|%t_save_settings")
 	self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUIGenMeshListExecute|%t_execute")
 	
 	-- Editbox 
@@ -63,6 +63,10 @@ function cUIGenMeshList:OnScriptControlAction(hwnd,event,info) -- needed because
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIGenMeshListExecute")) then
 		OnGenerate()
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIGenMeshListSaveSettings")) then
+		gSettings:SetValue("mesh_list","check_browse_recur",ahkGetVar("UIGenMeshListBrowseRecur"))	
+		gSettings:SetValue("mesh_list","path",ahkGetVar("UIGenMeshListInputPath"))
+		gSettings:Save()
 	end
 end
 
@@ -77,7 +81,7 @@ function OnGenerate()
 	gSettings:SetValue("mesh_list","existing_that_are_used",bCheckExisting)
 	bCheckExisting = bCheckExisting == "1" and true or false
 	
-	gSettings:SetValue("mesh_list","check_browse_recur",ahkGetVar("UIConverterBrowseRecur"))	
+	gSettings:SetValue("mesh_list","check_browse_recur",ahkGetVar("UIGenMeshListBrowseRecur"))	
 	gSettings:SetValue("mesh_list","path",inputpath)
 	gSettings:Save()
 		

@@ -40,6 +40,7 @@ function cUITidier:Reinit()
 	-- Buttons 
 	self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITidierBrowseInputPath|...")
 	self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUITidierBrowseOutputPath|...")
+	self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUITidierSaveSettings|%t_save_settings")
 	self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUITidierExecute|%t_execute")
 	
 	-- Editbox 
@@ -82,6 +83,11 @@ function cUITidier:OnScriptControlAction(hwnd,event,info) -- needed because it's
 		else 
 			MsgBox("LTX Tidier: Incorrect path setup! input=%s output=%s",i_path,o_path)
 		end
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITidierSaveSettings")) then
+		gSettings:SetValue("ltx_tidier","input_path",ahkGetVar("UITidierInputPath"))
+		gSettings:SetValue("ltx_tidier","output_path",ahkGetVar("UITidierOutputPath"))
+		gSettings:SetValue("ltx_tidier","check_browse_recur",ahkGetVar("UITidierBrowseRecur"))
+		gSettings:Save()
 	end
 end
 

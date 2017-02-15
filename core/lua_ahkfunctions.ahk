@@ -1412,16 +1412,20 @@ DownloadFile(L)
           Return 0
     ;Check if the user wants a progressbar
       If (UseProgressBar) {
-          ;Initialize the WinHttpRequest Object
-            WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-          ;Download the headers
-            WebRequest.Open("HEAD", UrlToFile)
-            WebRequest.Send()
-          ;Store the header which holds the file size in a variable:
-            FinalSize := WebRequest.GetResponseHeader("Content-Length")
-          ;Create the progressbar and the timer
-            Progress, H80, , Downloading..., %UrlToFile%
-            SetTimer, __UpdateProgressBar, 100
+         ;Initialize the WinHttpRequest Object
+         WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+         ;Download the headers
+         WebRequest.Open("HEAD", UrlToFile)
+         WebRequest.Send()
+         requestStatus := WebRequest.status
+         if(requestStatus < 200 || requestStatus > 299) ;2XX is success
+         {   
+            return 0
+         }
+         FinalSize := WebRequest.GetResponseHeader("Content-Length") ;not all headers have a content length attribute!
+         ;Create the progressbar and the timer
+         Progress, H80, , Downloading..., %UrlToFile%
+         SetTimer, __UpdateProgressBar, 100
       }
     ;Download the file
       UrlDownloadToFile, %UrlToFile%, %SaveFileAs%
