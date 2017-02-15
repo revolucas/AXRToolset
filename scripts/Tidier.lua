@@ -33,7 +33,10 @@ function cUITidier:Reinit()
 	-- GroupBox
 	self:Gui("Add|GroupBox|x10 y50 w510 h75|%t_input_path")
 	self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_output_path")
-		
+
+	-- Checkbox
+	self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUITidierBrowseRecur|%s",gSettings:GetValue("ltx_tidier","check_browse_recur","") == "1" and "Checked" or "","%t_recursive")
+			
 	-- Buttons 
 	self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITidierBrowseInputPath|...")
 	self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUITidierBrowseOutputPath|...")
@@ -71,6 +74,7 @@ function cUITidier:OnScriptControlAction(hwnd,event,info) -- needed because it's
 		if (i_path and i_path ~= "" and o_path and o_path ~= "") then
 			gSettings:SetValue("ltx_tidier","input_path",i_path)
 			gSettings:SetValue("ltx_tidier","output_path",o_path)
+			gSettings:SetValue("ltx_tidier","check_browse_recur",ahkGetVar("UITidierBrowseRecur"))
 			gSettings:Save()
 			--local working_directory = ahkGetVar("A_WorkingDir")
 			--Run(strformat([[java -jar %sLTXTidier.jar "%s" "%s"]],working_directory..[[\scripts\ltx_tidier\bin\]],input_path,output_path), working_directory)
@@ -91,6 +95,6 @@ function cUITidier:DoTidy(i_path,o_path)
 		end
 	end 
 	Msg("LTX Tidier:= Begin")
-	file_for_each(i_path,{"ltx"},on_execute)
+	file_for_each(i_path,{"ltx"},on_execute,ahkGetVar("UITidierBrowseRecur") ~= "1")
 	Msg("LTX Tidier:= End")
 end

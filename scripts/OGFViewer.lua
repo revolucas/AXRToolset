@@ -64,6 +64,9 @@ function cUIOGFViewer:Reinit()
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
 				self:Gui("Add|Text|x560 y555 w230 h20 cRed|%t_click_to_edit")
 				
+				-- Checkbox
+				self:Gui("Add|CheckBox|x250 y575 w120 h20 %s vUIOGFViewerBrowseRecur%s|%s",gSettings:GetValue("ogf_viewer","check_browse_recur"..i_s,"") == "1" and "Checked" or "",i,"%t_recursive")
+				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUIOGFViewerLV%s|",i)
 				
@@ -121,6 +124,9 @@ function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerSearchButton"..tab)) then 
 		local selected = trim(ahkGetVar("UIOGFViewerSearch"..tab))
 		if (selected and selected ~= "") then
+			gSettings:SetValue("ogf_viewer","path"..tab,ahkGetVar("UIOGFViewerPath"..tab))
+			gSettings:SetValue("ogf_viewer","check_browse_recur"..tab,ahkGetVar("UIOGFViewerBrowseRecur"..tab))
+			gSettings:Save()
 			self:FillListView(tab)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerBrowsePath"..tab)) then
@@ -132,8 +138,9 @@ function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 		local path = ahkGetVar("UIOGFViewerPath"..tab)
 		if (path and path ~= "") then
 			gSettings:SetValue("ogf_viewer","path"..tab,path)
-			gSettings:Save()
 		end
+		gSettings:SetValue("ogf_viewer","check_browse_recur"..tab,ahkGetVar("UIOGFViewerBrowseRecur"..tab))
+		gSettings:Save()
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerExecute"..tab)) then
 		self:Gui("Submit|NoHide")
 		if (self["ActionExecute"..tab]) then
@@ -170,6 +177,8 @@ function cUIOGFViewer:FillListView(tab)
 		return MsgBox("Please select a valid working directory")
 	end
 	
+	gSettings:SetValue("ogf_viewer","check_browse_recur"..tab,ahkGetVar("UIOGFViewerBrowseRecur"..tab))
+	
 	for i=1,200 do 
 		LV("LV_DeleteCol",self.ID,"1")
 	end
@@ -199,7 +208,7 @@ function cUIOGFViewer:FillListView1(tab,selected,dir,skip)
 		end
 	end
 	
-	file_for_each(dir,{"ogf"},on_execute)
+	file_for_each(dir,{"ogf"},on_execute,ahkGetVar("UIOGFViewerBrowseRecur"..tab) ~= "1")
 	
 	for k,v in pairs(self.list) do
 		LV("LV_ADD",self.ID,"",k)
@@ -277,12 +286,12 @@ function cUIOGFViewerModify:Reinit()
 	
 	local y = 125+35
 	for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata","bones"}) do
-		if (params[field] and params[field] ~= "") then
+		if (field == "lod_path") or (params[field] and params[field] ~= "") then
 			self:Gui("Add|Text|x5 y%s w300 h30|Skeleton %s",y,field)
 			if (field == "userdata") then
-				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
+				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field] or "")
 			else
-				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field])
+				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field] or "")
 			end
 			y = y + 30
 		end

@@ -62,6 +62,10 @@ function cImageMagick:Reinit()
 				end
 			end
 			
+			if (i==1) then
+				self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vImageMagickBrowseRecur%s|%s",gSettings:GetValue("ImageMagick","check_browse_recur"..i_s,"") == "1" and "Checked" or "",i,"%t_recursive")
+			end
+			
 			-- Buttons
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vImageMagickBrowseInputPath%s|...",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vImageMagickBrowseOutputPath%s|...",i)
@@ -118,7 +122,7 @@ function cImageMagick:OnScriptControlAction(hwnd,event,info) -- needed because i
 		gSettings:SetValue("ImageMagick","output_path"..tab,output_path)
 		gSettings:SetValue("ImageMagick","command_line"..tab,trim(ahkGetVar("ImageMagickMogrify"..tab)))
 		gSettings:SetValue("ImageMagick","search_pattern"..tab, trim(ahkGetVar("ImageMagickSearch"..tab)))
-		
+		gSettings:SetValue("ImageMagick","check_browse_recur"..tab,ahkGetVar("ImageMagickBrowseRecur")..tab)
 		gSettings:Save()
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ImageMagickLink"..tab)) then 
 		Run("http://www.imagemagick.org/script/convert.php")
@@ -151,6 +155,7 @@ function cImageMagick:ActionExecute(tab)
 	
 	gSettings:SetValue("ImageMagick","input_path"..tab,input_path)
 	gSettings:SetValue("ImageMagick","output_path"..tab,output_path)
+	gSettings:SetValue("ImageMagick","check_browse_recur"..tab,ahkGetVar("ImageMagickBrowseRecur")..tab)
 	gSettings:Save()
 	
 	_INACTION = true
@@ -227,7 +232,7 @@ function cImageMagick:ActionExecute1(tab,input_path,output_path)
 		end
 	end
 	
-	file_for_each(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute,ahkGetVar("ImageMagickBrowseRecur"..tab) ~= "1")
 	
 	Msg("ImageMagick:= Finished!")
 end

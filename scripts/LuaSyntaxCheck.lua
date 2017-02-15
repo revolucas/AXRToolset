@@ -35,6 +35,9 @@ function cUILuaSyntaxCheck:Reinit()
 			-- GroupBox
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|Input Directory")
 			
+			-- Checkbox
+			self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUILuaSyntaxBrowseRecur%s|%s",gSettings:GetValue("lua_syntax_check","check_browse_recur"..i,"") == "1" and "Checked" or "",i,"%t_recursive")
+			
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUILuaSyntaxCheckBrowseInputPath%s|...",n)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUILuaSyntaxCheckSaveSettings%s|%t_save_settings",n)
@@ -65,6 +68,7 @@ function cUILuaSyntaxCheck:OnScriptControlAction(hwnd,event,info) -- needed beca
 		self:ActionSubmit(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILuaSyntaxCheckSaveSettings"..tab)) then
 		gSettings:SetValue("lua_syntax_check","path"..tab,ahkGetVar("UILuaSyntaxCheckInputPath"..tab) or "")
+		gSettings:SetValue("lua_syntax_check","check_browse_recur"..tab,ahkGetVar("UILuaSyntaxCheckBrowseRecur"..tab))
 		gSettings:Save()
 	end
 end
@@ -86,6 +90,7 @@ function cUILuaSyntaxCheck:ActionSubmit(tab)
 	end 
 	
 	gSettings:SetValue("lua_syntax_check","path"..tab,input_path)
+	gSettings:SetValue("lua_syntax_check","check_browse_recur"..tab,ahkGetVar("UILuaSyntaxCheckBrowseRecur"..tab))
 	gSettings:Save()
 		
 	local working_directory = ahkGetVar("A_WorkingDir").."\\bin\\"
@@ -105,7 +110,7 @@ function cUILuaSyntaxCheck:ActionSubmit(tab)
 		end
 	end
 	
-	file_for_each(input_path,{"script","lua"},on_execute)
+	file_for_each(input_path,{"script","lua"},on_execute,ahkGetVar("UILuaSyntaxCheckBrowseRecur"..tab) ~= "1")
 	
 	Msg("Lua Syntax Check:= Finished!")
 	

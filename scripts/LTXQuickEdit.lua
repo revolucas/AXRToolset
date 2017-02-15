@@ -56,6 +56,8 @@ function cUILTXQuickEdit:Reinit()
 			self:Gui("Add|Edit|gOnScriptControlAction x400 y69 w150 h20 vUILTXQuickEditSearch%s|",i)
 			self:Gui("Add|Button|gOnScriptControlAction x555 y69 w20 h20 vUILTXQuickEditSearchButton%s|>",i)
 			
+			self:Gui("Add|CheckBox|x250 y575 w120 h20 %s vUILTXQuickEditBrowseRecur%s|%s",gSettings:GetValue("ltx_quickedit","check_browse_recur"..i,"") == "1" and "Checked" or "",i,"%t_recursive")
+			
 			self:Gui("Add|GroupBox|x22 y555 w530 h75|%t_working_directory")
 			self:Gui("Add|Text|x560 y555 w230 h20|%t_click_to_edit")
 			self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUILTXQuickEditBrowsePath%s|...",i)
@@ -103,8 +105,9 @@ function cUILTXQuickEdit:OnScriptControlAction(hwnd,event,info) -- needed becaus
 		local path = ahkGetVar("UILTXQuickEditPath"..tab)
 		if (path and path ~= "") then
 			gSettings:SetValue("ltx_quickedit","path"..tab,path)
-			gSettings:Save()
 		end
+		gSettings:SetValue("ltx_quickedit","check_browse_recur"..tab,ahkGetVar("UILTXQuickEditBrowseRecur"..tab))
+		gSettings:Save()
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UILTXQuickEditSearchButton"..tab)) then
 		local selected = trim(ahkGetVar("UILTXQuickEditSection"..tab))
 		if (selected and selected ~= "") then
@@ -145,8 +148,12 @@ function cUILTXQuickEdit:FillListView(tab)
 	local f = io.open("configs\\filters\\"..selected,"rb")
 	if not (f) then 
 		return Msg("failed to open %s","configs\\filters"..selected)
-	end 
-
+	end
+	
+	gSettings:SetValue("ltx_quickedit","path"..tab,dir)
+	gSettings:SetValue("ltx_quickedit","check_browse_recur"..tab,ahkGetVar("UILTXQuickEditBrowseRecur"..tab))
+	gSettings:Save()
+		
 	local data = f:read("*all")
 	f:close()
 
@@ -203,7 +210,7 @@ function cUILTXQuickEdit:FillListView(tab)
 		end
 	end
 	
-	file_for_each(dir,{"ltx"},on_execute)
+	file_for_each(dir,{"ltx"},on_execute,ahkGetVar("UILTXQuickEditBrowseRecur"..tab) ~= "1")
 	
 	for k,t in pairs(self.list) do
 		local a = {}

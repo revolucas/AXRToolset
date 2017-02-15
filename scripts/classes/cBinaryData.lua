@@ -316,7 +316,7 @@ function cBinaryData:w_chunk(ID,dwSize)
 end
 
 function cBinaryData:r_stringZ()
-	local t = {}
+	clear(read_t)
 	while true do
 		local v = self.data[self.r_marker]
 		if not (v) then
@@ -326,7 +326,7 @@ function cBinaryData:r_stringZ()
 		self.r_marker = self.r_marker + 1
 		
 		if (v > 0) then
-			table.insert(t,v)
+			table.insert(read_t,v)
 		else 
 			break
 		end
@@ -337,7 +337,7 @@ function cBinaryData:r_stringZ()
 		self.r_marker = size
 	end
 		
-	return #t > 0 and string.char(unpack(t)) or ""
+	return #read_t > 0 and string.char(unpack(read_t)) or ""
 end
 
 function cBinaryData:w_stringZ(str)
@@ -353,7 +353,7 @@ end
 function cBinaryData:r_string(cnt)
 	clear(read_t)
 	local data
-	for i=1,cnt do
+	for i=1,cnt-2 do
 		data = self.data[self.r_marker]
 		if not (data) then 
 			break 
@@ -369,7 +369,7 @@ function cBinaryData:r_string(cnt)
 		self.r_marker = size 
 	end
 	
-	return data and #data > 0 and string.char(unpack(data)) or ""
+	return read_t and #read_t > 0 and string.char(unpack(read_t)) or ""
 end 
 
 function cBinaryData:w_string(str)
@@ -378,7 +378,8 @@ function cBinaryData:w_string(str)
 		self.data[self.w_marker] = string.byte(str,i)
 		self.w_marker = self.w_marker + 1
 	end
-	self.w_marker = self.w_marker + 1
+	self:w_u8(13) -- CR
+	self:w_u8(10) -- LF
 end
 
 function cBinaryData:save(to_fname)

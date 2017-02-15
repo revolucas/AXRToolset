@@ -126,13 +126,14 @@ end
 
 function cOGF:OGF_S_LODS(loading)
 	if (loading) then
-		if (self:find_chunk(OGF_S_LODS) > 0) then
-			self.lod_path = self:r_string(2*260)
+		local size = self:find_chunk(OGF_S_LODS)
+		if (size > 0) then
+			self.lod_path = self:r_string(size)
 		end
 	elseif (self.lod_path and self.lod_path ~= "") then 
 		local chunk = self:open_chunk(OGF_S_LODS)
 		if (chunk) then
-			chunk:w_stringZ(trim(self.lod_path))
+			chunk:w_string(trim(self.lod_path))
 			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_LODS,chunk)
 		end

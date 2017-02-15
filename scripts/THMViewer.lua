@@ -77,6 +77,9 @@ function cUITHMViewer:Reinit()
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITHMViewerLV%s|filename^%s",i,table.concat(thm_fields,"^"))
 				
+				-- Checkbox
+				self:Gui("Add|CheckBox|x250 y575 w120 h20 %s vUITHMViewerBrowseRecur%s|%s",gSettings:GetValue("thm_viewer","check_browse_recur"..i,"") == "1" and "Checked" or "",i,"%t_recursive")
+				
 				-- GroupBox
 				self:Gui("Add|GroupBox|x22 y555 w530 h75|%t_working_directory")
 				
@@ -107,7 +110,10 @@ function cUITHMViewer:Reinit()
 						y = y + 20
 					end
 				end
-			
+
+				-- Checkbox
+				self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUITHMViewerBrowseRecur%s|%s",gSettings:GetValue("thm_viewer","check_browse_recur"..i,"") == "1" and "Checked" or "",i,"%t_recursive")
+				
 				-- Buttons 
 				self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITHMViewerBrowsePath%s|...",i)
 				self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUITHMViewerSaveSettings%s|%t_save_settings",i)
@@ -120,7 +126,10 @@ function cUITHMViewer:Reinit()
 		elseif (i == 3) then 
 			local filters = table.concat({"All","Diffuse","Bump","MissingTHM"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
-				self:Gui("Add|Text|x550 y75 w265 h30|%t_click_to_edit")
+				self:Gui("Add|Text|x560 y555 w230 h20 cRed|%t_click_to_edit")
+
+				-- Checkbox
+				self:Gui("Add|CheckBox|x250 y575 w120 h20 %s vUITHMViewerBrowseRecur%s|%s",gSettings:GetValue("thm_viewer","check_browse_recur"..i,"") == "1" and "Checked" or "",i,"%t_recursive")
 				
 				-- ListView 
 				self:Gui("Add|ListView|gOnScriptControlAction x22 y109 w920 h440 grid cBlack +altsubmit -multi vUITHMViewerLV%s|",i)
@@ -190,8 +199,9 @@ function cUITHMViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 		local path = ahkGetVar("UITHMViewerPath"..tab)
 		if (path and path ~= "") then
 			gSettings:SetValue("thm_viewer","path"..tab,path)
-			gSettings:Save()
 		end
+		gSettings:SetValue("thm_viewer","check_browse_recur"..tab,ahkGetVar("UITHMViewerBrowseRecur"..tab))
+		gSettings:Save()
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerExecute"..tab)) then
 		if (self["ActionExecute"..tab]) then
 			self["ActionExecute"..tab](self,tab)
@@ -230,6 +240,7 @@ function cUITHMViewer:ActionExecute2(tab)
 	end
 	
 	gSettings:SetValue("thm_viewer","path"..tab,input_path)
+	gSettings:SetValue("thm_viewer","check_browse_recur"..tab,ahkGetVar("UITHMViewerBrowseRecur"..tab))
 	gSettings:Save()
 	
 	_INACTION = true
@@ -424,7 +435,7 @@ function cUITHMViewer:ActionExecute2(tab)
 	end
 	
 	Msg("THM Validater := Checking...")
-	file_for_each(input_path,{"thm"},on_execute)
+	file_for_each(input_path,{"thm"},on_execute,ahkGetVar("UITHMViewerBrowseRecur"..tab) ~= "1")
 	
 	local function on_execute_2(path,fname)
 		Msg(fname)
@@ -500,7 +511,7 @@ function cUITHMViewer:ActionExecute2(tab)
 
 	Msg("THM Validater := Checking DDS...")
 	
-	file_for_each(input_path,{"dds"},on_execute_2)
+	file_for_each(input_path,{"dds"},on_execute_2,ahkGetVar("UITHMViewerBrowseRecur"..tab) ~= "1")
 
 	
 	if (files_resynced_count > 0) then
@@ -588,7 +599,7 @@ function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 		end
 	end
 	
-	file_for_each(dir,{"thm"},on_execute)
+	file_for_each(dir,{"thm"},on_execute,ahkGetVar("UITHMViewerBrowseRecur"..tab) ~= "1")
 	
 	table.sort(self.list)
 
@@ -638,7 +649,7 @@ function cUITHMViewer:FillListView3(tab,selected,dir,skip)
 	end
 	
 	if not (skip) then
-		file_for_each(dir,{"dds"},on_execute)
+		file_for_each(dir,{"dds"},on_execute,ahkGetVar("UITHMViewerBrowseRecur"..tab) ~= "1")
 	end
 	
 	for fname,t in pairs(self.list) do

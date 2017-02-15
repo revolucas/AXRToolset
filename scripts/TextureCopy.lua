@@ -45,6 +45,7 @@ function cUITextureCopy:Reinit()
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|%t_input_path")
 			self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_output_path")
 			
+			-- Checkbox
 			if (Checks[i_s]) then
 				local y = 245
 				--table.sort(Checks[i_s])
@@ -53,7 +54,9 @@ function cUITextureCopy:Reinit()
 					y = y + 20
 				end
 			end
-				
+			
+			self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUITextureCopyBrowseRecur%s|%s",gSettings:GetValue("TextureCopy","check_browse_recur"..i,"") == "1" and "Checked" or "",i,"%t_recursive")
+			
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUITextureCopyBrowseInputPath%s|...",i)
 			if (i ~= 2) then
@@ -98,6 +101,7 @@ function cUITextureCopy:OnScriptControlAction(hwnd,event,info) -- needed because
 		
 		gSettings:SetValue("TextureCopy","input_path"..tab,input_path)
 		gSettings:SetValue("TextureCopy","output_path"..tab,output_path)
+		gSettings:SetValue("TextureCopy","check_browse_recur"..tab,ahkGetVar("UITextureCopyBrowseRecur"..tab))
 		gSettings:Save()
 	end
 end
@@ -130,6 +134,7 @@ function cUITextureCopy:ActionExecute(tab)
 	
 	gSettings:SetValue("TextureCopy","input_path"..tab,input_path)
 	gSettings:SetValue("TextureCopy","output_path"..tab,output_path)
+	gSettings:SetValue("TextureCopy","check_browse_recur"..tab,ahkGetVar("UITextureCopyBrowseRecur"..tab))
 	gSettings:Save()
 	
 	_INACTION = true
@@ -215,7 +220,7 @@ function cUITextureCopy:ActionExecute1(tab,input_path,output_path)
 		end
 	end
 	
-	file_for_each(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute,ahkGetVar("UITextureCopyBrowseRecur"..tab) ~= "1")
 	
 	Msg("TextureCopy:= (SoC->CoP) Finished!")
 end
@@ -268,7 +273,7 @@ function cUITextureCopy:ActionExecute2(tab,input_path,output_path)
 		end
 	end
 	
-	file_for_each(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute,ahkGetVar("UITextureCopyBrowseRecur"..tab) ~= "1")
 	
 	ltx:Save()
 	
@@ -362,7 +367,7 @@ function cUITextureCopy:ActionExecute4(tab,input_path,output_path)
 		end
 	end
 	
-	file_for_each(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute,ahkGetVar("UITextureCopyBrowseRecur"..tab) ~= "1")
 	
 	ltx:Save()
 	
@@ -448,7 +453,7 @@ function cUITextureCopy:ActionExecute3(tab,input_path,output_path)
 		end
 	end
 	
-	file_for_each(input_path,{"dds"},on_execute)
+	file_for_each(input_path,{"dds"},on_execute,ahkGetVar("UITextureCopyBrowseRecur"..tab) ~= "1")
 	
 	Msg("TextureCopy:= Finished!")
 end

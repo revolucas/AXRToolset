@@ -34,6 +34,7 @@ function cUIGenMeshList:Reinit()
 
 	-- Checkbox 
 	self:Gui("Add|CheckBox|x175 w300 h25 %s vUIGenMeshListTag%s|%t_check_textures_in_use",gSettings:GetValue("mesh_list","existing_that_are_used") == "1" and "Checked" or "","existing_that_are_used")
+	self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUIGenMeshListBrowseRecur|%s",gSettings:GetValue("mesh_list","check_browse_recur","") == "1" and "Checked" or "","%t_recursive")
 	
 	-- Buttons 
 	self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUIGenMeshListBrowseInputPath|...")
@@ -72,6 +73,11 @@ function OnGenerate()
 		return 
 	end 
 	
+	local bCheckExisting = ahkGetVar("UIGenMeshListTagexisting_that_are_used")
+	gSettings:SetValue("mesh_list","existing_that_are_used",bCheckExisting)
+	bCheckExisting = bCheckExisting == "1" and true or false
+	
+	gSettings:SetValue("mesh_list","check_browse_recur",ahkGetVar("UIConverterBrowseRecur"))	
 	gSettings:SetValue("mesh_list","path",inputpath)
 	gSettings:Save()
 		
@@ -91,10 +97,6 @@ function OnGenerate()
 	
 	empty(texturefile.root)
 	
-	local bCheckExisting = ahkGetVar("UIGenMeshListTagexisting_that_are_used")
-	gSettings:SetValue("mesh_list","existing_that_are_used",bCheckExisting)
-	bCheckExisting = bCheckExisting == "1" and true or false
-		
 	local ignore_paths = {
 		["environment"] = true,
 		["fog"] = true,
@@ -162,7 +164,7 @@ function OnGenerate()
 		end
 	end 
 
-	file_for_each(inputpath,{"ltx","xml","spawn"},on_execute_ltx)
+	file_for_each(inputpath,{"ltx","xml","spawn"},on_execute_ltx,ahkGetVar("UIGenMeshListBrowseRecur") ~= "1")
 	
 	local function on_execute(path,fname)
 		local key = string.gsub(path,inputpath.."\\meshes\\", "")

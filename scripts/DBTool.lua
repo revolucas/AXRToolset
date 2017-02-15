@@ -36,6 +36,8 @@ function cUICoCDBTool:Reinit()
 		self:Gui("Add|GroupBox|x10 y50 w510 h75|%t_input_path")
 		self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_output_path")
 		
+		self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUICoCDBToolBrowseRecur|%s",gSettings:GetValue("dbtool","check_browse_recur","") == "1" and "Checked" or "","%t_recursive")
+		
 		-- Buttons 
 		self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath|...")
 		self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath|...")
@@ -131,6 +133,7 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 				gSettings:SetValue("dbtool","check_"..DBChecks[i]..tab,bool)
 			end
 			
+			gSettings:SetValue("dbtool","check_browse_recur",ahkGetVar("UICoCDBToolBrowseRecur"))
 			gSettings:SetValue("dbtool","path"..tab,input_path or "")
 			gSettings:SetValue("dbtool","output_path"..tab,output_path or "")
 			gSettings:Save()
@@ -162,8 +165,9 @@ function ActionSubmit(tab)
 	for i=1,#DBChecks do 
 		local bool = ahkGetVar("UICoCDBToolCheck"..DBChecks[i]..tab)
 		gSettings:SetValue("dbtool","check_"..DBChecks[i]..tab,bool)
-	end 
+	end
 	
+	gSettings:SetValue("dbtool","check_browse_recur",ahkGetVar("UICoCDBToolBrowseRecur"))
 	gSettings:SetValue("dbtool","path"..tab,input_path)
 	gSettings:SetValue("dbtool","output_path"..tab,output_path)
 	gSettings:Save()
@@ -355,7 +359,7 @@ function ActionUnpack()
 	
 	Msg("DB Tool:= Unpacking...")
 	
-	file_for_each(input_path,{"db","db0","db1","db2","db3","db4","db5","db6","db7","db8","db9","db10"},on_execute)
+	file_for_each(input_path,{"db","db0","db1","db2","db3","db4","db5","db6","db7","db8","db9","db10"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
 	
 	table.sort(patches)
 	

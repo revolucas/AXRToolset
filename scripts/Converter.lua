@@ -55,10 +55,13 @@ function cUIConverter:Reinit()
 					y = y + 20
 				end
 			end
+			
+			self:Gui("Add|CheckBox|x200 y58 w120 h20 %s vUIConverterBrowseRecur%s|%s",gSettings:GetValue("converter","check_browse_recur"..i_s,"") == "1" and "Checked" or "",i,"%t_recursive")
 				
-			-- Buttons 
+			-- Buttons
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUIConverterBrowseInputPath%s|...",i)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUIConverterBrowseOutputPath%s|...",i)
+			
 			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUIConverterSaveSettings%s|%t_save_settings",i)	
 			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUIConverterExecute%s|%t_execute",i)		
 			
@@ -96,6 +99,7 @@ function cUIConverter:OnScriptControlAction(hwnd,event,info) -- needed because i
 		local input_path = ahkGetVar("UIConverterInputPath"..tab)
 		local output_path = ahkGetVar("UIConverterOutputPath"..tab)
 		
+		gSettings:SetValue("converter","check_browse_recur"..tab,ahkGetVar("UIConverterBrowseRecur"..tab))
 		gSettings:SetValue("converter","input_path"..tab,input_path)
 		gSettings:SetValue("converter","output_path"..tab,output_path)
 		gSettings:Save()
@@ -128,6 +132,7 @@ function cUIConverter:ActionExecute(tab)
 		end
 	end
 	
+	gSettings:SetValue("converter","check_browse_recur"..tab,ahkGetVar("UIConverterBrowseRecur"..tab))
 	gSettings:SetValue("converter","input_path"..tab,input_path)
 	gSettings:SetValue("converter","output_path"..tab,output_path)
 	gSettings:Save()
@@ -157,7 +162,7 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 	
 	Msg("Converter:= (OGF) Working...")
 	
-	file_for_each(input_path,{"ogf"},on_execute)	
+	file_for_each(input_path,{"ogf"},on_execute,ahkGetVar("UIConverterBrowseRecur"..tab) ~= "1")	
 	
 	Msg("Converter:= (OGF) Finished!")
 end
