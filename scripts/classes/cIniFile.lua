@@ -1,36 +1,4 @@
---[[ cIniFile2 = Class "cIniFile2"
-function cIniFile2:initialize(fname,simple_mode)
-	local f,err = file_exists(fname) and io.open(fname,"rb")
-	if (f == nil or err) then 
-		return Msg(err)
-	end
-
-	local data = f:read("*all")
-	f:close()
-	
-	-- Merge included files
-	if (simple_mode) then
-		local path = get_path(fname)
-		data = string.gsub(data,[ [(#include%s*")([&%w_%-.%s\"'=:]*)(")] ],function(a,b,c)
-			local import_fname = path.."\\"..b
-			if (file_exists(import_fname)) then
-				f,err = io.open(import_fname,"rb")
-				if not (err) then
-					local import_data = f:read("*all")
-					f:close()
-					return import_data
-				end
-			end
-			return ""
-		end)
-	end
-	
-	for s in string.gmatch(data,"[(.-)](.-)[?") do 
-		print ( s )
-	end
-end 
---]]
-
+-- depreciated
 Class "cIniFile"
 function cIniFile:initialize(fname,simple_mode)
 	local cfg,err = io.open(fname,"a+")

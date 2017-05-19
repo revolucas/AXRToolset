@@ -120,6 +120,9 @@ function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 			end
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerSection"..tab)) then
+		if (self.ogf) then 
+			self.ogf = {}
+		end
 		self:FillListView(tab)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerSearchButton"..tab)) then 
 		local selected = trim(ahkGetVar("UIOGFViewerSearch"..tab))
@@ -127,6 +130,10 @@ function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 			gSettings:SetValue("ogf_viewer","path"..tab,ahkGetVar("UIOGFViewerPath"..tab))
 			gSettings:SetValue("ogf_viewer","check_browse_recur"..tab,ahkGetVar("UIOGFViewerBrowseRecur"..tab))
 			gSettings:Save()
+			
+			if (self.ogf) then 
+				self.ogf = {}
+			end
 			self:FillListView(tab)
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerBrowsePath"..tab)) then
@@ -285,8 +292,8 @@ function cUIOGFViewerModify:Reinit()
 
 	
 	local y = 125+35
-	for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata","bones"}) do
-		if (field == "lod_path") or (params[field] and params[field] ~= "") then
+	for _,field in ipairs({"motion_refs","motion_refs2","lod_path","userdata","bones"}) do
+		if (params[field]) then
 			self:Gui("Add|Text|x5 y%s w300 h30|Skeleton %s",y,field)
 			if (field == "userdata") then
 				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field] or "")
@@ -295,11 +302,14 @@ function cUIOGFViewerModify:Reinit()
 			end
 			y = y + 30
 		end
-
+	end
+	
+	-- children
+	for _,field in ipairs({"texture","shader"}) do
 		if (wnd.ogf[fname].children) then
 			for i,child in ipairs(wnd.ogf[fname].children) do 
 				local child_params = child:params()
-				if (child_params[field] and child_params[field] ~= "") then
+				if (child_params[field]) then
 					self:Gui("Add|Text|x5 y%s w300 h30|Mesh%s %s",y,i,field)
 					if (field == "userdata") then
 						self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
@@ -311,6 +321,7 @@ function cUIOGFViewerModify:Reinit()
 			end
 		end
 	end
+	
  
 	self:Gui("Add|Button|gOnScriptControlAction x12 default vUIOGFViewerModifyAccept2|%t_accept")
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyCancel2|%t_cancel")
@@ -345,30 +356,26 @@ function cUIOGFViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 			return
 		end
 		local val
-		for _,field in ipairs({"texture","shader","motion_refs","motion_refs2","lod_path","userdata"}) do
+		for _,field in ipairs({"motion_refs","motion_refs2","lod_path","userdata"}) do
 			val = ahkGetVar("UIOGFViewerModifyEdit2"..field)
-			if (ogf[field]) then
-				if (field == "motion_refs2" or field == "bones") then 
-					ogf[field] = str_explode(val,",")
-				else
-					ogf[field] = trim(val)
-				end
+			if (field == "motion_refs2" or field == "bones") then 
+				ogf[field] = val ~= "" and str_explode(val,",") or {}
+			else
+				ogf[field] = trim(val)
 			end
+		end
 
+		for _,field in ipairs({"texture","shader"}) do
 			if (ogf.children) then
 				for i,child in ipairs(ogf.children) do 
 					val = ahkGetVar("UIOGFViewerModifyEdit2_child"..i.."_"..field)
-					if (val and child[field]) then
-						if (field == "motion_refs2" or field == "bones") then
-							child[field] = val ~= "" and str_explode(val,",") or {}
-						else
-							child[field] = trim(val)
-						end
+					if (val and val ~= "") then
+						child[field] = trim(val)
 					end
 				end
 			end
 		end
-
+		
 		ogf:save()
 		
 		LVTop(wnd.ID,"UIOGFViewerLV"..tab)
