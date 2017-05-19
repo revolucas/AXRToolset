@@ -90,7 +90,7 @@ function cMainMenu:OnScriptControlAction(hwnd,event,info)
 			if not ver then
 				return Msg("Failed to get version")
 			end
- 			if (ver[1] > SOFTWARE_VERSION[1] or ver[2] > SOFTWARE_VERSION[2] or ver[3] > SOFTWARE_VERSION[3]) then
+ 			if (ver[1] ~= SOFTWARE_VERSION[1] and ver[2] ~= SOFTWARE_VERSION[2] ~= ver[3] > SOFTWARE_VERSION[3]) then
 				local version_name = string.format("%1d.%01d.%02d",unpack(ver))
 				
 				local mb = cUIMsgBox("9",Language.translate("t_update_yes_no"),Language.translate("t_update_available").. " v" .. version_name,function()
