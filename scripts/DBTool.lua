@@ -171,7 +171,11 @@ function ActionSubmit(tab)
 	gSettings:SetValue("dbtool","path"..tab,input_path)
 	gSettings:SetValue("dbtool","output_path"..tab,output_path)
 	gSettings:Save()
-		
+	
+	if not (directory_exists(output_path)) then
+		os.execute('MD "'..output_path..'"')
+	end
+	
 	local config_dir = ahkGetVar("A_WorkingDir")..[[\configs\compress\]]
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory.."xrCompress.exe"
@@ -198,28 +202,11 @@ creator = "Team EPIC" ; creator's name
 link = "forum.epicstalker.com" ; creator's link
 
 [options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk,*.xr
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
 
 [include_folders]
-.\ = true
-
-[exclude_folders]
-ai\ = true 
-anims\ = true
-configs\ = true
-;levels\ = true
-meshes\ = true 
-scripts\ = true 
-shaders\ = true
-sounds\ = true 
-spawns\ = true
-textures\ = true
+levels\%s\ = true
 ]],dir)
-		for k,v in pairs(level_directories) do 
-			if (k ~= dir) then
-				data = data .. "\nlevels\\" .. k .. "\\ = true"
-			end
-		end
 		local output_file = io.open(config_dir.."compress_levels_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
@@ -243,52 +230,33 @@ textures\ = true
 		["spawns"] = "config",
 		["shaders"] = "config",
 		["meshes"] = "resource",
-		["meshes_default"] = "resource",
 		["sounds"] = "sound",
-		["sounds_default"] = "sound",
-		["textures"] = "resource",
-		["textures_default"] = "resource"
+		["textures"] = "resource"
 	}
 	
-	os.remove(parent_dir.."\\"..dir..".pack_#0")
-	os.remove(parent_dir.."\\"..dir..".pack_#1")
-	os.remove(parent_dir.."\\"..dir..".pack_#2")
-	os.remove(parent_dir.."\\"..dir..".pack_#3")
-	os.remove(parent_dir.."\\"..dir..".pack_#4")
-	os.remove(parent_dir.."\\"..dir..".pack_#5")
-	os.remove(parent_dir.."\\"..dir..".pack_#6")
-	os.remove(parent_dir.."\\"..dir..".pack_#7")
-	os.remove(parent_dir.."\\"..dir..".pack_#8")
-				
-				
-	local function create_output(name,fname,out,prefix)
+	local function remove_pack(node,file,fullpath)
+		os.remove(fullpath)
+	end
+	file_for_each(parent_dir, {"pack_#"}, remove_pack, true)
 	
+	local function create_output(name,fname,out,prefix)
 		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
 		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,pltx), config_dir )
 
 		lfs.mkdir(out)
 		
-		os.remove(out.."\\"..fname..".db")
-		os.remove(out.."\\"..fname..".db0")
-		os.remove(out.."\\"..fname..".db1")
-		os.remove(out.."\\"..fname..".db2")
-		os.remove(out.."\\"..fname..".db3")
-		os.remove(out.."\\"..fname..".db4")
-		os.remove(out.."\\"..fname..".db5")
-		os.remove(out.."\\"..fname..".db6")
-		os.remove(out.."\\"..fname..".db7")
-		os.remove(out.."\\"..fname..".db8")
-
+		local function remove_db(node,file,fullpath)
+			os.remove(fullpath)
+		end
+		file_for_each(out, {"db"}, remove_db, true)
+		
+		local db_id = 0
+		local function rename_pack_in_db(node,file,fullpath)
+			os.rename(fullpath,node.."\\"..file..".db"..db_id)
+			db_id = db_id + 1
+		end
 		if (file_exists(parent_dir.."\\"..dir..".pack_#1")) then
-			os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db0")
-			os.rename(parent_dir.."\\"..dir..".pack_#1",out.."\\"..fname..".db1")
-			os.rename(parent_dir.."\\"..dir..".pack_#2",out.."\\"..fname..".db2")
-			os.rename(parent_dir.."\\"..dir..".pack_#3",out.."\\"..fname..".db3")
-			os.rename(parent_dir.."\\"..dir..".pack_#4",out.."\\"..fname..".db4")
-			os.rename(parent_dir.."\\"..dir..".pack_#5",out.."\\"..fname..".db5")
-			os.rename(parent_dir.."\\"..dir..".pack_#6",out.."\\"..fname..".db6")
-			os.rename(parent_dir.."\\"..dir..".pack_#7",out.."\\"..fname..".db7")
-			os.rename(parent_dir.."\\"..dir..".pack_#8",out.."\\"..fname..".db8")
+			file_for_each(parent_dir, {"pack_#"}, rename_pack_in_db, true)
 		else
 			os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db")
 		end
@@ -311,7 +279,7 @@ textures\ = true
 		end
 	end
 	
-	Msg("DB Tool:= Finished!")
+	Msg("\nDB Tool:= Finished!")
 	
 	_INACTION = false
 end
@@ -340,7 +308,11 @@ function ActionUnpack()
 	gSettings:SetValue("dbtool","unpack_input_path",input_path)
 	gSettings:SetValue("dbtool","unpack_output_path",output_path)
 	gSettings:Save()
-		
+	
+	if not (directory_exists(output_path)) then
+		os.execute('MD "'..output_path..'"')
+	end
+	
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory .. "converter.exe"
 	
@@ -359,7 +331,7 @@ function ActionUnpack()
 	
 	Msg("DB Tool:= Unpacking...")
 	
-	file_for_each(input_path,{"db","db0","db1","db2","db3","db4","db5","db6","db7","db8","db9","db10"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
+	file_for_each(input_path,{"db"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
 	
 	table.sort(patches)
 	
