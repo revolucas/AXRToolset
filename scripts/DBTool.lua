@@ -237,28 +237,41 @@ levels\%s\ = true
 	local function remove_pack(node,file,fullpath)
 		os.remove(fullpath)
 	end
+	lfs_ignore_exact_ext_match = true
 	file_for_each(parent_dir, {"pack_#"}, remove_pack, true)
+	lfs_ignore_exact_ext_match = false
 	
-	local function create_output(name,fname,out,prefix)
+	local check_clear_out = {}
+	
+	local function create_output(name,out, prefix)
 		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
 		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,pltx), config_dir )
 
 		lfs.mkdir(out)
 		
-		local function remove_db(node,file,fullpath)
-			os.remove(fullpath)
+		if not check_clear_out[name] then
+			local function remove_db(node,file,fullpath)
+				if string.find(file, name) then
+					os.remove(fullpath)
+				end
+			end
+			lfs_ignore_exact_ext_match = true
+			file_for_each(out, {"db"}, remove_db, true)
+			lfs_ignore_exact_ext_match = false
+			check_clear_out[name] = true
 		end
-		file_for_each(out, {"db"}, remove_db, true)
 		
 		local db_id = 0
 		local function rename_pack_in_db(node,file,fullpath)
-			os.rename(fullpath,node.."\\"..file..".db"..db_id)
+			os.rename(fullpath, out.."\\"..name..".db"..db_id)
 			db_id = db_id + 1
 		end
 		if (file_exists(parent_dir.."\\"..dir..".pack_#1")) then
+			lfs_ignore_exact_ext_match = true
 			file_for_each(parent_dir, {"pack_#"}, rename_pack_in_db, true)
+			lfs_ignore_exact_ext_match = false
 		else
-			os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..fname..".db")
+			os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..name..".db")
 		end
 	end 
 	
@@ -269,13 +282,13 @@ levels\%s\ = true
 	for i=1,#compress do 
 		local chk = gSettings:GetValue("dbtool","check_"..compress[i]..tab)
 		if (chk == nil or chk == "1") then
-			create_output(compress[i],compress[i],outdir[compress[i]] and output_path.."\\"..outdir[compress[i]] or output_path)
+			create_output(compress[i],outdir[compress[i]] and output_path.."\\"..outdir[compress[i]] or output_path)
 		end
 	end
 	
 	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
 		for k,v in spairs(level_directories) do 
-			create_output(k,k,output_path.."\\maps","levels")
+			create_output(k,output_path.."\\maps","levels")
 		end
 	end
 	

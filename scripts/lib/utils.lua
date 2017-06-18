@@ -188,6 +188,7 @@ function file_to_table(fname,parent,simple)
 	return root
 end
 
+lfs_ignore_exact_ext_match = false
 function file_for_each(node,ext,func,nonrecursive,...)
 	local stack = {}
 	local deepest
@@ -199,7 +200,7 @@ function file_for_each(node,ext,func,nonrecursive,...)
 					local mode = lfs.attributes(fullpath,"mode")
 					if (mode == "file") then
 						for i=1,#ext do
-							if (get_ext(file) == ext[i]) then
+							if (lfs_ignore_exact_ext_match and string.find(get_ext(file), ext[i]) or get_ext(file) == ext[i]) then
 								func(node,file,fullpath,...)
 							end
 						end
