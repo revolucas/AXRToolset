@@ -212,13 +212,15 @@ function file_for_each(node,ext,func,nonrecursive,...)
 				end
 			end
 		end
-
 		if (#stack > 0) then
 			node = stack[#stack]
 			stack[#stack] = nil
 		else
 			deepest = true
 		end
+	end
+	if lfs_ignore_exact_ext_match then
+		lfs_ignore_exact_ext_match = false
 	end
 end
 

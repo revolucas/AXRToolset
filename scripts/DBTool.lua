@@ -141,6 +141,12 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 	end
 end
 
+local function check_out_folder(output_path)
+	if not (directory_exists(output_path)) then
+		os.execute('MD "'..output_path..'"')
+	end
+end
+
 _INACTION = nil
 function ActionSubmit(tab)
 	if (_INACTION) then 
@@ -172,9 +178,7 @@ function ActionSubmit(tab)
 	gSettings:SetValue("dbtool","output_path"..tab,output_path)
 	gSettings:Save()
 	
-	if not (directory_exists(output_path)) then
-		os.execute('MD "'..output_path..'"')
-	end
+	check_out_folder(output_path)
 	
 	local config_dir = ahkGetVar("A_WorkingDir")..[[\configs\compress\]]
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
@@ -202,11 +206,28 @@ creator = "Team EPIC" ; creator's name
 link = "forum.epicstalker.com" ; creator's link
 
 [options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk,*.xr
 
 [include_folders]
-levels\%s\ = true
+.\ = true
+
+[exclude_folders]
+ai\ = true 
+anims\ = true
+configs\ = true
+;levels\ = true
+meshes\ = true 
+scripts\ = true 
+shaders\ = true
+sounds\ = true 
+spawns\ = true
+textures\ = true
 ]],dir)
+		for k,v in pairs(level_directories) do 
+			if (k ~= dir) then
+				data = data .. "\nlevels\\" .. k .. "\\ = true"
+			end
+		end
 		local output_file = io.open(config_dir.."compress_levels_"..dir..".ltx","wb+")
 		if (output_file) then
 			output_file:write(data)
@@ -237,15 +258,14 @@ levels\%s\ = true
 	local function remove_pack(node,file,fullpath)
 		os.remove(fullpath)
 	end
-	lfs_ignore_exact_ext_match = true
-	file_for_each(parent_dir, {"pack_#"}, remove_pack, true)
-	lfs_ignore_exact_ext_match = false
+	_G.lfs_ignore_exact_ext_match = true
+	file_for_each(parent_dir, {"db"}, remove_pack, true)
 	
 	local check_clear_out = {}
 	
 	local function create_output(name,out, prefix)
 		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
-		RunWait( strformat([["%s" "%s" -ltx %s]],cp,input_path,pltx), config_dir )
+		RunWait( strformat([["%s" "%s" -ltx %s  -pack -1024 -nodelete]],cp,input_path,pltx), config_dir )
 
 		lfs.mkdir(out)
 		
@@ -255,9 +275,8 @@ levels\%s\ = true
 					os.remove(fullpath)
 				end
 			end
-			lfs_ignore_exact_ext_match = true
+			_G.lfs_ignore_exact_ext_match = true
 			file_for_each(out, {"db"}, remove_db, true)
-			lfs_ignore_exact_ext_match = false
 			check_clear_out[name] = true
 		end
 		
@@ -266,12 +285,11 @@ levels\%s\ = true
 			os.rename(fullpath, out.."\\"..name..".db"..db_id)
 			db_id = db_id + 1
 		end
-		if (file_exists(parent_dir.."\\"..dir..".pack_#1")) then
-			lfs_ignore_exact_ext_match = true
-			file_for_each(parent_dir, {"pack_#"}, rename_pack_in_db, true)
-			lfs_ignore_exact_ext_match = false
+		if (file_exists(parent_dir.."\\"..dir..".db1")) then
+			_G.lfs_ignore_exact_ext_match = true
+			file_for_each(parent_dir, {"db"}, rename_pack_in_db, true)
 		else
-			os.rename(parent_dir.."\\"..dir..".pack_#0",out.."\\"..name..".db")
+			os.rename(parent_dir.."\\"..dir..".db0",out.."\\"..name..".db")
 		end
 	end 
 	
@@ -322,16 +340,13 @@ function ActionUnpack()
 	gSettings:SetValue("dbtool","unpack_output_path",output_path)
 	gSettings:Save()
 	
-	if not (directory_exists(output_path)) then
-		os.execute('MD "'..output_path..'"')
-	end
+	check_out_folder(output_path)
 	
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory .. "converter.exe"
 	
 	local patches = {}
 	local function on_execute(path,fname)
-		--Msg("%s\\%s",path,fname)
 		if (string.find(fname,"patch")) then -- do patches last!
 			table.insert(patches,path.."\\"..fname)
 		else
@@ -344,6 +359,7 @@ function ActionUnpack()
 	
 	Msg("DB Tool:= Unpacking...")
 	
+	_G.lfs_ignore_exact_ext_match = true
 	file_for_each(input_path,{"db"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
 	
 	table.sort(patches)
