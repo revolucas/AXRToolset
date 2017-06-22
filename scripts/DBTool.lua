@@ -1,4 +1,4 @@
-local DBChecks = {"ai","anims","configs","scripts","xr","shaders","spawns","levels","sounds","textures","meshes"}
+local version_stalker, DBChecks, exclude_exts, name_configs_folder
 -----------------------------------------------------------------
 -- 
 -----------------------------------------------------------------
@@ -29,6 +29,21 @@ end
 
 function cUICoCDBTool:Reinit()
 	self.inherited[1].Reinit(self)
+	
+	version_stalker = 'SoC'	-- 'SoC'
+	local settings = {
+		SoC = {
+			DBChecks = {"ai","anims","config","scripts","xr","shaders","spawns","levels","sounds","textures","meshes"},
+			name_configs_folder = 'config'
+		},
+		CS_CoP = {
+			DBChecks = {"ai","anims","configs","scripts","xr","shaders","spawns","levels","sounds","textures","meshes"},
+			name_configs_folder = 'configs'
+		}
+	}
+	local current_settings = settings[version_stalker]
+	DBChecks = current_settings.DBChecks
+	name_configs_folder = current_settings.name_configs_folder
 	
 	self:Gui("Add|Tab2|x0 y0 w1024 h720 AltSubmit vUICoCDBToolTab|%t_unpacker^%t_repacker 1^%t_repacker 2^%t_repacker 3^%t_repacker 4^%t_repacker 5^%t_repacker 6^%t_repacker 7^%t_repacker 8^%t_repacker 9^%t_repacker 10")
 	self:Gui("Tab|%t_unpacker")
@@ -143,10 +158,11 @@ end
 
 local function check_out_folder(output_path)
 	if not (directory_exists(output_path)) then
+		Msg(strformat('DB Tool:= create %s', output_path))
 		os.execute('MD "'..output_path..'"')
 	end
 end
-
+	
 _INACTION = nil
 function ActionSubmit(tab)
 	if (_INACTION) then 
@@ -179,24 +195,46 @@ function ActionSubmit(tab)
 	gSettings:Save()
 	
 	check_out_folder(output_path)
+	Sleep(1000)
 	
-	local config_dir = ahkGetVar("A_WorkingDir")..[[\configs\compress\]]
+	local config_dir = ahkGetVar("A_WorkingDir")..strformat([[\configs\compress\%s\]], version_stalker)
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory.."xrCompress.exe"
 	local dir = trim_directory(input_path)
 	local parent_dir = get_path(input_path)
+	local check_clear_out, level_directories = {}, {}
+	local outdir = {	
+		["ai"] = "configs",
+		["anims"] = "configs",
+		["scripts"] = "configs",
+		["xr"] = "configs",
+		[name_configs_folder] = "configs",
+		["spawns"] = "configs",
+		["shaders"] = "configs",
+		["meshes"] = "resources",
+		["sounds"] = "sounds",
+		["textures"] = "resources"
+	}
 	
-	Msg("DB Tool:= working...")
+	Msg("\nDB Tool:= working...")
 	
-	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns","textures","meshes","sounds"}
+	local function remove_levels_ltx(node,file,fullpath)
+		if string.find(file, 'compress_levels_') then
+			Msg(strformat('DB Tool:= remove %s', fullpath))
+			os.remove(fullpath)
+		end
+	end
 	
 	-- create compress_*.ltx for levels
-	local level_directories = {}
-	local function generate_level_options1(path,dir)
-		level_directories[dir] = true
-	end 
-	local function generate_level_options2(dir)
-		local data = strformat([[
+	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
+		file_for_each(config_dir, {"ltx"}, remove_levels_ltx, true)
+		Sleep(1000)
+		local function generate_level_options1(path,dir)
+			level_directories[dir] = true
+		end
+		directory_for_each(input_path.."\\levels",generate_level_options1)
+		local function generate_level_options2(dir)
+			local data = strformat([[
 [header]
 auto_load = true
 level_name = single ; former level name, now can be mod name
@@ -206,15 +244,25 @@ creator = "Team EPIC" ; creator's name
 link = "forum.epicstalker.com" ; creator's link
 
 [options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk,*.xr
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.cmd,*.bat,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk,*.tmp,*.xr
+
+[exclude_files]
+game.graph = true
+resource.h = true
+stalkergame.inf = true
 
 [include_folders]
 .\ = true
 
+[exclude_files]
+game.graph = true 
+resource.h = true 
+stalkergame.inf = true 
+
 [exclude_folders]
 ai\ = true 
 anims\ = true
-configs\ = true
+%s\ = true
 ;levels\ = true
 meshes\ = true 
 scripts\ = true 
@@ -222,93 +270,84 @@ shaders\ = true
 sounds\ = true 
 spawns\ = true
 textures\ = true
-]],dir)
-		for k,v in pairs(level_directories) do 
-			if (k ~= dir) then
-				data = data .. "\nlevels\\" .. k .. "\\ = true"
+
+]], name_configs_folder)
+			for k,v in pairs(level_directories) do 
+				if (k ~= dir) then
+					data = data .. "\nlevels\\" .. k .. "\\ = true"
+				end
 			end
+			local output_file = io.open(config_dir.."compress_levels_"..dir..".ltx","wb+")
+			if (output_file) then
+				output_file:write(data)
+				output_file:close()
+			end	
 		end
-		local output_file = io.open(config_dir.."compress_levels_"..dir..".ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-		end	
-	end
-	
-	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
-		directory_for_each(input_path.."\\levels",generate_level_options1)
 		for k,v in pairs(level_directories) do 
 			generate_level_options2(k)
 		end
 	end
-		
-	local outdir = {	
-		["ai"] = "config",
-		["anims"] = "config",
-		["scripts"] = "config",
-		["xr"] = "config",
-		["configs"] = "config",
-		["spawns"] = "config",
-		["shaders"] = "config",
-		["meshes"] = "resource",
-		["sounds"] = "sound",
-		["textures"] = "resource"
-	}
 	
 	local function remove_pack(node,file,fullpath)
+		Msg(strformat('DB Tool:= remove %s', fullpath))
 		os.remove(fullpath)
 	end
+	
 	_G.lfs_ignore_exact_ext_match = true
 	file_for_each(parent_dir, {"db"}, remove_pack, true)
+	Sleep(1000)
 	
-	local check_clear_out = {}
+	table.sort(DBChecks)
 	
-	local function create_output(name,out, prefix)
-		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
-		RunWait( strformat([["%s" "%s" -ltx %s  -pack -1024 -nodelete]],cp,input_path,pltx), config_dir )
+	local function create_output(name,out, pack_levels)
+		local pltx = pack_levels and "compress_levels_"..name..".ltx" or "compress_"..name..".ltx"
+		RunWait( strformat([["%s" "%s" -ltx %s -pack -1024 -delete]],cp,input_path,pltx), config_dir )
 
 		lfs.mkdir(out)
 		
 		if not check_clear_out[name] then
 			local function remove_db(node,file,fullpath)
 				if string.find(file, name) then
+					Msg(strformat('\nDB Tool:= remove %s', fullpath))
 					os.remove(fullpath)
 				end
 			end
+			
 			_G.lfs_ignore_exact_ext_match = true
 			file_for_each(out, {"db"}, remove_db, true)
 			check_clear_out[name] = true
+			Sleep(1000)
 		end
 		
 		local db_id = 0
 		local function rename_pack_in_db(node,file,fullpath)
-			os.rename(fullpath, out.."\\"..name..".db"..db_id)
+			os.rename(fullpath, version_stalker == 'SoC' and strformat('%s\\gamedata.xdb_%s_db_id', out, name, db_id) or strformat('%s\\%s.db%s', out, name, db_id))
 			db_id = db_id + 1
 		end
 		if (file_exists(parent_dir.."\\"..dir..".db1")) then
 			_G.lfs_ignore_exact_ext_match = true
 			file_for_each(parent_dir, {"db"}, rename_pack_in_db, true)
 		else
-			os.rename(parent_dir.."\\"..dir..".db0",out.."\\"..name..".db")
+			os.rename(strformat('%s\\%s.db0', parent_dir, dir), version_stalker == 'SoC' and strformat('%s\\gamedata.xdb_%s', out, name) or strformat('%s\\%s.db', out, name))
 		end
+		Sleep(1000)
 	end 
 	
-	Sleep(1000)
-	
-	table.sort(compress)
-	
-	for i=1,#compress do 
-		local chk = gSettings:GetValue("dbtool","check_"..compress[i]..tab)
+	for i=1,#DBChecks do 
+		local chk = gSettings:GetValue("dbtool","check_"..DBChecks[i]..tab)
 		if (chk == nil or chk == "1") then
-			create_output(compress[i],outdir[compress[i]] and output_path.."\\"..outdir[compress[i]] or output_path)
+			create_output(DBChecks[i],outdir[DBChecks[i]] and output_path.."\\"..outdir[DBChecks[i]] or output_path)
 		end
 	end
 	
 	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
 		for k,v in spairs(level_directories) do 
-			create_output(k,output_path.."\\maps","levels")
+			create_output(k,output_path.."\\maps",true)
 		end
 	end
+	
+	file_for_each(config_dir, {"ltx"}, remove_levels_ltx, true)
+	Sleep(1000)
 	
 	Msg("\nDB Tool:= Finished!")
 	
@@ -346,6 +385,8 @@ function ActionUnpack()
 	local cp = working_directory .. "converter.exe"
 	
 	local patches = {}
+	Msg("DB Tool:= Unpacking...")
+	
 	local function on_execute(path,fname)
 		if (string.find(fname,"patch")) then -- do patches last!
 			table.insert(patches,path.."\\"..fname)
@@ -356,8 +397,6 @@ function ActionUnpack()
 			Msg("unpacked %s",fname)
 		end
 	end 
-	
-	Msg("DB Tool:= Unpacking...")
 	
 	_G.lfs_ignore_exact_ext_match = true
 	file_for_each(input_path,{"db"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
