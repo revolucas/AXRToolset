@@ -18,6 +18,6 @@ xray_sections.ltx
 canvas_ui_icon_equipment.png
 
 new_ui_icon_equipment.png
-configs\settings.ltx
+configs/settings.ltx
 
 compress_levels_*.ltx

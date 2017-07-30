@@ -1,4 +1,59 @@
-local DBChecks = {"ai","anims","configs","scripts","xr","shaders","spawns","levels","sounds","textures","meshes"}
+local type_dbs = {
+	['2947ru'] = 'config',
+	xdb = 'configs'
+}
+local DBChecks = {
+	[1] = 'ai',
+	[2] = 'anims',
+	[3] = 'configs_temp', -- name generated in cUICoCDBTool:Reinit()
+	[4] = 'scripts',
+	[5] = 'xr',
+	[6] = 'shaders',
+	[7] = 'spawns',
+	[8] = 'levels',
+	[9] = 'sounds',
+	[10] = 'textures',
+	[11] = 'meshes'
+}
+local outdir = {	
+	["ai"] = "configs",
+	["anims"] = "configs",
+	["scripts"] = "configs",
+	["xr"] = "configs",
+	-- [folder_name] = "configs", -- name generated in ActionSubmit(tab)
+	["spawns"] = "configs",
+	["shaders"] = "configs",
+	["meshes"] = "resources",
+	["sounds"] = "sounds",
+	["textures"] = "resources"
+}
+local data_for_levels = [[
+[header]
+auto_load = true
+level_name = single ; former level name, now can be mod name
+level_ver = 1.0 ; former level version, now can be mod version
+entry_point = $fs_root$\gamedata\ ; do not change !
+creator = "Team EPIC" ; creator's name
+link = "forum.epicstalker.com" ; creator's link
+
+[options] ; exclude files from compression with such extension
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.cmd,*.bat,*.db,*.xdb,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.*~*,*~*.*,*.rar,*.sfk,*.tmp,*.xr
+
+[include_folders]
+.\ = true
+
+[exclude_folders]
+ai\ = true 
+anims\ = true
+%s\ = true
+;levels\ = true
+meshes\ = true 
+scripts\ = true 
+shaders\ = true
+sounds\ = true 
+spawns\ = true
+textures\ = true
+]]
 -----------------------------------------------------------------
 -- 
 -----------------------------------------------------------------
@@ -48,35 +103,42 @@ function cUICoCDBTool:Reinit()
 		self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUICoCDBToolInputPath|")
 		self:Gui("Add|Edit|gOnScriptControlAction x25 y180 w450 h20 vUICoCDBToolOutputPath|")
 		
+		self:Gui("Add|DropDownList|gOnScriptControlAction x550 y80 vUICoCDBToolDBToolListDbTypeUnpack Choose%s|xdb^2947ru", gSettings:GetValue("dbtool","unpack_db_type") == '2947ru' and 2 or 1)
+		
 	GuiControl(self.ID,"","UICoCDBToolInputPath", gSettings:GetValue("dbtool","unpack_input_path") or "")
 	GuiControl(self.ID,"","UICoCDBToolOutputPath", gSettings:GetValue("dbtool","unpack_output_path") or "")
 	
-	for n=1,10 do
-		self:Gui("Tab|%t_repacker "..n)
+	for tab=1,10 do
+		self:Gui("Tab|%t_repacker "..tab)
 			-- GroupBox
 			self:Gui("Add|GroupBox|x10 y50 w510 h75|%t_unpacked_gamedata_path")
 			self:Gui("Add|GroupBox|x10 y150 w510 h75|%t_output_path")
 			self:Gui("Add|GroupBox|x10 y230 w510 h275|%t_compress_options")
 			
 			y = 245
-			table.sort(DBChecks)
+			local pack_db_type = gSettings:GetValue("dbtool","pack_db_type"..tab)
+			pack_db_type = pack_db_type ~= '' and pack_db_type or 'xdb'
+			-- table.sort(DBChecks)
 			for i=1,#DBChecks do
-				self:Gui("Add|CheckBox|x50 y%s w100 h22 %s vUICoCDBToolCheck%s%s|%s",y,gSettings:GetValue("dbtool","check_"..DBChecks[i]..n) == "1" and "Checked" or "",DBChecks[i],n,DBChecks[i])
+				local folder_name = i == 3 and type_dbs[pack_db_type] or DBChecks[i]
+				self:Gui("Add|CheckBox|x50 y%s w100 h22 %s vUICoCDBToolCheck_%s_%s|%s",y,gSettings:GetValue("dbtool",strformat('check_%s_%s',i,tab)) == "1" and "Checked" or "",i,tab,folder_name)
 				y = y + 20
 			end
 			
 			-- Buttons 
-			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath%s|...",n)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath%s|...",n)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUICoCDBToolSaveSettings%s|%t_save_settings",n)
-			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUICoCDBToolExecute%s|%t_execute",n)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath%s|...",tab)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath%s|...",tab)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y655 w201 h20 vUICoCDBToolSaveSettings%s|%t_save_settings",tab)
+			self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUICoCDBToolExecute%s|%t_execute",tab)
 			
 			-- Editbox 
-			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUICoCDBToolInputPath%s|",n)
-			self:Gui("Add|Edit|gOnScriptControlAction x25 y180 w450 h20 vUICoCDBToolOutputPath%s|",n)
-		
-		GuiControl(self.ID,"","UICoCDBToolInputPath"..n, gSettings:GetValue("dbtool","path"..n) or "")
-		GuiControl(self.ID,"","UICoCDBToolOutputPath"..n, gSettings:GetValue("dbtool","output_path"..n) or "")
+			self:Gui("Add|Edit|gOnScriptControlAction x25 y80 w450 h20 vUICoCDBToolInputPath%s|",tab)
+			self:Gui("Add|Edit|gOnScriptControlAction x25 y180 w450 h20 vUICoCDBToolOutputPath%s|",tab)
+			
+			self:Gui("Add|DropDownList|gOnScriptControlAction x550 y80 vUICoCDBToolDBToolListDbTypePack%s Choose%s|xdb^2947ru", tab, pack_db_type == '2947ru' and 2 or 1)
+			
+		GuiControl(self.ID,"","UICoCDBToolInputPath"..tab, gSettings:GetValue("dbtool","path"..tab) or "")
+		GuiControl(self.ID,"","UICoCDBToolOutputPath"..tab, gSettings:GetValue("dbtool","output_path"..tab) or "")
 	end
 	self:Gui("Show|w1024 h720|%t_plugin_db_tool")
 end
@@ -103,11 +165,10 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute")) then
 			ActionUnpack()
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings0")) then
-			local input_path = ahkGetVar("UICoCDBToolInputPath")
-			local output_path = ahkGetVar("UICoCDBToolOutputPath")
-			
-			gSettings:SetValue("dbtool","unpack_input_path",input_path)
-			gSettings:SetValue("dbtool","unpack_output_path",output_path)
+			gSettings:SetValue("dbtool","check_browse_recur",ahkGetVar("UICoCDBToolBrowseRecur"))
+			gSettings:SetValue("dbtool","unpack_input_path", ahkGetVar("UICoCDBToolInputPath"))
+			gSettings:SetValue("dbtool","unpack_output_path", ahkGetVar("UICoCDBToolOutputPath"))
+			gSettings:SetValue("dbtool","unpack_db_type", ahkGetVar("UICoCDBToolDBToolListDbTypeUnpack"))
 			gSettings:Save()
 		end
 	else 
@@ -122,20 +183,18 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 			if (dir and dir ~= "") then
 				GuiControl(self.ID,"","UICoCDBToolOutputPath"..tab,dir)
 			end
+		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolDBToolListDbTypePack"..tab)) then
+			GuiControl(self.ID,"",strformat('UICoCDBToolCheck_%s_%s',3,tab),type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)])
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute"..tab)) then
 			ActionSubmit(tab)
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings"..tab)) then
-			local input_path = ahkGetVar("UICoCDBToolInputPath"..tab)
-			local output_path = ahkGetVar("UICoCDBToolOutputPath"..tab)
-			
-			for i=1,#DBChecks do 
-				local bool = ahkGetVar("UICoCDBToolCheck"..DBChecks[i]..tab)
-				gSettings:SetValue("dbtool","check_"..DBChecks[i]..tab,bool)
+			for i=1,#DBChecks do
+				local bool = ahkGetVar("UICoCDBToolCheck_"..i..'_'..tab)
+				gSettings:SetValue("dbtool",strformat('check_%s_%s',i,tab),bool)
 			end
-			
-			gSettings:SetValue("dbtool","check_browse_recur",ahkGetVar("UICoCDBToolBrowseRecur"))
-			gSettings:SetValue("dbtool","path"..tab,input_path or "")
-			gSettings:SetValue("dbtool","output_path"..tab,output_path or "")
+			gSettings:SetValue("dbtool","path"..tab,ahkGetVar("UICoCDBToolInputPath"..tab) or "")
+			gSettings:SetValue("dbtool","output_path"..tab,ahkGetVar("UICoCDBToolOutputPath"..tab) or "")
+			gSettings:SetValue("dbtool","pack_db_type"..tab, ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab))
 			gSettings:Save()
 		end
 	end
@@ -143,7 +202,15 @@ end
 
 local function check_out_folder(output_path)
 	if not (directory_exists(output_path)) then
+		-- Msg(strformat('DB Tool:= create %s', output_path))
 		os.execute('MD "'..output_path..'"')
+	end
+end
+
+local function remove_files(node,file,fullpath,name)
+	if not name or string.find(file, name) then
+		-- Msg(strformat('DB Tool:= remove %s', fullpath))
+		os.remove(fullpath)
 	end
 end
 
@@ -168,153 +235,112 @@ function ActionSubmit(tab)
 	
 	_INACTION = true
 	
-	for i=1,#DBChecks do 
-		local bool = ahkGetVar("UICoCDBToolCheck"..DBChecks[i]..tab)
-		gSettings:SetValue("dbtool","check_"..DBChecks[i]..tab,bool)
+	-- self:OnScriptControlAction(GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings"..tab),'Normal',0)
+	for i=1,#DBChecks do
+		local bool = ahkGetVar("UICoCDBToolCheck_"..i..'_'..tab)
+		gSettings:SetValue("dbtool",strformat('check_%s_%s',i,tab),bool)
 	end
-	
-	gSettings:SetValue("dbtool","check_browse_recur",ahkGetVar("UICoCDBToolBrowseRecur"))
 	gSettings:SetValue("dbtool","path"..tab,input_path)
 	gSettings:SetValue("dbtool","output_path"..tab,output_path)
+	gSettings:SetValue("dbtool","pack_db_type"..tab, ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab))
 	gSettings:Save()
 	
 	check_out_folder(output_path)
+	Sleep(1000)
 	
-	local config_dir = ahkGetVar("A_WorkingDir")..[[\configs\compress\]]
+	local config_dir = ahkGetVar("A_WorkingDir")..strformat([[\configs\compress\%s\]], ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab))
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory.."xrCompress.exe"
 	local dir = trim_directory(input_path)
 	local parent_dir = get_path(input_path)
+	local check_clear_out, level_directories = {}, {}
+	outdir[type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)]] = "configs"
 	
 	Msg("DB Tool:= working...")
 	
-	local compress = {"ai","anims","configs","scripts","xr","shaders","spawns","textures","meshes","sounds"}
-	
 	-- create compress_*.ltx for levels
-	local level_directories = {}
-	local function generate_level_options1(path,dir)
-		level_directories[dir] = true
-	end 
-	local function generate_level_options2(dir)
-		local data = strformat([[
-[header]
-auto_load = true
-level_name = single ; former level name, now can be mod name
-level_ver = 1.0 ; former level version, now can be mod version
-entry_point = $fs_root$\gamedata\ ; do not change !
-creator = "Team EPIC" ; creator's name
-link = "forum.epicstalker.com" ; creator's link
-
-[options] ; exclude files from compression with such extension
-exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.db,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.~*,*.rar,*.sfk,*.xr
-
-[include_folders]
-.\ = true
-
-[exclude_folders]
-ai\ = true 
-anims\ = true
-configs\ = true
-;levels\ = true
-meshes\ = true 
-scripts\ = true 
-shaders\ = true
-sounds\ = true 
-spawns\ = true
-textures\ = true
-]],dir)
-		for k,v in pairs(level_directories) do 
-			if (k ~= dir) then
-				data = data .. "\nlevels\\" .. k .. "\\ = true"
-			end
+	if (gSettings:GetValue("dbtool",'check_8_'..tab) == "1") then
+		file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_levels_')
+		Sleep(1000)
+		local function generate_level_options1(path,dir)
+			level_directories[dir] = true
 		end
-		local output_file = io.open(config_dir.."compress_levels_"..dir..".ltx","wb+")
-		if (output_file) then
-			output_file:write(data)
-			output_file:close()
-		end	
-	end
-	
-	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
 		directory_for_each(input_path.."\\levels",generate_level_options1)
+		local function generate_level_options2(dir)
+			local data = strformat(data_for_levels, type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)])
+			for k,v in pairs(level_directories) do 
+				if (k ~= dir) then
+					data = data .. "\nlevels\\" .. k .. "\\ = true"
+				end
+			end
+			local output_file = io.open(config_dir.."compress_levels_"..dir..".ltx","wb+")
+			if (output_file) then
+				output_file:write(data)
+				output_file:close()
+			end	
+		end
 		for k,v in pairs(level_directories) do 
 			generate_level_options2(k)
 		end
 	end
-		
-	local outdir = {	
-		["ai"] = "config",
-		["anims"] = "config",
-		["scripts"] = "config",
-		["xr"] = "config",
-		["configs"] = "config",
-		["spawns"] = "config",
-		["shaders"] = "config",
-		["meshes"] = "resource",
-		["sounds"] = "sound",
-		["textures"] = "resource"
-	}
 	
-	local function remove_pack(node,file,fullpath)
-		os.remove(fullpath)
-	end
 	_G.lfs_ignore_exact_ext_match = true
-	file_for_each(parent_dir, {"db"}, remove_pack, true)
+	-- ???
+	file_for_each(parent_dir, {"db"}, remove_files, true)
+	Sleep(1000)
 	
-	local check_clear_out = {}
-	
-	local function create_output(name,out, prefix)
-		local pltx = prefix and "compress_"..prefix.."_"..name..".ltx" or "compress_"..name..".ltx"
-		RunWait( strformat([["%s" "%s" -ltx %s  -pack -1024 -nodelete]],cp,input_path,pltx), config_dir )
+	local function create_output(name,out, pack_levels)
+		local pltx = pack_levels and "compress_levels_"..name..".ltx" or "compress_"..name..".ltx"
+		local nocompress = ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru' and '-nocompress' or ''	-- It required for levels SoC
+		local cmdline = strformat([["%s" "%s" -ltx %s -pack -db -1024 %s]],cp,input_path,pltx,nocompress)
+		Msg(strformat('DB Tool:= Start compression in format %s %s\ncmdline: %s', ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab), name, cmdline))
+		RunWait(cmdline, config_dir)
+		Msg('\n')
 
 		lfs.mkdir(out)
 		
 		if not check_clear_out[name] then
-			local function remove_db(node,file,fullpath)
-				if string.find(file, name) then
-					os.remove(fullpath)
-				end
-			end
 			_G.lfs_ignore_exact_ext_match = true
-			file_for_each(out, {"db"}, remove_db, true)
+			-- ???
+			file_for_each(out, {"db"}, remove_files, true, name)
 			check_clear_out[name] = true
+			Sleep(1000)
 		end
 		
 		local db_id = 0
 		local function rename_pack_in_db(node,file,fullpath)
-			os.rename(fullpath, out.."\\"..name..".db"..db_id)
+			os.rename(fullpath, ahkGetVar("UICoCDBToolDBToolListDbTypePack") == '2947ru' and strformat('%s\\gamedata.xdb_%s%s', out, name, db_id) or strformat('%s\\%s.db%s', out, name, db_id))
 			db_id = db_id + 1
 		end
 		if (file_exists(parent_dir.."\\"..dir..".db1")) then
 			_G.lfs_ignore_exact_ext_match = true
 			file_for_each(parent_dir, {"db"}, rename_pack_in_db, true)
 		else
-			os.rename(parent_dir.."\\"..dir..".db0",out.."\\"..name..".db")
+			os.rename(strformat('%s\\%s.db0', parent_dir, dir), ahkGetVar("UICoCDBToolDBToolListDbTypePack") == '2947ru' and strformat('%s\\gamedata.xdb_%s', out, name) or strformat('%s\\%s.db', out, name))
 		end
 	end 
 	
+	for i=1,#DBChecks do
+		local chk = gSettings:GetValue("dbtool",strformat('check_%s_%s',i,tab))
+		if (chk == nil or chk == "1") then
+			if i == 8 then
+				for k,v in spairs(level_directories) do 
+					create_output(k,output_path.."\\maps",true)
+				end
+			else
+				local folder_name = i == 3 and type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)] or DBChecks[i]
+				create_output(folder_name,outdir[folder_name] and output_path.."\\"..outdir[folder_name] or output_path)
+			end
+		end
+	end
+	
+	file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_levels_')
 	Sleep(1000)
 	
-	table.sort(compress)
-	
-	for i=1,#compress do 
-		local chk = gSettings:GetValue("dbtool","check_"..compress[i]..tab)
-		if (chk == nil or chk == "1") then
-			create_output(compress[i],outdir[compress[i]] and output_path.."\\"..outdir[compress[i]] or output_path)
-		end
-	end
-	
-	if (gSettings:GetValue("dbtool","check_levels"..tab) == "1") then
-		for k,v in spairs(level_directories) do 
-			create_output(k,output_path.."\\maps","levels")
-		end
-	end
-	
-	Msg("\nDB Tool:= Finished!")
+	Msg("DB Tool:= Finished!")
 	
 	_INACTION = false
 end
-
 
 function ActionUnpack()
 	if (_INACTION) then 
@@ -336,36 +362,40 @@ function ActionUnpack()
 	
 	_INACTION = true
 	
+	gSettings:SetValue("dbtool","check_browse_recur",ahkGetVar("UICoCDBToolBrowseRecur"))
 	gSettings:SetValue("dbtool","unpack_input_path",input_path)
 	gSettings:SetValue("dbtool","unpack_output_path",output_path)
+	gSettings:SetValue("dbtool","unpack_db_type", ahkGetVar("UICoCDBToolDBToolListDbTypeUnpack"))
 	gSettings:Save()
 	
 	check_out_folder(output_path)
 	
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory .. "converter.exe"
-	
+	local type_unpack_dbs = ahkGetVar("UICoCDBToolDBToolListDbTypeUnpack")
 	local patches = {}
+	
+	Msg("DB Tool:= Unpacking...")
+	
 	local function on_execute(path,fname)
-		if (string.find(fname,"patch")) then -- do patches last!
-			table.insert(patches,path.."\\"..fname)
+		if (string.find(fname,"patch")) or (string.find(fname,"patches")) then -- do patches last!
+			patches[#patches] = path.."\\"..fname
 		else
 			-- Run(target,working_directory)
 			-- converter.exe -unpack -xdb %%f -dir .\unpacked
-			RunWait( strformat([["%s" -unpack -xdb "%s" -dir "%s"]],cp,path.."\\"..fname,output_path), working_directory )
+			RunWait( strformat([["%s" -unpack -%s "%s" -dir "%s"]],cp,type_unpack_dbs,path.."\\"..fname,output_path), working_directory )
 			Msg("unpacked %s",fname)
 		end
 	end 
 	
-	Msg("DB Tool:= Unpacking...")
-	
 	_G.lfs_ignore_exact_ext_match = true
+	-- ???
 	file_for_each(input_path,{"db"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
 	
 	table.sort(patches)
 	
 	for i=1,#patches do 
-		RunWait( strformat([["%s" -unpack -xdb "%s" -dir "%s"]],cp,patches[i],output_path), working_directory )
+		RunWait( strformat([["%s" -unpack -%s "%s" -dir "%s"]],cp,type_unpack_dbs,patches[i],output_path), working_directory )
 		Msg("unpacked %s", trim_directory(patches[i]))
 	end
 	
