@@ -76,6 +76,7 @@ function cUIOGFViewer:Reinit()
 				self:Gui("Add|DropDownList|gOnScriptControlAction x22 y69 w320 h30 R40 H300 vUIOGFViewerSection%s|"..filters,i)
 				
 				-- Buttons 
+				self:Gui("Add|Button|gOnScriptControlAction x695 y600 w200 h20 vUIOGFViewerLaunchMeshViewer%s|%t_launch_mesh_viewer",i)
 				self:Gui("Add|Button|gOnScriptControlAction x495 y600 w30 h20 vUIOGFViewerBrowsePath%s|...",i)
 				self:Gui("Add|Button|gOnScriptControlAction x485 y680 w201 h20 vUIOGFViewerSaveSettings%s|%t_save_settings",i)
 				
@@ -155,6 +156,9 @@ function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 		else 
 			Msg("cUIOGFViewer:%s doesn't exist!","ActionExecute"..tab)
 		end
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerLaunchMeshViewer"..tab)) then	
+		local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\OGFViewer\]]
+		RunWait(working_directory.."OGFViewer.exe", working_directory)
 	end
 end
 
