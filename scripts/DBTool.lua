@@ -209,7 +209,7 @@ end
 
 local remove_full_name = nil
 local function remove_files(node,file,fullpath,name)
-	if not name or (remove_full_name and (name == file) or string.find(file, name)) then
+	if not name or (remove_full_name and (name == file) or not remove_full_name and string.find(file, name)) then
 		-- Msg(strformat('DB Tool:= remove %s', fullpath))
 		os.remove(fullpath)
 		if remove_full_name then
