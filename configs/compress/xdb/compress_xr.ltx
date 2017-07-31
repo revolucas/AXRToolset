@@ -9,10 +9,17 @@ link = "forum.epicstalker.com" ; creator's link
 [options] ; exclude files from compression with such extension
 exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.cmd,*.bat,*.db,*.xdb,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.*~*,*~*.*,*.rar,*.sfk,*.tmp
 
-[include_files]
-gamemtl.xr = true
-lanims.xr = true
-particles.xr = true
-senvironment.xr = true
-shaders.xr = true
-shaders_xrlc.xr = true
+[include_folders]
+.\ = true
+
+[exclude_folders]
+ai\ = true 
+anims\ = true
+configs\ = true
+levels\ = true
+meshes\ = true 
+scripts\ = true 
+shaders\ = true
+sounds\ = true 
+spawns\ = true
+textures\ = true

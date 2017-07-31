@@ -207,8 +207,8 @@ local function check_out_folder(output_path)
 	end
 end
 
-local function remove_files(node,file,fullpath,name)
-	if not name or string.find(file, name) then
+local function remove_files(node,file,fullpath,name,pack_levels)
+	if not name or (pack_levels and (name == file) or string.find(file, name)) then
 		-- Msg(strformat('DB Tool:= remove %s', fullpath))
 		os.remove(fullpath)
 	end
@@ -302,7 +302,7 @@ function ActionSubmit(tab)
 		if not check_clear_out[name] then
 			_G.lfs_ignore_exact_ext_match = true
 			-- ???
-			file_for_each(out, {"db"}, remove_files, true, name)
+			file_for_each(out, {"db"}, remove_files, true, name, pack_levels)
 			check_clear_out[name] = true
 			Sleep(1000)
 		end
