@@ -208,8 +208,8 @@ local function check_out_folder(output_path)
 end
 
 local function remove_files(node,file,fullpath,name,levels)
-	if not name or (levels and (name == file) or not levels and string.find(file, name)) then
-		-- Msg(strformat('DB Tool:= remove %s', fullpath))
+	if not name or (levels and (name..'.db' == file or name..'.xdb' == file) or not levels and string.find(file, name)) then
+		Msg(strformat('DB Tool:= remove %s', fullpath))
 		os.remove(fullpath)
 	end
 end
