@@ -38,12 +38,13 @@ function cMainMenu:Reinit()
 	
 		-- GroupBox
 		self:Gui("Add|GroupBox|x360 y50 w250 h660|%t_plugins_launcher")
-		self:Gui("Add|GroupBox|x720 y50 w155|%t_lang")
+		self:Gui("Add|GroupBox|x720 y50 w190|%t_lang")
 		
 		self:Gui("Add|Picture|gOnScriptControlAction x730 y70 vApplicationSelectEnglish|icons/english.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x765 y70 vApplicationSelectFrench|icons/french.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x800 y70 vApplicationSelectRussian|icons/russian.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x835 y70 vApplicationSelectSpanish|icons/spanish.png")	
+		self:Gui("Add|Picture|gOnScriptControlAction x870 y70 vApplicationSelectArabic|icons/arabic.png")
 		
 		self:Gui("Add|Button|gOnScriptControlAction x745 y110 vApplicationCheckUpdates|%t_check_updates")
 		
@@ -140,6 +141,12 @@ function cMainMenu:OnScriptControlAction(hwnd,event,info)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectSpanish")) then
 		self:Gui("Submit|NoHide")
 		gSettings:SetValue("core","language","spanish")
+		gSettings:Save()
+		MainMenu:Destroy()
+		MainMenu:Create()
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectArabic")) then
+		self:Gui("Submit|NoHide")
+		gSettings:SetValue("core","language","arabic")
 		gSettings:Save()
 		MainMenu:Destroy()
 		MainMenu:Create()
@@ -301,5 +308,35 @@ function cMainMenu:Show(bool)
 		
 	file_for_each(ipath,{"ogf"},on_execute)
 	Msg("done")
+	--]]
+	
+	--[[
+	-- Compiles a list of parameters in engine source code
+	Msg("Compiling a list of parameters!")
+	local i_p = "E:\\STALKER\\X-Ray Source\\X-Ray_CallOfChernobyl\\src"
+	local o_p = "E:\\STALKER\\Games"
+	
+	local new_data = {}
+	local function on_execute(path,fname)
+		local full_path = path.."\\"..fname
+		local f,err = io.open(full_path,"rb")
+		if not (err) then 
+			local data = f:read("*all")
+			f:close()
+			if (data and data ~= "") then 
+				for s in string.gmatch(data,[ [Core.Params,%s*"(.-)"] ]) do
+					table.insert(new_data,s)
+					Msg(s)
+				end
+			end
+		end
+	end
+	file_for_each(i_p,{"cpp"},on_execute)
+	local f,err = io.open(o_p.."\\params_list.txt","wb")
+	if not (err) then 
+		f:write(table.concat(new_data,"\n"))
+		f:close()
+	end
+	Msg("DONE!")
 	--]]
 end
