@@ -291,10 +291,22 @@ function ActionSubmit(tab)
 	
 	local function create_output(name,out, pack_levels)
 		local pltx = pack_levels and "compress_levels_"..name..".ltx" or "compress_"..name..".ltx"
-		local nocompress = ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru' and '-nocompress' or ''	-- It required for levels SoC
+		local nocompress = --[[pack_levels and (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and '-nocompress' or]] ''	-- It required for levels SoC ??
 		local cmdline = strformat([["%s" "%s" -ltx %s -pack -db -1024 %s]],cp,input_path,pltx,nocompress)
-		Msg(strformat('DB Tool:= Start compression in format %s %s\ncmdline: %s', ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab), name, cmdline))
+		Msg(strformat('DB Tool:= Start compression for structure %s %s\ncmdline: %s', ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab), name, cmdline))
+		local function temp_move(_in, _out)
+			if (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and (name ~= 'config') then
+				local collect = {'game.graph', 'resource.h', 'stalkergame.inf'}
+				for k, v in pairs(collect) do
+					os.rename(strformat('%s\\%s', _in, v), strformat('%s\\%s', _out, v))
+					Sleep(1000)
+					os.remove(strformat('%s\\%s', _in, v))
+				end
+			end
+		end
+		temp_move(input_path, config_dir)	-- stupid hack for structure SoC, because stupid xrCompressor
 		RunWait(cmdline, config_dir)
+		temp_move(config_dir, input_path)
 		Msg('\n')
 
 		lfs.mkdir(out)
@@ -309,14 +321,14 @@ function ActionSubmit(tab)
 		
 		local db_id = 0
 		local function rename_pack_in_db(node,file,fullpath)
-			os.rename(fullpath, ahkGetVar("UICoCDBToolDBToolListDbTypePack") == '2947ru' and strformat('%s\\gamedata.xdb_%s%s', out, name, db_id) or strformat('%s\\%s.db%s', out, name, db_id))
+			os.rename(fullpath, ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru' and strformat('%s\\%s%s.xdb', out, name, db_id) or strformat('%s\\%s.db%s', out, name, db_id))
 			db_id = db_id + 1
 		end
 		if (file_exists(parent_dir.."\\"..dir..".db1")) then
 			_G.lfs_ignore_exact_ext_match = true
 			file_for_each(parent_dir, {"db"}, rename_pack_in_db, true)
 		else
-			os.rename(strformat('%s\\%s.db0', parent_dir, dir), ahkGetVar("UICoCDBToolDBToolListDbTypePack") == '2947ru' and strformat('%s\\gamedata.xdb_%s', out, name) or strformat('%s\\%s.db', out, name))
+			os.rename(strformat('%s\\%s.db0', parent_dir, dir), ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru' and strformat('%s\\%s.xdb', out, name) or strformat('%s\\%s.db', out, name))
 		end
 	end 
 	
@@ -378,13 +390,13 @@ function ActionUnpack()
 	Msg("DB Tool:= Unpacking...")
 	
 	local function on_execute(path,fname)
-		if (string.find(fname,"patch")) or (string.find(fname,"patches")) then -- do patches last!
-			patches[#patches] = path.."\\"..fname
+		if (string.find(fname,"patch")) then -- do patches last!
+			patches[#patches + 1] = path.."\\"..fname
 		else
 			-- Run(target,working_directory)
 			-- converter.exe -unpack -xdb %%f -dir .\unpacked
+			Msg("Unpacking %s",fname)
 			RunWait( strformat([["%s" -unpack -%s "%s" -dir "%s"]],cp,type_unpack_dbs,path.."\\"..fname,output_path), working_directory )
-			Msg("unpacked %s",fname)
 		end
 	end 
 	
@@ -393,10 +405,9 @@ function ActionUnpack()
 	file_for_each(input_path,{"db"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
 	
 	table.sort(patches)
-	
-	for i=1,#patches do 
+	for i=1,#patches do
+		Msg("Unpacking %s", trim_directory(patches[i]))
 		RunWait( strformat([["%s" -unpack -%s "%s" -dir "%s"]],cp,type_unpack_dbs,patches[i],output_path), working_directory )
-		Msg("unpacked %s", trim_directory(patches[i]))
 	end
 	
 	Msg("DB Tool:= Unpacking Finished!")
