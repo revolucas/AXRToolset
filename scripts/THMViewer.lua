@@ -8,13 +8,26 @@ http://stackoverflow.com/questions/24002210/cannot-update-listview
 --]]
 
 local Checks = {}
-local thm_fields = {	"version","texture_format","flags","border_color",
-					"fade_color","fade_amount","mip_filter","texture_width",
-					"texture_height","texture_type","detail_name","detail_scale",
-					"material","material_weight","bump_height","bump_mode","bump_name",
-					"normal_map_name","fade_delay"
+local thm_fields = {
+	"version","texture_format","flags","border_color",
+	"fade_color","fade_amount","mip_filter","texture_width",
+	"texture_height","texture_type","detail_name","detail_scale",
+	"material","material_weight","bump_height","bump_mode","bump_name",
+	"normal_map_name","fade_delay"
 }
 table.sort(thm_fields)
+
+local thm_field_modify_order = {
+	"version",
+	"texture_width","texture_height",
+	"texture_type","texture_format","mip_filter",
+	"bump_mode","bump_name","bump_height",
+	"normal_map_name",
+	"detail_name","detail_scale",
+	"material","material_weight",
+	"fade_color","fade_amount","fade_delay",
+	"border_color","flags"
+}
 
 local clipboard = {}
 -----------------------------------------------------------------
@@ -564,11 +577,11 @@ end
 
 function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 	
+	for i=1,#thm_fields do 
+		LV("LV_InsertCol",self.ID,tostring(i),"",thm_fields[i])
+	end
 	LV("LV_InsertCol",self.ID,"1","","filename")
 	LV("LV_InsertCol",self.ID,"2","","path")
-	for i=3,#thm_fields do 
-		LV("LV_InsertCol",self.ID,tostring(i),"",thm_fields[i])
-	end 
 
 	LV("LV_ModifyCol",self.ID,"1","AutoHdr")
 	
@@ -594,7 +607,6 @@ function cUITHMViewer:FillListView1(tab,selected,dir,skip)
 					end
 					if (self.thm[full_path]) then
 						self.list[full_path] = self.thm[full_path].params
-						self.list[full_path].__fullpath = path.."\\"..fname
 					end
 				end
 			end
@@ -723,10 +735,10 @@ function cUITHMViewerModify:Reinit()
 	local tab = ahkGetVar("UITHMViewerTab")
 
 	local y = 35
-	for field,v in pairs(list) do
-		if (field ~= "__fullpath") then
+	for i,field in ipairs(thm_field_modify_order) do
+		if (list[field]) then
 			self:Gui("Add|Text|x5 y%s w300 h30|%s",y,field)
-			self:Gui("Add|Edit|x200 y%s w800 h30 vUITHMViewerModifyEdit%s|%s",y,field,v)
+			self:Gui("Add|Edit|x200 y%s w800 h30 vUITHMViewerModifyEdit%s|%s",y,field,list[field])
 			y = y + 30
 		end
 	end
@@ -762,11 +774,9 @@ function cUITHMViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 		local list = assert(wnd.list[full_path])
 	
 		for field,v in pairs(list) do
-			if (field ~= "__fullpath") then
-				local val = ahkGetVar("UITHMViewerModifyEdit"..field)
-				if (val) then
-					wnd.thm[full_path].params[field] = tonumber(val) or val
-				end
+			local val = ahkGetVar("UITHMViewerModifyEdit"..field)
+			if (val) then
+				wnd.thm[full_path].params[field] = tonumber(val) or val
 			end
 		end
 		
@@ -794,7 +804,7 @@ function cUITHMViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 			Msg("Copy failed")
 			return 
 		end
-		os.execute(strformat([[start "" "%s"]],trim_ext(wnd.list[full_path].__fullpath)..".dds"))
+		os.execute(strformat([[start "" "%s"]],trim_ext(full_path)..".dds"))
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyCopy")) then
 		local wnd = Get()
 		local full_path = wnd.listItemSelected
@@ -803,9 +813,7 @@ function cUITHMViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 			return
 		end
 		for k,v in pairs(wnd.list[full_path]) do
-			if (k ~= "__fullpath") then
-				clipboard[k] = v
-			end
+			clipboard[k] = v
 		end
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UITHMViewerModifyPaste")) then
 		local wnd = Get()
@@ -866,17 +874,17 @@ function cUITHMViewerModify2:Reinit()
 	wnd.thm[thm_path] = wnd.thm[thm_path] or cTHM(thm_path)
 	list = wnd.thm[thm_path].params
 	
-	table.sort(list)
-	
 	self:Gui("Add|Text|w300 h30|%s",fname)
 	
 	local tab = ahkGetVar("UITHMViewerTab")
 
 	local y = 35
-	for field,v in pairs(list) do 
-		self:Gui("Add|Text|x5 y%s w300 h30|%s",y,field)
-		self:Gui("Add|Edit|x200 y%s w800 h30 vUITHMViewerModifyEdit2%s|%s",y,field,v)
-		y = y + 30
+	for i,field in ipairs(thm_field_modify_order) do
+		if (list[field]) then
+			self:Gui("Add|Text|x5 y%s w300 h30|%s",y,field)
+			self:Gui("Add|Edit|x200 y%s w800 h30 vUITHMViewerModifyEdit2%s|%s",y,field,list[field])
+			y = y + 30
+		end
 	end
  
 	self:Gui("Add|Button|gOnScriptControlAction x12 default vUITHMViewerModifyAccept2|%t_accept")

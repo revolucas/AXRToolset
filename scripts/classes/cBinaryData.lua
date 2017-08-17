@@ -247,6 +247,36 @@ function cBinaryData:resize(size)
 	end
 end 
 
+function cBinaryData:remove_chunk(ID)
+	self.r_marker = 1
+	
+	local size = self:size()
+	local dwType,dwSize
+	while true do
+		dwType,dwSize = self:r_u32(),self:r_u32()
+		if not (dwType and dwSize) then 
+			return
+		end
+
+		if (dwType == ID) then
+			self:w_seek(self.r_marker-4)
+			Msg("removing chunk %s, remove %s bytes",ID,dwSize+4)
+			for i=1,dwSize+4 do
+				table.remove(self.data,self.r_marker)
+			end
+			return
+		end
+		
+		self.r_marker = self.r_marker + dwSize
+		if (self.r_marker > size) then 
+			self.r_marker = size
+			return
+		elseif (self.r_marker == size) then 
+			return
+		end
+	end
+end 
+
 function cBinaryData:replace_chunk(ID,chunk)
 	self.r_marker = 1
 	
@@ -311,6 +341,7 @@ function cBinaryData:r_chunk(ID)
 end
 
 function cBinaryData:w_chunk(ID,dwSize)
+
 	self:w_u32(ID)
 	self:w_u32(dwSize)
 end
