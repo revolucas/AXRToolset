@@ -13,7 +13,8 @@ local DBChecks = {
 	[8] = 'levels',
 	[9] = 'sounds',
 	[10] = 'textures',
-	[11] = 'meshes'
+	[11] = 'meshes',
+	[12] = 'thms'
 }
 local outdir = {	
 	["ai"] = "configs",
@@ -25,7 +26,8 @@ local outdir = {
 	["shaders"] = "configs",
 	["meshes"] = "resources",
 	["sounds"] = "sounds",
-	["textures"] = "resources"
+	["textures"] = "resources",
+	["thms"] = "resources"
 }
 local data_for_levels = [[
 [header]
@@ -54,7 +56,21 @@ sounds\ = true
 spawns\ = true
 textures\ = true
 ]]
------------------------------------------------------------------
+local data_for_thms = [[
+[header]
+auto_load = true
+level_name = single ; former level name, now can be mod name
+level_ver = 1.0 ; former level version, now can be mod version
+entry_point = $fs_root$\gamedata\ ; do not change !
+creator = "Team EPIC" ; creator's name
+link = "forum.epicstalker.com" ; creator's link
+
+[options] ; exclude files from compression with such extension
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.cmd,*.bat,*.db,*.xdb,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.*~*,*~*.*,*.rar,*.sfk,*.tmp,*.xr
+
+[include_files]
+]]
+---------------------------------------------------------
 -- 
 -----------------------------------------------------------------
 function OnApplicationBegin()
@@ -281,6 +297,26 @@ function ActionSubmit(tab)
 		end
 		for k,v in pairs(level_directories) do 
 			generate_level_options2(k)
+		end
+	end
+	
+	-- create compress_*.ltx for thms
+	if (gSettings:GetValue("dbtool",'check_12_'..tab) == "1") then
+		file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_thms')
+		Sleep(1000)
+		
+		local i_o = input_path.."\\"
+		local function generate_thm_file_list(node,file,fullpath)
+			local relative_file_path = trim(string.sub(node,i_o:len()+1)) .. "\\" .. file
+			data_for_thms = data_for_thms .. relative_file_path .. "\n"
+		end
+		
+		file_for_each(input_path.."\\textures", {"thm"}, generate_thm_file_list)
+
+		local output_file,err = io.open(config_dir.."compress_thms.ltx","wb+")
+		if not (err) then
+			output_file:write(data_for_thms)
+			output_file:close()
 		end
 	end
 	
