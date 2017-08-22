@@ -314,6 +314,7 @@ function cBinaryData:replace_chunk(ID,chunk)
 				-- overwrite data
 				for i=1,newsize do
 					if (chunk.data[i]) then
+						--Msg("overwrite data[%s] = %s",self:r_tell()+i,chunk.data[i])
 						self.data[self:r_tell()+i] = chunk.data[i]
 					end
 				end
@@ -418,6 +419,7 @@ function cBinaryData:save(to_fname)
 	if (fname) then
 		local f,err = io.open(fname,"wb")
 		if (err) then 
+			Msg(err)
 			error(err)
 		end
 		

@@ -32,7 +32,7 @@ function cUIConverter:Reinit()
 	self.inherited[1].Reinit(self)
 	
 	local tabs = {"OGF->Object","OMF->SKLS","DDS->TGA","OGF->SMD"}
-	Checks["1"] = {"object", "bones", "skls"}
+	Checks["1"] = {"object", "bones", "skls", "AE_batch_ltx","force_progressive","force_hq"}
 	Checks["2"] = {"skls"}
 	Checks["3"] = {"t_with_solid","t_with_bump"}
 	
@@ -147,14 +147,98 @@ end
 function cUIConverter:ActionExecute1(tab,input_path,output_path)
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory .. "converter.exe"
+
+	--[[	Flags32			m_objectFlags;
+	enum{
+		eoDynamic 	 	= (1<<0),			
+		eoProgressive 	= (1<<1),			
+		eoUsingLOD		= (1<<2),			
+		eoHOM			= (1<<3),			
+		eoMultipleUsage	= (1<<4),			
+		eoSoundOccluder	= (1<<5),
+		eoHQExport      = (1<<6),           
+		eoFORCE32		= u32(-1)           
+	};
+	--]]	
+	local eoProgressive = bit.lshift(1,1)
+	local eoHQExport = bit.lshift(1,6)
 	
+	local use_relative = true--ahkGetVar("UIConverterCheck"..Checks[tab][4]..tab) == "1"
+	local make_batch_ltx = ahkGetVar("UIConverterCheck"..Checks[tab][4]..tab) == "1"
+	local force_progressive = ahkGetVar("UIConverterCheck"..Checks[tab][5]..tab) == "1"
+	local force_hq = ahkGetVar("UIConverterCheck"..Checks[tab][6]..tab) == "1"
+	local batch_ltx = nil
 	local function on_execute(path,fname)
 		--@start /wait converter.exe -ogf -object wpn_pkm_trenoga.ogf -out wpn_pkm_trenoga.object
 		if (Checks[tab]) then
-			for i=1,#Checks[tab] do
+			for i=1,3 do
 				local bool = ahkGetVar("UIConverterCheck"..Checks[tab][i]..tab)
 				if (gSettings:GetValue("converter","check_"..Checks[tab][i]..tab,"") == "1") then
-					RunWait( strformat([["%s" -ogf -%s "%s" -out "%s"]],cp,Checks[tab][i],path.."\\"..fname,output_path.."\\"..trim_ext(fname).."."..Checks[tab][i]), working_directory )
+					local ext = Checks[tab][i]
+					local filename = trim_ext(fname).."."..ext
+					local new_output_path = use_relative and output_path..trim_final_backslash(string.gsub(path,escape_lua_pattern(input_path),"")).."\\"..filename or output_path.."\\"..filename
+					RunWait( strformat([["%s" -ogf -%s "%s" -out "%s"]],cp,Checks[tab][i],path.."\\"..fname,new_output_path), working_directory )
+					if (make_batch_ltx) then 
+						if not (batch_ltx) then 
+							batch_ltx = cIniFile(output_path.."\\batch_convert.ltx")
+						end
+						batch_ltx:SetValue("ogf",trim_ext(new_output_path),trim_ext(new_output_path))
+					end
+					
+					if (ext == "object") and (force_progressive or force_hq) and ( --[[string.find(path,"actors")--]] string.find(fname,"_lod") == nil) then
+						-- Force Make Progressive and HQ
+						Sleep(100)
+						local need_save = false
+						local object_file = cBinaryData(new_output_path)
+						if (object_file and object_file:size() > 0) then
+							local body = object_file:open_chunk(0x7777)
+							if (body and body:size() > 0) then
+								if (body:find_chunk(0x0903) > 0) then
+									local flag = body:r_u32()
+									local old_flag = flag
+									if (flag > 0) then
+										-- Make Progressive
+										if (force_progressive) then
+											if not (bit.band(eoProgressive,flag) == eoProgressive) then 
+												flag = flag + eoProgressive
+												Msg("!---------------------%s Make Progressive",fname)
+											end
+										end
+										
+										-- HQ export
+										if (force_hq) then
+											if not (bit.band(eoHQExport,flag) == eoHQExport) then 
+												flag = flag + eoHQExport
+												Msg("!---------------------%s HQ Export",fname)
+											end
+										end
+									end
+									
+									if (old_flag ~= flag) then
+										-- replace data
+										local chunk = body:open_chunk(0x0903)
+										if (chunk and chunk:size() > 0) then
+											need_save = true
+											chunk:w_u32(flag)
+											body:replace_chunk(0x0903,chunk)
+										end
+									end
+								else 
+									Msg("cannot find object flag chunk %s",fname)
+								end
+								if (need_save) then
+									object_file:replace_chunk(0x7777,body)
+									--Msg("saved")
+								end
+							end
+							
+							if (need_save) then
+								object_file:save()
+							end
+						else 
+							Msg("failed to open %s",fname)
+						end
+					end
 				end
 			end
 		end
@@ -163,7 +247,9 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 	Msg("Converter:= (OGF) Working...")
 	
 	file_for_each(input_path,{"ogf"},on_execute,ahkGetVar("UIConverterBrowseRecur"..tab) ~= "1")	
-	
+	if (batch_ltx) then 
+		batch_ltx:Save()
+	end
 	Msg("Converter:= (OGF) Finished!")
 end
 
