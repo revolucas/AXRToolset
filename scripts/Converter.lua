@@ -32,7 +32,7 @@ function cUIConverter:Reinit()
 	self.inherited[1].Reinit(self)
 	
 	local tabs = {"OGF->Object","OMF->SKLS","DDS->TGA","OGF->SMD"}
-	Checks["1"] = {"object", "bones", "skls", "AE_batch_ltx","force_progressive","force_hq"}
+	Checks["1"] = {"object", "bones", "skls", "AE_batch_ltx","force_progressive"}
 	Checks["2"] = {"skls"}
 	Checks["3"] = {"t_with_solid","t_with_bump"}
 	
@@ -161,12 +161,9 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 	};
 	--]]	
 	local eoProgressive = bit.lshift(1,1)
-	local eoHQExport = bit.lshift(1,6)
 	
-	local use_relative = true--ahkGetVar("UIConverterCheck"..Checks[tab][4]..tab) == "1"
 	local make_batch_ltx = ahkGetVar("UIConverterCheck"..Checks[tab][4]..tab) == "1"
 	local force_progressive = ahkGetVar("UIConverterCheck"..Checks[tab][5]..tab) == "1"
-	local force_hq = ahkGetVar("UIConverterCheck"..Checks[tab][6]..tab) == "1"
 	local batch_ltx = nil
 	local function on_execute(path,fname)
 		--@start /wait converter.exe -ogf -object wpn_pkm_trenoga.ogf -out wpn_pkm_trenoga.object
@@ -176,17 +173,18 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 				if (gSettings:GetValue("converter","check_"..Checks[tab][i]..tab,"") == "1") then
 					local ext = Checks[tab][i]
 					local filename = trim_ext(fname).."."..ext
-					local new_output_path = use_relative and output_path..trim_final_backslash(string.gsub(path,escape_lua_pattern(input_path),"")).."\\"..filename or output_path.."\\"..filename
+					local relative_path = trim_final_backslash(string.gsub(path,escape_lua_pattern(input_path),"")).."\\"..filename
+					local new_output_path = output_path..relative_path
 					RunWait( strformat([["%s" -ogf -%s "%s" -out "%s"]],cp,Checks[tab][i],path.."\\"..fname,new_output_path), working_directory )
 					if (make_batch_ltx) then 
 						if not (batch_ltx) then 
 							batch_ltx = cIniFile(output_path.."\\batch_convert.ltx")
 						end
-						batch_ltx:SetValue("ogf",trim_ext(new_output_path),trim_ext(new_output_path))
+						batch_ltx:SetValue("ogf","import\\"..trim_ext(relative_path),"export\\"..trim_ext(relative_path))
 					end
 					
-					if (ext == "object") and (force_progressive or force_hq) and ( --[[string.find(path,"actors")--]] string.find(fname,"_lod") == nil) then
-						-- Force Make Progressive and HQ
+					if (ext == "object") and (force_progressive) and ( --[[string.find(path,"actors")--]] string.find(fname,"_lod") == nil) then
+						-- Force Make Progressive
 						Sleep(100)
 						local need_save = false
 						local object_file = cBinaryData(new_output_path)
@@ -202,14 +200,6 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 											if not (bit.band(eoProgressive,flag) == eoProgressive) then 
 												flag = flag + eoProgressive
 												Msg("!---------------------%s Make Progressive",fname)
-											end
-										end
-										
-										-- HQ export
-										if (force_hq) then
-											if not (bit.band(eoHQExport,flag) == eoHQExport) then 
-												flag = flag + eoHQExport
-												Msg("!---------------------%s HQ Export",fname)
 											end
 										end
 									end
