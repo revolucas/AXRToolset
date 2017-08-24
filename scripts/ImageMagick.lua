@@ -213,7 +213,7 @@ function cImageMagick:ActionExecute1(tab,input_path,output_path)
 			end
 				
 			if not (skip) then
-				local local_path = trim_final_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
+				local local_path = trim_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
 				
 				lfs.mkdir(get_path(local_path))
 				
@@ -284,7 +284,7 @@ function cImageMagick:ActionExecute2(tab,input_path,output_path)
 			end
 				
 			if not (skip) then
-				local local_path = trim_final_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
+				local local_path = trim_backslash(output_path..string.gsub(full_path,escape_lua_pattern(input_path),""))
 				
 				lfs.mkdir(get_path(local_path))
 				

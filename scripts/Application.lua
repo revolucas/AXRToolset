@@ -195,7 +195,7 @@ function cMainMenu:Show(bool)
 		if (dds and dds:PixelFormatIsDXT1()) then
 			Msg("checking for 1-bit alpha %s",fname)
 			if (dds:HasAlpha()) then
-				local relative_path = trim_final_backslash(string.gsub(path,escape_lua_pattern(i_p),""))
+				local relative_path = trim_backslash(string.gsub(path,escape_lua_pattern(i_p),""))
 				RunWait( strformat([ [xcopy "%s" "%s" /y /i /q /c] ],i_p.."\\"..trim_ext(relative_path).."\\"..trim_ext(fname)..".thm",o_p..relative_path.."\\") , working_directory )
 				RunWait( strformat([ [xcopy "%s" "%s" /y /i /q /c] ],i_p.."\\"..trim_ext(relative_path).."\\"..fname,o_p..relative_path.."\\") , working_directory )
 			end
@@ -208,7 +208,7 @@ function cMainMenu:Show(bool)
 	local ltx = cIniFile("debug_visual.ltx")
 	local ipath = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\meshes\\actors"
 	local function on_execute(path,fname,fullpath)
-		local relative_path = trim_ext("actors"..trim_final_backslash(string.gsub(fullpath,escape_lua_pattern(ipath),"")))
+		local relative_path = trim_ext("actors"..trim_backslash(string.gsub(fullpath,escape_lua_pattern(ipath),"")))
 		if (ltx:GetValue("visual_at_cursor",relative_path)) then
 			local ogf = cOGF(fullpath)
 			if (ogf) then
@@ -243,7 +243,7 @@ function cMainMenu:Show(bool)
 	local ipath = "E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\meshes\\monsters"
 	lfs.mkdir("E:\\STALKER\\Games\\COP_COC_db_converter\\unpacked\\textures\\monsters")
 	local function on_execute(path,fname,fullpath)
-		local relative_path = trim_ext("monsters"..trim_final_backslash(string.gsub(fullpath,escape_lua_pattern(ipath),"")))
+		local relative_path = trim_ext("monsters"..trim_backslash(string.gsub(fullpath,escape_lua_pattern(ipath),"")))
 		local ogf = cOGF(fullpath)
 		if (ogf) then
 			Msg("scanning...%s",fname)

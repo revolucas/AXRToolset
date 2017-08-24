@@ -6,14 +6,6 @@ function rem_quotes(txt)
 	return txt
 end
 
-function trim_final_backslash(s)
-	local a,b = string.find(s,"\\",s:len())
-	if (a) then 
-		return string.sub(s,1,a-1)
-	end 
-	return s
-end
-
 function escape_lua_pattern(s)
 	local matches = {
 		["^"] = "%^",
@@ -86,6 +78,10 @@ end
 
 function trim(s)
 	return s and (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
+function trim_backslash(s)
+	return s and (string.gsub(s, "^[\\%s]*(.-)[\\%s]*$", "%1"))
 end
 
 function clamp(val, min, max)

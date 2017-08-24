@@ -169,19 +169,21 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 		--@start /wait converter.exe -ogf -object wpn_pkm_trenoga.ogf -out wpn_pkm_trenoga.object
 		if (Checks[tab]) then
 			for i=1,3 do
-				local bool = ahkGetVar("UIConverterCheck"..Checks[tab][i]..tab)
+				if (make_batch_ltx) then 
+					if not (batch_ltx) then 
+						batch_ltx = cIniFile(output_path.."\\batch_convert.ltx")
+						batch_ltx.root = {}
+					end
+					
+					local rel_p = trim_backslash(trim_backslash(string.gsub(path,escape_lua_pattern(input_path),"")).."\\"..trim_ext(fname))
+					batch_ltx:SetValue("ogf","import\\"..rel_p,"export\\"..rel_p)
+				end
 				if (gSettings:GetValue("converter","check_"..Checks[tab][i]..tab,"") == "1") then
 					local ext = Checks[tab][i]
 					local filename = trim_ext(fname).."."..ext
-					local relative_path = trim_final_backslash(string.gsub(path,escape_lua_pattern(input_path),"")).."\\"..filename
+					local relative_path = trim_backslash(trim_backslash(string.gsub(path,escape_lua_pattern(input_path),"")).."\\"..filename)
 					local new_output_path = output_path..relative_path
 					RunWait( strformat([["%s" -ogf -%s "%s" -out "%s"]],cp,Checks[tab][i],path.."\\"..fname,new_output_path), working_directory )
-					if (make_batch_ltx) then 
-						if not (batch_ltx) then 
-							batch_ltx = cIniFile(output_path.."\\batch_convert.ltx")
-						end
-						batch_ltx:SetValue("ogf","import\\"..trim_ext(relative_path),"export\\"..trim_ext(relative_path))
-					end
 					
 					if (ext == "object") and (force_progressive) and ( --[[string.find(path,"actors")--]] string.find(fname,"_lod") == nil) then
 						-- Force Make Progressive
