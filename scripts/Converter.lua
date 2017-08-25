@@ -148,6 +148,7 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 	local working_directory = ahkGetVar("A_WorkingDir")..[[\bin\]]
 	local cp = working_directory .. "converter.exe"
 
+	lfs.mkdir(output_path)
 	--[[	Flags32			m_objectFlags;
 	enum{
 		eoDynamic 	 	= (1<<0),			
@@ -182,7 +183,7 @@ function cUIConverter:ActionExecute1(tab,input_path,output_path)
 					local ext = Checks[tab][i]
 					local filename = trim_ext(fname).."."..ext
 					local relative_path = trim_backslash(trim_backslash(string.gsub(path,escape_lua_pattern(input_path),"")).."\\"..filename)
-					local new_output_path = output_path..relative_path
+					local new_output_path = output_path.."\\"..relative_path
 					RunWait( strformat([["%s" -ogf -%s "%s" -out "%s"]],cp,Checks[tab][i],path.."\\"..fname,new_output_path), working_directory )
 					
 					if (ext == "object") and (force_progressive) and ( --[[string.find(path,"actors")--]] string.find(fname,"_lod") == nil) then
