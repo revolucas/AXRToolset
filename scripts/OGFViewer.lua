@@ -59,7 +59,7 @@ function cUIOGFViewer:Reinit()
 	
 	for i=1,#tabs do
 		local i_s = tostring(i)
-		if (i == 1) then 
+		--if (i == 1) then 
 			local filters = table.concat({"All"},"^")
 			self:Gui("Tab|%s",Language.translate(tabs[i]))
 				self:Gui("Add|Text|x560 y555 w230 h20 cRed|%t_click_to_edit")
@@ -88,13 +88,13 @@ function cUIOGFViewer:Reinit()
 				self:Gui("Add|Button|gOnScriptControlAction x555 y69 w20 h20 vUIOGFViewerSearchButton%s|>",i)
 				
 			GuiControl(self.ID,"","UIOGFViewerPath"..i, gSettings:GetValue("ogf_viewer","path"..i) or "")
-		end
+		--end
 	end
 	
 	self:Gui("Show|w1024 h720|%t_plugin_ogf_viewer")
 
 	LV("LV_Delete",self.ID)
-	clear(self.list)
+	empty(self.list)
 end
 
 function cUIOGFViewer:OnGuiClose(idx) -- needed because it's registered to callback
@@ -113,7 +113,7 @@ function cUIOGFViewer:OnScriptControlAction(hwnd,event,info) -- needed because i
 		if (event and string.lower(event) == "rightclick") then
 			LVTop(self.ID,"UIOGFViewerLV"..tab)
 			local row = LVGetNext(self.ID,"0","UIOGFViewerLV"..tab)
-			local txt = LVGetText(self.ID,row,"1")
+			local txt = LVGetText(self.ID,row,"2")
 			--Msg("event=%s LVGetNext=%s txt=%s",event,LVGetNext(self.ID,"0","UIOGFViewerLV"..tab),txt)
 			if (txt and txt ~= "" and not self.listItemSelected) then 
 				self.listItemSelected = txt
@@ -205,7 +205,7 @@ function cUIOGFViewer:FillListView(tab)
 end
 
 function cUIOGFViewer:FillListView1(tab,selected,dir,skip)
-	local fields = {"filename"}
+	local fields = {"filename","path"}
 	for i=1,#fields do 
 		LV("LV_InsertCol",self.ID,tostring(i),"",fields[i])
 	end
@@ -215,14 +215,14 @@ function cUIOGFViewer:FillListView1(tab,selected,dir,skip)
 	local search_str = trim(ahkGetVar("UIOGFViewerSearch"..tab))
 	local function on_execute(path,fname)
 		if (search_str == nil or search_str == "" or fname:match(search_str)) then
-			self.list[fname] = path.."\\"..fname
+			self.list[path.."\\"..fname] = true
 		end
 	end
 	
-	file_for_each(dir,{"ogf"},on_execute,ahkGetVar("UIOGFViewerBrowseRecur"..tab) ~= "1")
+	file_for_each(dir,{"ogf","object"},on_execute,ahkGetVar("UIOGFViewerBrowseRecur"..tab) ~= "1")
 	
 	for k,v in pairs(self.list) do
-		LV("LV_ADD",self.ID,"",k)
+		LV("LV_ADD",self.ID,"",trim_directory(k),k)
 	end
 end
 -----------------------------------------------------------------
@@ -274,64 +274,21 @@ function cUIOGFViewerModify:Reinit()
 		return Msgbox("An error has occured. listItemSelected = nil!")
 	end
 	
-	local fname = wnd.listItemSelected
-	if not (wnd.list[fname]) then 
+	local full_path = wnd.listItemSelected
+	if not (wnd.list[full_path]) then 
 		return
 	end
 	
-	wnd.ogf[fname] = wnd.ogf[fname] or cOGF(wnd.list[fname])
-
-	if not (wnd.ogf[fname]) then
-		Msg("failed to load %s",fname)
-		return
-	end 
-
-	local params = wnd.ogf[fname]:params()
-	
-	self:Gui("Add|Text|w1000 h30 center|%s",fname)
-	self:Gui("Add|Text|x5 y35 w700 h30|Source: %s",params.source_file)
-	self:Gui("Add|Text|x5 y65 w700 h30|Build: %s",params.build_name)
-	self:Gui("Add|Text|x5 y95 w700 h30|Created by: %s",params.create_name)
-	self:Gui("Add|Text|x5 y125 w700 h30|Modified by:%s",params.modif_name)
-
-	
-	local y = 125+35
-	for _,field in ipairs({"motion_refs","motion_refs2","lod_path","userdata","bones"}) do
-		if (params[field]) then
-			self:Gui("Add|Text|x5 y%s w300 h30|Skeleton %s",y,field)
-			if (field == "userdata") then
-				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field] or "")
-			else
-				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field] or "")
-			end
-			y = y + 30
-		end
+	self:Gui("Add|Text|w1000 h30 center|%s",trim_directory(full_path))
+	local ext = get_ext(full_path)
+	if (ext == "ogf") then
+		self:process_ogf(full_path)
+	elseif (ext == "object") then 
+		self:process_eobj(full_path)
 	end
 	
-	-- children
-	for _,field in ipairs({"texture","shader"}) do
-		if (wnd.ogf[fname].children) then
-			for i,child in ipairs(wnd.ogf[fname].children) do 
-				local child_params = child:params()
-				if (child_params[field]) then
-					self:Gui("Add|Text|x5 y%s w300 h30|Mesh%s %s",y,i,field)
-					if (field == "userdata") then
-						self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
-					else
-						self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
-					end
-					y = y + 30
-				end
-			end
-		end
-	end
-	
- 
-	self:Gui("Add|Button|gOnScriptControlAction x12 default vUIOGFViewerModifyAccept2|%t_accept")
+ 	self:Gui("Add|Button|gOnScriptControlAction x12 default vUIOGFViewerModifyAccept2|%t_accept")
 	self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyCancel2|%t_cancel")
-	--self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyOpenDDS2|%t_open .DDS")
-	--self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyCopy2|%t_copy")
-	--self:Gui("Add|Button|gOnScriptControlAction x+4 vUIOGFViewerModifyPaste2|%t_paste")
 	--self:Gui("+Resize +MaxSize1000x800 +0x200000")
 	self:Gui("Show|center|%t_edit_values")
 	self:Gui("Default")
@@ -359,68 +316,130 @@ function cUIOGFViewerModify:OnScriptControlAction(hwnd,event,info) -- needed bec
 			Msg("ogf is nil %s",fname)
 			return
 		end
-		local val
-		for _,field in ipairs({"motion_refs","motion_refs2","lod_path","userdata"}) do
-			val = ahkGetVar("UIOGFViewerModifyEdit2"..field)
-			if (field == "motion_refs2" or field == "bones") then 
-				ogf[field] = val ~= "" and str_explode(val,",") or {}
-			else
-				ogf[field] = trim(val)
+		
+		local ext = get_ext(fname)
+		
+		if (ext == "ogf") then
+			local val
+			for _,field in ipairs({"motion_refs","motion_refs2","lod_path","userdata"}) do
+				val = ahkGetVar("UIOGFViewerModifyEdit2"..field)
+				if (field == "motion_refs2" or field == "bones") then 
+					ogf[field] = val ~= "" and str_explode(val,",") or {}
+				else
+					ogf[field] = trim(val)
+				end
 			end
-		end
 
-		for _,field in ipairs({"texture","shader"}) do
-			if (ogf.children) then
-				for i,child in ipairs(ogf.children) do 
-					val = ahkGetVar("UIOGFViewerModifyEdit2_child"..i.."_"..field)
-					if (val and val ~= "") then
-						child[field] = trim(val)
+			for _,field in ipairs({"texture","shader"}) do
+				if (ogf.children) then
+					for i,child in ipairs(ogf.children) do 
+						val = ahkGetVar("UIOGFViewerModifyEdit2_child"..i.."_"..field)
+						if (val and val ~= "") then
+							child[field] = trim(val)
+						end
 					end
 				end
 			end
+		elseif (ext == "object") then 
+		
 		end
 		
 		ogf:save()
 		
 		LVTop(wnd.ID,"UIOGFViewerLV"..tab)
-		LV("LV_Modify",wnd.ID,self.modify_row,"",wnd.listItemSelected)
+		LV("LV_Modify",wnd.ID,self.modify_row,"",trim_directory(wnd.listItemSelected))
 		
 		self:Show(false)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerModifyCancel2")) then
 		self:Show(false)
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerModifyOpenDDS2")) then 
-		local wnd = Get()
-		local fname = wnd.listItemSelected
-		local list = assert(wnd.list[fname])
-		local full_path = list[1].."\\"..fname
-		
-		os.execute(strformat([[start "" "%s"]],full_path))
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerModifyCopy2")) then
-		local wnd = Get()
-		local fname = wnd.listItemSelected
-		local list = assert(wnd.list[fname])
-		local ogf_path = list[1].."\\"..list[2]
-		
-		local t = wnd.ogf[ogf_path].params
-		for k,v in pairs(t) do
-			clipboard[k] = v
-		end
-	elseif (hwnd == GuiControlGet(self.ID,"hwnd","UIOGFViewerModifyPaste2")) then
-		local wnd = Get()
-		local fname = wnd.listItemSelected
-		local list = assert(wnd.list[fname])
-		local ogf_path = list[1].."\\"..list[2]
-		for k,v in pairs(clipboard) do 
-			wnd.ogf[ogf_path].params[k] = v
-		end
-		
-		local selected = fname
-		self:Show(false)
-		wnd.listItemSelected = fname
-		self:Show(true)
 	end
 end
 
 function cUIOGFViewerModify:Gui(...)
 	self.inherited[1].Gui(self,...)
+end
+
+function cUIOGFViewerModify:process_ogf(full_path)
+	local wnd = Get()
+	wnd.ogf[full_path] = wnd.ogf[full_path] or cOGF(full_path)
+
+	if not (wnd.ogf[full_path]) then
+		Msg("failed to load %s",full_path)
+		return
+	end 
+
+	local params = wnd.ogf[full_path]:params()
+	
+	self:Gui("Add|Text|x5 y35 w700 h30|Source: %s",params.source_file)
+	self:Gui("Add|Text|x5 y65 w700 h30|Build: %s",params.build_name)
+	self:Gui("Add|Text|x5 y95 w700 h30|Created by: %s",params.create_name)
+	self:Gui("Add|Text|x5 y125 w700 h30|Modified by:%s",params.modif_name)
+
+	local y = 125+35
+	for _,field in ipairs({"motion_refs","motion_refs2","lod_path","userdata","bones"}) do
+		if (params[field]) then
+			self:Gui("Add|Text|x5 y%s w300 h30|Skeleton %s",y,field)
+			if (field == "userdata") then
+				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field] or "")
+			else
+				self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,params[field] or "")
+			end
+			y = y + 30
+		end
+	end
+	
+	-- children
+	for _,field in ipairs({"texture","shader"}) do
+		if (wnd.ogf[full_path].children) then
+			for i,child in ipairs(wnd.ogf[full_path].children) do 
+				local child_params = child:params()
+				if (child_params[field]) then
+					self:Gui("Add|Text|x5 y%s w300 h30|Mesh%s %s",y,i,field)
+					if (field == "userdata") then
+						self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
+					else
+						self:Gui("Add|Edit|x200 y%s w800 h30 vUIOGFViewerModifyEdit2_child%s_%s|%s",y,i,field,child_params[field])
+					end
+					y = y + 30
+				end
+			end
+		end
+	end
+end
+
+function cUIOGFViewerModify:process_eobj(full_path)
+	local wnd = Get()
+	
+	wnd.ogf[full_path] = wnd.ogf[full_path] or cEObject(full_path)
+	if not (wnd.ogf[full_path]) then
+		Msg("failed to load %s",full_path)
+		return
+	end 
+	
+	local obj = wnd.ogf[full_path]
+	
+	self:Gui("Add|Text|x5 y5 w700 h30|Surfaces: %s",obj.params.surfaces and #obj.params.surfaces or 0)
+	local y = 35
+	local x = 5
+	for field,v in spairs(obj.params) do 
+		if (field == "surfaces") then 
+			for i,t in ipairs(v) do
+				for kk,vv in spairs(t) do
+					if (type(vv) == "number") then 
+						w = 50
+					else 
+						w = 200
+					end 
+					self:Gui("Add|Edit|x%s y%s w%s h30 vUIOGFViewerModifyEdit2%s%s|%s",x,y,w,kk,i,vv or "")
+					x = x + w
+				end
+				x = 5
+				y = y + 35
+			end
+		else
+			x = 5
+			self:Gui("Add|Edit|x5 y%s w1000 h30 vUIOGFViewerModifyEdit2%s|%s",y,field,v or "")
+			y = y + 35
+		end
+	end
 end

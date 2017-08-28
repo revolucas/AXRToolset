@@ -7,7 +7,7 @@ function cBinaryData:initialize(fname,partial,start,chunk)
 	if (fname and file_exists(fname)) then
 		local f, err = io.open(fname,"rb")
 		if (f == nil or err) then 
-			error(err)
+			Msg(err)
 		end
 		
 		if (start) then
