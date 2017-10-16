@@ -205,7 +205,7 @@ function cImageMagick:ActionExecute1(tab,input_path,output_path)
 			local command_line_options = ""
 			local output_format = dds and (dds.pixel_format.dwFourCC == "DXT5" and "dxt5" or  dds.pixel_format.dwFourCC == "DXT3" and "dxt5" or dds.pixel_format.dwFourCC == "DXT1" and "dxt1") or nil
 			if (output_format) then
-				command_line_options = user_command_line_options .. " -define dds:compression="..output_format.." "
+				command_line_options = "-define dds:compression="..output_format.." "..user_command_line_options
 				if (output_format == "dxt1" and dds:HasAlpha()) then 
 					skip = true
 					Msg("DXT1a not supported skipping image")
@@ -217,8 +217,8 @@ function cImageMagick:ActionExecute1(tab,input_path,output_path)
 				
 				lfs.mkdir(get_path(local_path))
 				
-				Msg("%s converting",local_path)
-				
+				Msg("%s",full_path)
+
 				if (use_mogrify) then
 					RunWait( strformat([["%s" %s "%s"]],cp,command_line_options,local_path) , working_directory )
 				else

@@ -197,7 +197,9 @@ function file_for_each(node,ext,func,nonrecursive,...)
 					if (mode == "file") then
 						for i=1,#ext do
 							if (lfs_ignore_exact_ext_match and string.find(get_ext(file), ext[i]) or get_ext(file) == ext[i]) then
-								func(node,file,fullpath,...)
+								if (func(node,file,fullpath,...) == true) then 
+									return
+								end
 							end
 						end
 					elseif (mode == "directory" and nonrecursive ~= true) then

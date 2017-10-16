@@ -425,7 +425,7 @@ function ActionUnpack()
 	
 	Msg("DB Tool:= Unpacking...")
 	
-	local function on_execute(path,fname)
+	local function on_execute(path,fname,fullpath)
 		if (string.find(fname,"patch")) then -- do patches last!
 			patches[#patches + 1] = path.."\\"..fname
 		else
@@ -438,7 +438,11 @@ function ActionUnpack()
 	
 	_G.lfs_ignore_exact_ext_match = true
 	-- ???
-	file_for_each(input_path,{"db"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
+	if (input_path:sub(-3) == ".db" or string.find(input_path:sub(-4),".db")) then
+		on_execute(get_path(input_path),trim_directory(input_path),input_path)
+	else
+		file_for_each(input_path,{"db"},on_execute,ahkGetVar("UICoCDBToolBrowseRecur") ~= "1")
+	end
 	
 	table.sort(patches)
 	for i=1,#patches do
