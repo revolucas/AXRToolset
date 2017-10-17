@@ -47,7 +47,8 @@ exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.cmd,
 [exclude_folders]
 ai\ = true 
 anims\ = true
-%s\ = true
+config\ = true
+configs\ = true
 ;levels\ = true
 meshes\ = true 
 scripts\ = true 
@@ -56,6 +57,36 @@ sounds\ = true
 spawns\ = true
 textures\ = true
 ]]
+
+local data_for_textures = [[
+[header]
+auto_load = true
+level_name = single ; former level name, now can be mod name
+level_ver = 1.0 ; former level version, now can be mod version
+entry_point = $fs_root$\gamedata\ ; do not change !
+creator = "Team EPIC" ; creator's name
+link = "forum.epicstalker.com" ; creator's link
+
+[options] ; exclude files from compression with such extension
+exclude_exts = *.ncb,*.sln,*.vcproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.exe,*.cmd,*.bat,*.db,*.xdb,*.bak*,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.rtf,*.doc,*.log,*.*~*,*~*.*,*.rar,*.sfk,*.tmp,*.xr
+
+[include_folders]
+.\ = true
+
+[exclude_folders]
+ai\ = true 
+anims\ = true
+config\ = true
+configs\ = true
+levels\ = true
+meshes\ = true 
+scripts\ = true 
+shaders\ = true
+sounds\ = true 
+spawns\ = true
+;textures\ = true
+]]
+
 local data_for_thms = [[
 [header]
 auto_load = true
@@ -153,6 +184,21 @@ function cUICoCDBTool:Reinit()
 			
 			self:Gui("Add|DropDownList|gOnScriptControlAction x550 y80 vUICoCDBToolDBToolListDbTypePack%s Choose%s|xdb^2947ru", tab, pack_db_type == '2947ru' and 2 or 1)
 			
+			local level_list_str, texture_list_str = "none", "none"
+			local i_p = gSettings:GetValue("dbtool","path"..tab) or ""
+			if (i_p ~= "") then
+				local function get_level_list(path,dir)
+					level_list_str = level_list_str .. "^" .. dir
+				end
+				directory_for_each(i_p.."\\levels",get_level_list)
+				local function get_texture_list(path,dir)
+					texture_list_str = texture_list_str .. "^" .. dir
+				end
+				directory_for_each(i_p.."\\textures",get_texture_list)
+			end
+			self:Gui("Add|DropDownList|gOnScriptControlAction x550 y250 vUICoCDBToolDBToolListLevel%s Choose1|%s",tab,level_list_str)
+			self:Gui("Add|DropDownList|gOnScriptControlAction x550 y270 vUICoCDBToolDBToolListTexture%s Choose1|%s",tab,texture_list_str)
+		
 		GuiControl(self.ID,"","UICoCDBToolInputPath"..tab, gSettings:GetValue("dbtool","path"..tab) or "")
 		GuiControl(self.ID,"","UICoCDBToolOutputPath"..tab, gSettings:GetValue("dbtool","output_path"..tab) or "")
 	end
@@ -193,6 +239,26 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","path"..tab) or ""))
 			if (dir and dir ~= "") then
 				GuiControl(self.ID,"","UICoCDBToolInputPath"..tab,dir)
+				
+				local level_list_str, texture_list_str = "none", "none"
+				local i_p = dir
+				if (i_p ~= "") then
+					local function get_level_list(path,dir)
+						level_list_str = level_list_str .. "|" .. dir
+					end
+					directory_for_each(i_p.."\\levels",get_level_list)
+					local function get_texture_list(path,dir)
+						texture_list_str = texture_list_str .. "|" .. dir
+					end
+					directory_for_each(i_p.."\\textures",get_texture_list)
+				end
+			
+				GuiControl(self.ID,"","UICoCDBToolDBToolListLevel"..tab, "|")
+				GuiControl(self.ID,"","UICoCDBToolDBToolListTexture"..tab, "|")
+				GuiControl(self.ID,"","UICoCDBToolDBToolListLevel"..tab, level_list_str)
+				GuiControl(self.ID,"","UICoCDBToolDBToolListTexture"..tab, texture_list_str)
+				GuiControl(self.ID,"Choose","UICoCDBToolDBToolListLevel"..tab, 1)
+				GuiControl(self.ID,"Choose","UICoCDBToolDBToolListTexture"..tab, 1)
 			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolBrowseOutputPath"..tab)) then 
 			local dir = FileSelectFolder("*"..(gSettings:GetValue("dbtool","output_path"..tab) or ""))
@@ -201,6 +267,10 @@ function cUICoCDBTool:OnScriptControlAction(hwnd,event,info) -- needed because i
 			end
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolDBToolListDbTypePack"..tab)) then
 			GuiControl(self.ID,"",strformat('UICoCDBToolCheck_%s_%s',3,tab),type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)])
+		elseif (hwnd == GuiControlGet(self.ID,"hwnd","vUICoCDBToolDBToolListLevel"..tab)) then 
+		
+		elseif (hwnd == GuiControlGet(self.ID,"hwnd","vUICoCDBToolDBToolListTexture"..tab)) then  
+		
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolExecute"..tab)) then
 			ActionSubmit(tab)
 		elseif (hwnd == GuiControlGet(self.ID,"hwnd","UICoCDBToolSaveSettings"..tab)) then
@@ -269,8 +339,11 @@ function ActionSubmit(tab)
 	local cp = working_directory.."xrCompress.exe"
 	local dir = trim_directory(input_path)
 	local parent_dir = get_path(input_path)
-	local check_clear_out, level_directories = {}, {}
+	local check_clear_out, level_directories, texture_directories = {}, {}, {}
 	outdir[type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)]] = "configs"
+	
+	local single_level_select = ahkGetVar("UICoCDBToolDBToolListLevel"..tab)
+	local single_texture_select = ahkGetVar("UICoCDBToolDBToolListTexture"..tab)
 	
 	Msg("DB Tool:= working...")
 	
@@ -283,7 +356,7 @@ function ActionSubmit(tab)
 		end
 		directory_for_each(input_path.."\\levels",generate_level_options1)
 		local function generate_level_options2(dir)
-			local data = strformat(data_for_levels, type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)])
+			local data = data_for_levels
 			for k,v in pairs(level_directories) do 
 				if (k ~= dir) then
 					data = data .. "\nlevels\\" .. k .. "\\ = true"
@@ -297,6 +370,56 @@ function ActionSubmit(tab)
 		end
 		for k,v in pairs(level_directories) do 
 			generate_level_options2(k)
+		end
+	end
+	
+	-- create compress_*.ltx for textures
+	if (gSettings:GetValue("dbtool",'check_10_'..tab) == "1") then
+		file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_textures_')
+		Sleep(1000)
+		local ignore_list_data = ""
+		local i_o = input_path.."\\"
+		local function generate_ignore_list(node,file,fullpath)
+			local relative_file_path = trim(string.sub(node,i_o:len()+1)) .. "\\" .. file
+			ignore_list_data = ignore_list_data .. relative_file_path .. "\n"
+		end
+		file_for_each(input_path.."\\textures", {"dds","ogm","seq"}, generate_ignore_list, true)
+		local function generate_texture_options1(path,dir)
+			texture_directories[dir] = true
+		end
+		directory_for_each(input_path.."\\textures",generate_texture_options1)
+		local function generate_texture_options2(dir)
+			local data = data_for_textures
+			for k,v in pairs(texture_directories) do 
+				if (k ~= dir) then
+					data = data .. "\ntextures\\" .. k .. "\\ = true"
+				end
+			end
+			
+			data = data .. "\n[exclude_files]\n" .. ignore_list_data
+			
+			local output_file = io.open(config_dir.."compress_textures_"..dir..".ltx","wb+")
+			if (output_file) then
+				output_file:write(data)
+				output_file:close()
+			end
+		end
+		for k,v in pairs(texture_directories) do 
+			generate_texture_options2(k)
+		end
+		
+		-- for base directory
+		local data = data_for_textures
+		for k,v in pairs(texture_directories) do 
+			data = data .. "\ntextures\\" .. k .. "\\ = true"
+		end
+		
+		data = data .. "\n[include_files]\n" .. ignore_list_data
+		
+		local output_file = io.open(config_dir.."compress_textures.ltx","wb+")
+		if (output_file) then
+			output_file:write(data)
+			output_file:close()
 		end
 	end
 	
@@ -327,8 +450,8 @@ function ActionSubmit(tab)
 	
 	local function create_output(name,out, pack_levels)
 		local pltx = pack_levels and "compress_levels_"..name..".ltx" or "compress_"..name..".ltx"
-		local nocompress = --[[pack_levels and (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and '-nocompress' or]] ''	-- It required for levels SoC ??
-		local cmdline = strformat([["%s" "%s" -ltx %s -pack -db -1024 %s]],cp,input_path,pltx,nocompress)
+		--local nocompress = pack_levels and (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and '-nocompress' or ''	-- It required for levels SoC ??
+		local cmdline = strformat([["%s" "%s" -ltx %s -pack -db -1024]],cp,input_path,pltx)
 		Msg(strformat('DB Tool:= Start compression for structure %s %s\ncmdline: %s', ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab), name, cmdline))
 		local function temp_move(_in, _out)
 			if (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and (name ~= 'config') then
@@ -372,8 +495,21 @@ function ActionSubmit(tab)
 		local chk = gSettings:GetValue("dbtool",strformat('check_%s_%s',i,tab))
 		if (chk == nil or chk == "1") then
 			if i == 8 then
-				for k,v in spairs(level_directories) do 
-					create_output(k,output_path.."\\maps",true)
+				if (single_level_select and level_directories[single_level_select]) then 
+					create_output(single_level_select,output_path.."\\maps",true)
+				else
+					for k,v in spairs(level_directories) do 
+						create_output(k,output_path.."\\maps",true)
+					end
+				end
+			elseif (i == 10) then
+				create_output("textures",output_path.."\\resources")
+				if (single_texture_select and texture_directories[single_texture_select]) then 
+					create_output("textures_"..single_texture_select,output_path.."\\resources")
+				else
+					for k,v in spairs(texture_directories) do
+						create_output("textures_"..k,output_path.."\\resources")
+					end
 				end
 			else
 				local folder_name = i == 3 and type_dbs[ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab)] or DBChecks[i]
