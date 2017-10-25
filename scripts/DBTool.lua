@@ -172,6 +172,8 @@ function cUICoCDBTool:Reinit()
 				y = y + 20
 			end
 			
+			self:Gui("Add|CheckBox|x550 y200 w100 h22 %s vUICoCDBToolCheck_%s_no_compress|-no_compress",gSettings:GetValue("dbtool",strformat('check_%s_no_compress',tab)) == "1" and "Checked" or "",tab)
+			
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath%s|...",tab)
 			self:Gui("Add|Button|gOnScriptControlAction x485 y180 w30 h20 vUICoCDBToolBrowseOutputPath%s|...",tab)
@@ -326,6 +328,7 @@ function ActionSubmit(tab)
 		local bool = ahkGetVar("UICoCDBToolCheck_"..i..'_'..tab)
 		gSettings:SetValue("dbtool",strformat('check_%s_%s',i,tab),bool)
 	end
+	gSettings:SetValue("dbtool",strformat('check_%s_no_compress',tab),ahkGetVar("UICoCDBToolCheck_"..tab.."_no_compress"))
 	gSettings:SetValue("dbtool","path"..tab,input_path)
 	gSettings:SetValue("dbtool","output_path"..tab,output_path)
 	gSettings:SetValue("dbtool","pack_db_type"..tab, ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab))
@@ -451,7 +454,8 @@ function ActionSubmit(tab)
 	local function create_output(name,out, pack_levels)
 		local pltx = pack_levels and "compress_levels_"..name..".ltx" or "compress_"..name..".ltx"
 		--local nocompress = pack_levels and (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and '-nocompress' or ''	-- It required for levels SoC ??
-		local cmdline = strformat([["%s" "%s" -ltx %s -pack -db -1024]],cp,input_path,pltx)
+		local nocompress = gSettings:GetValue("dbtool",'check_'..tab.."_no_compress") == "1" and "-nocompress" or ""
+		local cmdline = strformat([["%s" "%s" -ltx %s -pack -db -1024 %s]],cp,input_path,pltx,nocompress)
 		Msg(strformat('DB Tool:= Start compression for structure %s %s\ncmdline: %s', ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab), name, cmdline))
 		local function temp_move(_in, _out)
 			if (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and (name ~= 'config') then
