@@ -295,8 +295,21 @@ local function check_out_folder(output_path)
 	end
 end
 
-local function remove_files(node,file,fullpath,name,levels)
-	if not name or (levels and (name..'.db' == file or name..'.xdb' == file) or not levels and string.find(file, name)) then
+local function remove_files(node,file,fullpath,name)
+	if (name) then
+		if (string.find(file,name..".db") or string.find(file,name..".xdb")) then 
+			Msg(strformat('DB Tool:= remove %s', fullpath))
+			os.remove(fullpath)
+			return
+		end
+		return
+	end
+	Msg(strformat('DB Tool:= remove %s', fullpath))
+	os.remove(fullpath)		
+end
+
+local function remove_by_match(node,file,fullpath,name)
+	if (string.find(file, name)) then
 		Msg(strformat('DB Tool:= remove %s', fullpath))
 		os.remove(fullpath)
 	end
@@ -352,7 +365,7 @@ function ActionSubmit(tab)
 	
 	-- create compress_*.ltx for levels
 	if (gSettings:GetValue("dbtool",'check_8_'..tab) == "1") then
-		file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_levels_')
+		file_for_each(config_dir, {"ltx"}, remove_by_match, true, 'compress_levels_')
 		Sleep(1000)
 		local function generate_level_options1(path,dir)
 			level_directories[dir] = true
@@ -360,6 +373,7 @@ function ActionSubmit(tab)
 		directory_for_each(input_path.."\\levels",generate_level_options1)
 		local function generate_level_options2(dir)
 			local data = data_for_levels
+			
 			for k,v in pairs(level_directories) do 
 				if (k ~= dir) then
 					data = data .. "\nlevels\\" .. k .. "\\ = true"
@@ -378,7 +392,7 @@ function ActionSubmit(tab)
 	
 	-- create compress_*.ltx for textures
 	if (gSettings:GetValue("dbtool",'check_10_'..tab) == "1") then
-		file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_textures_')
+		file_for_each(config_dir, {"ltx"}, remove_by_match, true, 'compress_textures_')
 		Sleep(1000)
 		local ignore_list_data = ""
 		local i_o = input_path.."\\"
@@ -428,7 +442,7 @@ function ActionSubmit(tab)
 	
 	-- create compress_*.ltx for thms
 	if (gSettings:GetValue("dbtool",'check_12_'..tab) == "1") then
-		file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_thms')
+		file_for_each(config_dir, {"ltx"}, remove_by_match, true, 'compress_thms')
 		Sleep(1000)
 		
 		local i_o = input_path.."\\"
@@ -474,13 +488,13 @@ function ActionSubmit(tab)
 
 		lfs.mkdir(out)
 		
-		if not check_clear_out[name] then
+--[[ 		if not check_clear_out[name] then
 			_G.lfs_ignore_exact_ext_match = true
 			-- ???
 			file_for_each(out, {"db"}, remove_files, true, name, pack_levels)
 			check_clear_out[name] = true
 			Sleep(1000)
-		end
+		end ]]
 		
 		local db_id = 0
 		local function rename_pack_in_db(node,file,fullpath)
@@ -522,7 +536,8 @@ function ActionSubmit(tab)
 		end
 	end
 	
-	file_for_each(config_dir, {"ltx"}, remove_files, true, 'compress_levels_')
+	Sleep(2000)
+	file_for_each(config_dir, {"ltx"}, remove_by_match, true, 'compress_levels_')
 	Sleep(1000)
 	
 	Msg("DB Tool:= Finished!")
