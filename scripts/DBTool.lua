@@ -488,13 +488,13 @@ function ActionSubmit(tab)
 
 		lfs.mkdir(out)
 		
---[[ 		if not check_clear_out[name] then
+ 		if not check_clear_out[name] then
 			_G.lfs_ignore_exact_ext_match = true
 			-- ???
 			file_for_each(out, {"db"}, remove_files, true, name, pack_levels)
 			check_clear_out[name] = true
 			Sleep(1000)
-		end ]]
+		end
 		
 		local db_id = 0
 		local function rename_pack_in_db(node,file,fullpath)
