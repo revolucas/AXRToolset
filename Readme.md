@@ -7,6 +7,9 @@ scripted plugins that do various automated tasks. Although the current plugins a
 
 Plugins can be coded in lua with exported API from AutoHotkey. This gives an advantage over using pure AHK, allowing you to use lua's natural ability for procedural and object-oriented programming and allows AHK to be executed from lua at run time without having to re-compile binaries. Using AHK fills in the gap of pretty much everything lua cannot do on it's own, like the advantages of using Unicode, creating simple GUIs, macros, File handling, OS hooks, etc.
 
+####Dependencies
+Requires Microsoft Visual C++ 2013 x86: https://www.microsoft.com/en-us/download/details.aspx?id=40784
+
 ####Wiki
 ---------
 https://github.com/revolucas/AXRToolset/wiki/
