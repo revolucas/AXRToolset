@@ -357,9 +357,9 @@ function cUITHMViewer:ActionExecute2(tab)
 							end
 
 							-- CHECK BUMP MODE
-							if (string.find(fname,"_bump#.dds")) then
+							if (string.find(fname,"_bump#")) then
 								table.insert(errors,strformat("%s doesn't need *.thm",fname))
-							elseif (string.find(fname,"_bump.dds")) then
+							elseif (string.find(fname,"_bump")) then
 								if not (thm.params.texture_type == "BumpMap") then
 									table.insert(errors,strformat("[TextureType] %s has texture_type %s but dds has _bump.dds postfix. Should be BumpMap.\n",fn,thm.params.texture_type))
 									needs_resync = true
