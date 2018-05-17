@@ -34,9 +34,9 @@ function addTab(s,n)
 	return s .. table.concat(padding)
 end
 	
-function trim_ext(str)
-	local a = string.find(str,"%.")
-	return a and trim(string.sub(str,1,a-1)) or str
+function trim_ext(s)
+	local ret = s:gsub("(%..*)","")
+	return ret
 end
 
 function trim_comment(str)

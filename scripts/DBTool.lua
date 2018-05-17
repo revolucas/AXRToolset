@@ -297,7 +297,8 @@ end
 
 local function remove_files(node,file,fullpath,name)
 	if (name) then
-		if (string.find(file,name..".db") or string.find(file,name..".xdb")) then 
+		local fname = trim_ext(file)
+		if (fname == name) then 
 			Msg(strformat('DB Tool:= remove %s', fullpath))
 			os.remove(fullpath)
 			return

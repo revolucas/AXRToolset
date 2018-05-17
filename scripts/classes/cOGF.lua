@@ -15,7 +15,9 @@ function cOGF:initialize(fname,partial,start,chunk)
 	
 	self:OGF_S_DESC(true)
 	self:OGF_TEXTURE(true)
+	self:OGF_VERTICES(true)
 	self:OGF_S_BONE_NAMES(true)
+	--self:OGF_S_IKDATA(true)
 	self:OGF_S_MOTION_REFS(true)
 	self:OGF_S_MOTION_REFS2(true)
 	self:OGF_S_USERDATA(true)
@@ -48,6 +50,22 @@ function cOGF:OGF_TEXTURE(loading)
 			chunk:w_stringZ(trim(self.shader))
 			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_TEXTURE,chunk)
+		end
+	end
+end
+
+function cOGF:OGF_VERTICES(loading)
+	if (loading) then
+		if (self:find_chunk(OGF_VERTICES) > 0) then
+			self.vertices = {type=self:r_u32(),count=self:r_u32()}
+			Msg("Vertices: type=%s count=%s",self.vertices.type,self.vertices.count)
+		end
+	elseif (self.texture and self.shader and self.texture ~= "" and self.shader ~= "") then
+		local chunk = self:open_chunk(OGF_VERTICES)
+		if (chunk) then
+
+			chunk:resize(chunk:w_tell())
+			self:replace_chunk(OGF_VERTICES,chunk)
 		end
 	end
 end
@@ -146,23 +164,30 @@ function cOGF:OGF_S_BONE_NAMES(loading)
 			local cnt = self:r_u32()
 			if (cnt > 0) then
 				self.bones = {}
-				for i=1,cnt do 
-					self.bones[self:r_stringZ()] = {parent=self:r_stringZ()}
-					self:r(60)
+				Msg("======== BONE DATA ========")
+				for i=1,cnt do
+					self.bones[i] = {name=self:r_stringZ(),parent=self:r_stringZ()}
+					Msg("bone=%s  parent=%s",self.bones[i].name,self.bones[i].parent)
+					self.bones[i].fobb = {} --15*4 Fobb (5 vec3)
+					for n=1,5 do
+						table.insert(self.bones[i].fobb,{self:r_float(),self:r_float(),self:r_float()})
+					end
 				end
+				Msg("===========================")
 			end
 		end
 	elseif (self.bones) then
 		local chunk = self:open_chunk(OGF_S_BONE_NAMES)
 		if (chunk) then
-			local cnt = 0
-			for k,v in pairs(self.bones) do 
-				cnt = cnt + 1
-			end
-			chunk:w_u32(cnt)
-			for k,v in pairs(self.bones) do 
-				chunk:w_stringZ(trim(k))
-				chunk:w_stringZ(trim(v))
+			chunk:w_u32(#self.bones)
+			for i,data in ipairs(self.bones) do
+				chunk:w_stringZ(trim(data.name))
+				chunk:w_stringZ(trim(data.parent))
+				for n=1,5 do
+					chunk:w_float(data.fobb[n][1])
+					chunk:w_float(data.fobb[n][2])
+					chunk:w_float(data.fobb[n][3])
+				end
 			end
 			chunk:resize(chunk:w_tell())
 			self:replace_chunk(OGF_S_BONE_NAMES,chunk)
@@ -175,27 +200,96 @@ function cOGF:OGF_S_IKDATA(loading)
 		if (self.bones) then
 			local main_chunk = self:open_chunk(OGF_S_IKDATA)
 			if (main_chunk) then 
-				for name,data in pairs(self.bones) do
+				for i,data in ipairs(self.bones) do
+					data.version = self:r_u32()
 					data.game_mtl_name = self:r_stringZ()
+					--Msg("version=%s mtl_name=%s",data.version,data.game_mtl_name)
+					-- shape
 					data.type = self:r_u16()
 					data.flags = self:r_u16() --Flags16 flags; // 2
+					
 					data.box = {}
-					for i=1,15 do -- Fobb box; // 15*4
+					for n=1,15 do -- Fobb box; // 15*4
 						table.insert(data.box,self:r_float())
 					end
-					data.sphere = {} -- Fsphere; //4*4
-					for i=1,4 do
+					data.sphere = {}
+					for n=1,4 do  -- Fsphere; //4*4
 						table.insert(data.sphere,self:r_float())
 					end
 					data.cylinder = {}
-					for i=1,8 do -- Fcylinder cylinder; // 8*4
+					for n=1,8 do -- Fcylinder cylinder; // 8*4
 						table.insert(data.cylinder,self:r_float())
 					end
+					-- IK data
+					data.joint = {}
+					data.joint.type = self:r_u32()
+					data.joint.limits = {}
+					for n=1,3 do
+						table.insert(data.joint.limits,{self:r_float(),self:r_float(),self:r_float(),self:r_float()})
+					end
+					data.joint.spring_factor = self:r_float()
+					data.joint.damping_factor = self:r_float()
+					data.joint.flags = self:r_u32()
+					data.joint.break_force = self:r_float()
+					data.joint.break_torque = self:r_float()
+					data.joint.friction = self:r_float()
+					data.rotation = {self:r_float(),self:r_float(),self:r_float()}
+					data.offset = {self:r_float(),self:r_float(),self:r_float()}
+					data.mass = self:r_float()
+					data.center_of_mass = {self:r_float(),self:r_float(),self:r_float()}
 				end
 			end
 		end
-	else
-
+	elseif (self.bones) then
+		local chunk = self:open_chunk(OGF_S_IKDATA)
+		if (chunk) then
+			for i,data in pairs(self.bones) do 
+				chunk:w_u32(data.version)
+				chunk:w_stringZ(data.game_mtl_name)
+				chunk:w_u16(data.type)
+				chunk:w_u16(data.flags)
+				for n=1,15 do
+					chunk:r_float(data.box[n])
+				end
+				for n=1,4 do
+					chunk:r_float(data.sphere[n])
+				end
+				for n=1,8 do
+					chunk:r_float(data.cylinder[n])
+				end
+				chunk:w_u32(data.joint.type)
+				for n=1,3 do
+					chunk:w_float(data.joint.limits[n][1])
+					chunk:w_float(data.joint.limits[n][2])
+					chunk:w_float(data.joint.limits[n][3])
+					chunk:w_float(data.joint.limits[n][4])
+				end
+				chunk:w_float(data.joint.spring_factor)
+				chunk:w_float(data.joint.damping_factor)
+				chunk:w_u32(data.joint.flags)
+				chunk:w_float(data.joint.break_force)
+				chunk:w_float(data.joint.break_torque)
+				chunk:w_float(data.joint.friction)
+				for n=1,3 do
+					chunk:w_float(data.rotation[1])
+					chunk:w_float(data.rotation[2])
+					chunk:w_float(data.rotation[3])
+				end
+				for n=1,3 do
+					chunk:w_float(data.offset[1])
+					chunk:w_float(data.offset[2])
+					chunk:w_float(data.offset[3])
+				end
+				chunk:w_float(data.mass)
+				for n=1,3 do
+					chunk:w_float(data.center_of_mass[1])
+					chunk:w_float(data.center_of_mass[2])
+					chunk:w_float(data.center_of_mass[3])
+				end
+			end
+			chunk:resize(chunk:w_tell())
+			self:replace_chunk(OGF_S_IKDATA,chunk)
+		end
 	end
 end
 
@@ -221,6 +315,7 @@ function cOGF:OGF_CHILDREN(loading)
 			self.children = {}
 			local chunk = main_chunk:open_chunk(0)
 			while (chunk and chunk:size() > 0) do
+				Msg("child %s:",#self.children+1)
 				table.insert(self.children,cOGF(nil,nil,nil,chunk))
 				chunk = main_chunk:open_chunk(#self.children)
 			end
@@ -247,6 +342,7 @@ function cOGF:save(to_fname)
 	self:OGF_S_DESC()
   	self:OGF_TEXTURE()
 	--self:OGF_S_BONE_NAMES()
+	--self:OGF_S_IKDATA()
 	self:OGF_S_MOTION_REFS()
 	self:OGF_S_MOTION_REFS2()
 	self:OGF_S_USERDATA()
@@ -280,8 +376,8 @@ function cOGF:params()
 	end
 	if (self.bones) then 
 		local new = {}
-		for k,v in pairs(self.bones) do 
-			table.insert(new,k)
+		for i,t in pairs(self.bones) do 
+			table.insert(new,t.name)
 		end
 		table.sort(new)
 		t.bones = table.concat(new,",")
