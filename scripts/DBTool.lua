@@ -173,6 +173,7 @@ function cUICoCDBTool:Reinit()
 			end
 			
 			self:Gui("Add|CheckBox|x550 y200 w100 h22 %s vUICoCDBToolCheck_%s_no_compress|-no_compress",gSettings:GetValue("dbtool",strformat('check_%s_no_compress',tab)) == "1" and "Checked" or "",tab)
+			self:Gui("Add|CheckBox|x550 y222 w100 h22 %s vUICoCDBToolCheck_%s_fast|-fast",gSettings:GetValue("dbtool",strformat('check_%s_fast',tab)) == "1" and "Checked" or "",tab)
 			
 			-- Buttons 
 			self:Gui("Add|Button|gOnScriptControlAction x485 y80 w30 h20 vUICoCDBToolBrowseInputPath%s|...",tab)
@@ -343,6 +344,7 @@ function ActionSubmit(tab)
 		gSettings:SetValue("dbtool",strformat('check_%s_%s',i,tab),bool)
 	end
 	gSettings:SetValue("dbtool",strformat('check_%s_no_compress',tab),ahkGetVar("UICoCDBToolCheck_"..tab.."_no_compress"))
+	gSettings:SetValue("dbtool",strformat('check_%s_fast',tab),ahkGetVar("UICoCDBToolCheck_"..tab.."_fast"))
 	gSettings:SetValue("dbtool","path"..tab,input_path)
 	gSettings:SetValue("dbtool","output_path"..tab,output_path)
 	gSettings:SetValue("dbtool","pack_db_type"..tab, ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab))
@@ -470,7 +472,8 @@ function ActionSubmit(tab)
 		local pltx = pack_levels and "compress_levels_"..name..".ltx" or "compress_"..name..".ltx"
 		--local nocompress = pack_levels and (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and '-nocompress' or ''	-- It required for levels SoC ??
 		local nocompress = gSettings:GetValue("dbtool",'check_'..tab.."_no_compress") == "1" and "-nocompress" or ""
-		local cmdline = strformat([["%s" "%s" -ltx %s -pack -db -1024 %s]],cp,input_path,pltx,nocompress)
+		local fast = gSettings:GetValue("dbtool",'check_'..tab.."_fast") == "1" and "-fast" or ""
+		local cmdline = strformat([["%s" "%s" -ltx %s %s %s]],cp,input_path,pltx,nocompress,fast)
 		Msg(strformat('DB Tool:= Start compression for structure %s %s\ncmdline: %s', ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab), name, cmdline))
 		local function temp_move(_in, _out)
 			if (ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru') and (name ~= 'config') then
@@ -502,11 +505,12 @@ function ActionSubmit(tab)
 			os.rename(fullpath, ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru' and strformat('%s\\%s%s.xdb', out, name, db_id) or strformat('%s\\%s.db%s', out, name, db_id))
 			db_id = db_id + 1
 		end
-		if (file_exists(parent_dir.."\\"..dir..".db1")) then
+		if (file_exists(parent_dir.."\\"..dir..".db1") or file_exists(parent_dir.."\\"..dir..".pack_#1")) then
 			_G.lfs_ignore_exact_ext_match = true
-			file_for_each(parent_dir, {"db"}, rename_pack_in_db, true)
+			file_for_each(parent_dir, {"db","pack_#"}, rename_pack_in_db, true)
 		else
 			os.rename(strformat('%s\\%s.db0', parent_dir, dir), ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru' and strformat('%s\\%s.xdb', out, name) or strformat('%s\\%s.db', out, name))
+			os.rename(strformat('%s\\%s.pack_#0', parent_dir, dir), ahkGetVar("UICoCDBToolDBToolListDbTypePack"..tab) == '2947ru' and strformat('%s\\%s.xdb', out, name) or strformat('%s\\%s.db', out, name))
 		end
 	end 
 	
