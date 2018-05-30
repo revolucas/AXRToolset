@@ -439,6 +439,8 @@ function cUITHMViewer:ActionExecute2(tab)
 								thm:save()
 								--Msg("%s resynced with dds",fn)
 								files_resynced_count = files_resynced_count + 1
+							else
+								thm:save()
 							end
 						end
 					end
