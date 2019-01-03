@@ -38,13 +38,14 @@ function cMainMenu:Reinit()
 	
 		-- GroupBox
 		self:Gui("Add|GroupBox|x360 y50 w250 h660|%t_plugins_launcher")
-		self:Gui("Add|GroupBox|x720 y50 w190|%t_lang")
+		self:Gui("Add|GroupBox|x720 y50 w228|%t_lang")
 		
 		self:Gui("Add|Picture|gOnScriptControlAction x730 y70 vApplicationSelectEnglish|icons/english.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x765 y70 vApplicationSelectFrench|icons/french.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x800 y70 vApplicationSelectRussian|icons/russian.png")
 		self:Gui("Add|Picture|gOnScriptControlAction x835 y70 vApplicationSelectSpanish|icons/spanish.png")	
 		self:Gui("Add|Picture|gOnScriptControlAction x870 y70 vApplicationSelectArabic|icons/arabic.png")
+		self:Gui("Add|Picture|gOnScriptControlAction x905 y70 vApplicationSelectPortuguesebr|icons/portuguesebr.png")
 		
 		self:Gui("Add|Button|gOnScriptControlAction x745 y110 vApplicationCheckUpdates|%t_check_updates")
 		
@@ -147,6 +148,12 @@ function cMainMenu:OnScriptControlAction(hwnd,event,info)
 	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectArabic")) then
 		self:Gui("Submit|NoHide")
 		gSettings:SetValue("core","language","arabic")
+		gSettings:Save()
+		MainMenu:Destroy()
+		MainMenu:Create()
+	elseif (hwnd == GuiControlGet(self.ID,"hwnd","ApplicationSelectPortuguesebr")) then
+		self:Gui("Submit|NoHide")
+		gSettings:SetValue("core","language","portuguesebr")
 		gSettings:Save()
 		MainMenu:Destroy()
 		MainMenu:Create()
