@@ -1,6 +1,5 @@
 #### AXRToolset
----------
-                               
+---------                               
                                                         
 AXRToolset is an AutoHotkey & Lua-based scripting engine that utilizes a Graphical User Interface to display
 scripted plugins that do various automated tasks. Although the current plugins are designed to aid in the development of S.T.A.L.K.E.R.: Call of Chernobyl, the engine itself can be used to create macros, scripts and other utilities for any application or purpose. 
@@ -9,7 +8,8 @@ Plugins can be coded in lua with exported API from AutoHotkey. This gives an adv
 
 #### Dependencies
 ---------
-Requires Microsoft Visual C++ 2013 x86: https://www.microsoft.com/en-us/download/details.aspx?id=40784
+Requires Microsoft Visual C++ 2013 x86: https://www.microsoft.com/en-us/download/details.aspx?id=40784  
+`converter.exe` requires `MSVCP140.dll` (VC++ 2015 Upd 3, 14.0.24212.0, `md5=1b3d24a3e9c99e63391a53b9e5be5356`): https://www.microsoft.com/en-us/download/details.aspx?id=53587
 
 #### Wiki
 ---------
